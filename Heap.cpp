@@ -3,6 +3,9 @@
  * Andrew Maxwell
  */
 
+
+
+//TODO: figure out remove items
 #include <vector>
 #include <iostream>
 #include <math.h>
@@ -17,6 +20,7 @@ bool DEBUG = false;
     /**Helper Functions*/
 
     void Heap::heapify(int i) {
+    	assert(heaped);
         int l = i * 2;
         int r = i * 2 + 1;
         int greatest = i;
@@ -37,6 +41,7 @@ bool DEBUG = false;
     //bubbles an element down to its proper location within the heap
 
     void Heap::heap_increase_key(int i, Order * key) {
+    	assert(heaped);
     	if (*(heap -> at(floor(i/2))) < *key) {
     		heap -> at(i) = heap -> at(floor(i/2));
     		heap -> at(floor(i/2)) = key;
@@ -53,6 +58,7 @@ bool DEBUG = false;
     	heap = new vector<Order *>;
     	Order placeHolder;
     	heap -> push_back(&placeHolder);
+    	heaped = true;
     }
     //Constructor for a new heap
 
@@ -62,12 +68,14 @@ bool DEBUG = false;
         for (int i = heap_size/2; i > 0; i--) {
             heapify(i);
         }
+        heaped = true;
     }
     //Builds the heap
     //Called as a helper function of the constructor
     //Calls heapify as a helper function
 
     void Heap::place(Order * o, int days) {
+    	assert(heaped);
     	if (o == NULL) {
     		return;
     	}
@@ -80,6 +88,7 @@ bool DEBUG = false;
     //Places an order while simultaneously putting it on the heap
 
     void Heap::ship(int index) {
+    	assert(!heaped);
     	assert(1 <= index);
     	assert(index <= heap_size);
     	heap -> at(index) -> ship();
@@ -93,7 +102,15 @@ bool DEBUG = false;
     void Heap::ship(Order * o) {
     	for (unsigned i = 0; i < heap -> size(); i++) {
     		if (heap -> at(i) == o) {
-    			ship(i);
+    	    	heap -> at(i) -> ship();
+    	    	heap -> at(i) = heap -> at(heap_size);
+    	    	heap -> pop_back();
+    	    	heap_size--;
+    	    	if (heaped) {
+    	    		heapify(i);
+    	    	} else {
+    	    		printSorted();
+    	    	}
     		}
     	}
     }
@@ -102,6 +119,7 @@ bool DEBUG = false;
     /**Access Functions*/
 
     Order * Heap::get_max() const {
+    	assert(heaped);
         assert(heap_size > 0);
         return heap -> at(1);
     }
@@ -109,6 +127,7 @@ bool DEBUG = false;
     //pre: heap_size > 0
 
     Order * Heap::get_parent(int i) const {
+    	assert(heaped);
         assert(0 < i);
         assert(i <= heap_size);
         return heap -> at(floor(i/2));
@@ -117,6 +136,7 @@ bool DEBUG = false;
     //pre: 0 < i <= heap_size
 
      Order * Heap::get_left(int i)  const {
+    	assert(heaped);
         assert(0 < i);
         assert(i <= heap_size);
         return heap -> at(i * 2);
@@ -125,6 +145,7 @@ bool DEBUG = false;
     //pre: 0 < i <= heap_size
 
     Order * Heap::get_right(int i)  const {
+    	assert(heaped);
         assert(0 < i);
         assert(i <= heap_size);
         return heap -> at((i * 2) + 1);
@@ -134,10 +155,12 @@ bool DEBUG = false;
     //pre: 0 < i <= heap_size
 
     int Heap::get_size() const {
+    	assert(heaped);
         return heap_size;
     }
 
     Order * Heap::get_element(int i) const {
+    	assert(heaped);
         assert(0 < i);
         assert(i <= heap_size);
         return heap -> at(i);
@@ -145,9 +168,14 @@ bool DEBUG = false;
     //returns the element at the specified index i
     //pre: 0 < i <= heap_size
 
+    bool Heap::isHeaped() const {
+    	return heaped;
+    }
+
     /**Additional Operations*/
 
     void Heap::displayHeap(ostream& out) const {
+    	assert(heaped);
     	int level = 0;
         for (int i = 1; i <= heap_size; i++) {
             if (floor(log2(i)) > level) {
@@ -159,36 +187,42 @@ bool DEBUG = false;
     }
 
     string Heap::print(int index) {
+    	assert(!heaped);
     	return heap -> at(index) -> printDetailed();
     }
 
     string Heap::printSorted() {
-    	stringstream out(" ");
-    	int realLength = heap_size;
-    	while (heap_size > 1) {
-    		if (DEBUG) {
-    			out << "\ninitially\n";
-    			displayHeap(out);
+    	stringstream out;
+    	if (heap_size == 0) {
+    		out << "No orders to ship!\n";
+    	} else {
+    		out << "Unshipped orders:\n";
+    		int realLength = heap_size;
+    		while (heap_size > 1) {
+    			if (DEBUG) {
+    				out << "\ninitially\n";
+    				displayHeap(out);
+    			}
+    			Order * swap = heap -> at(1);
+    			heap -> at(1) = heap -> at(heap_size);
+    			heap -> at(heap_size) = swap;
+    			if (DEBUG) {
+    				out << "\nafter swapping\n";
+    				displayHeap(out);
+    			}
+    			heap_size--;
+    			heapify(1);
+    			if (DEBUG) {
+    				out << "\nafter decreasing length and heapify\n";
+    				displayHeap(out);
+    			}
     		}
-    		Order * swap = heap -> at(1);
-    		heap -> at(1) = heap -> at(heap_size);
-    		heap -> at(heap_size) = swap;
-    		if (DEBUG) {
-        		out << "\nafter swapping\n";
-        		displayHeap(out);
-    		}
-    		heap_size--;
-    		heapify(1);
-    		if (DEBUG) {
-    			out << "\nafter decreasing length and heapify\n";
-    			displayHeap(out);
-    		}
+    		heap_size = realLength;
+        	for (int i = heap_size; i >= 1; i--) {
+            	out << (*heap)[i] -> print();
+        	}
     	}
-    	heap_size = realLength;
-        for (int i = heap_size; i >= 1; i--) {
-            out << (*heap)[i] -> print();
-        }
-    	build_heap();
+    	heaped = false;
     	return out.str();
     }
     //prints each element in the array (heap) on a different line
