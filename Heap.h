@@ -15,6 +15,7 @@ class Heap {
 private:
     int heap_size;
     vector<Order*> *heap;
+    bool heaped;
 
     /**Helper Functions*/
 
@@ -75,6 +76,8 @@ public:
     Order * get_element(int i) const;
     //returns the element at the specified index i
     //pre: 0 < i <= heap_size
+
+    bool isHeaped() const;
 
     /**Additional Operations*/
 
