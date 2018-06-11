@@ -31,7 +31,6 @@ public:
 	WindowManager();
 	~WindowManager();
 
-	static void go_to_window(string id);
 	static void go_to_window(string id, string options);
 	static void loadxml(string path);
 	static string getxml(string id);
