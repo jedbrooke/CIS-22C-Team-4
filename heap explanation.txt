@@ -1,0 +1,58 @@
+Here's how I thought things would work. If you have a better idea, feel free to change things/ask me to modify the code accordingly.
+
+Create an order: Pass a pointer to the containing customer to the order so that the print functions can print address, etc. for the employee (in constructor)
+I was thinking customers would have one active order (the cart) at any time plus however many orders they'd already placed.
+To create a new order: 	Order::Order(Customer * owner) {
+To read in order from file: 	Order::Order(istream &in, BST<Product> &products, Customer * owner) { (More info on this below)
+
+To Edit order (Customer):
+addLaptop(Product *)
+removeLaptop(int index)
+setQuantity(int index, int quant)
+Make sure to check that the order is not placed before attempting to edit it. I've (mostly) handled this using assertions, but the Customer class should also perform these checks so it can catch them before the assertions stop the program.
+
+To Place order (Customer):
+Call heap.place(Order * o, int days) where o is the pointer to the order and days is the shipping speed.
+don't call order.placeOrder(); this should only be called by the heap.
+
+To view/edit orders (employees):
+The heap is either heaped or not heaped. The state is stored in a bool called "heaped". build_heap() turns the vector
+	into a heap. sort() sorts the vector (turns it into not a heap.)
+string heap::printSorted(); will display orders in order of priority. Must be sorted.
+heap::printSpecific(int index); returns a string containing detailed information on one order. (Calls the order printDetailed()
+	function.) Because it uses an index, can only be called when sorted, not heaped.
+heap::ship(int index): will ship the order at that index in the heap. pre: sorted, !heaped.
+	Because efficiency, this function does not immediately remove the order from the vector. Instead,
+	shipped orders are set to lowest priority and sorted to the bottom of the heap. When printSorted is called after
+	this function, shipped orders are shown in their original place in the list, but listed as "en route".
+heap::clear() removes orders that have been shipped. Pre: heaped
+heap::place(order * o, int days): places a new order with the given days to ship. pre: IS heaped
+heap::insert(order * o) adds an already-placed order to the heap (e.g. after loading from a file.)
+heap::build_heap(): Turns the array into a max heap. post: heaped
+
+do not use printRaw, it's for testing only
+
+To ship order (employees):
+ship(int index);
+don't call order.ship(); this will be called by the heap.
+
+There is no load function for the heap. The heap must be rebuilt from orders as they're loaded in:
+The Load function also returns a pointer to itself if the order should go into the heap (that is, it's placed but not shipped. Otherwise, it returns NULL, which the heap is programmed to reject.) So, something like this should work to read in orders from a file to a customer object:
+
+List<Order> orders;	//The List of orders for this customer
+Heap newHeap;		//The priority queue for all orders which are placed but not shipped
+BST products;		//The product BST
+
+while ([is reading in from fileInput]) {
+	Order * o;	//must be declared as pointer or the data will be deleted when it goes out of scope
+	newHeap.insert(o -> load(fileInput, BST));
+	orders.insertStop(o);
+}
+(Not sure that this is actually the best way to do it. You could also just do it manually by loading in orders, then 
+if (o.isPlaced() and !o.isShipped()) {
+	newHeap.insert(&o);
+}
+
+
+
+
