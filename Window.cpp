@@ -30,7 +30,6 @@ Window::Window(string xml) {
     self_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     g_signal_connect(self_window, "delete-event", G_CALLBACK(delete_event), NULL);
     gtk_container_set_border_width(GTK_CONTAINER(self_window), 10);
-    //gtk_window_set_default_size(GTK_WINDOW(self_window), 800, 600);
     
     //create box
     self_box = gtk_vbox_new(FALSE, 2);
@@ -50,7 +49,6 @@ Window::Window(string xml) {
     //create new vector of box pointers
 	vector<GtkWidget*> boxes;
 	boxes.push_back(self_box);
-
     
     while(getline(xmlss,tag)) {
         string msg;
@@ -84,14 +82,14 @@ Window::Window(string xml) {
             continue;
             
         } else if(tagName == "hbox") {// skip the line named box and assign inner box == true;
-            g_print("creating hbox\n");
+
             //get homogeneous
             if(optionsMap["homogeneous"] == "true"){
                 //create new box
-                boxes.push_back(gtk_hbox_new(TRUE, 0));
+                boxes.push_back(gtk_hbox_new(TRUE, 2));
             } else {
                 //create new box
-                boxes.push_back(gtk_hbox_new(FALSE, 0));
+                boxes.push_back(gtk_hbox_new(FALSE, 2));
             }
             
             //set the box spacing
@@ -112,13 +110,47 @@ Window::Window(string xml) {
             
         } else if (tagName == "scroll") {
         	
-        	boxes.push_back(gtk_scrolled_window_new(NULL,NULL));
-        } 
-        else if(tagName == "/hbox" || tagName == "/vbox" || tagName == "/scroll") {
-            
-            //pack the box into the next higher box
-            gtk_box_pack_start(GTK_BOX(boxes.at(boxes.size()-2)),boxes.at(boxes.size()-1),FALSE,FALSE,0);
+        	//create the new scroll window
+        	GtkWidget* scroll_window = gtk_scrolled_window_new(NULL,NULL);
+        	boxes.push_back(scroll_window); //NULL,NULL for auto-generated scroll bars
 
+        	//make the window bigger
+        	gtk_widget_set_size_request (scroll_window, 1200, 300);
+
+        	//set the box border width
+        	gtk_container_set_border_width (GTK_CONTAINER (boxes.at(boxes.size()-1)), 10);
+
+        	//set the box policy
+        	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (boxes.at(boxes.size()-1)), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+
+
+        	continue;
+
+        } else if (tagName == "hr") {
+
+        	//make a horizontal separator
+        	GtkWidget* hr = gtk_hseparator_new();
+
+        	//pack it into the box
+        	gtk_box_pack_start(GTK_BOX(boxes.at(boxes.size()-1)),hr,FALSE,FALSE,0);
+
+        	//show the wdiget
+        	gtk_widget_show(hr);
+
+        	continue;
+
+        } else if(tagName == "/hbox" || tagName == "/vbox" || tagName == "/scroll") {
+
+            string box_name = g_strconcat(G_OBJECT_TYPE_NAME(boxes.at(boxes.size()-2)),NULL);
+        	string window_name = "GtkScrolledWindow";
+        	if( box_name == window_name) {
+            	//pack it into the scroll box
+            	gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (boxes.at(boxes.size()-2)), boxes.at(boxes.size()-1));
+            } else {
+            	//pack the box into the next higher box
+            	gtk_box_pack_start(GTK_BOX(boxes.at(boxes.size()-2)),boxes.at(boxes.size()-1),FALSE,FALSE,0);
+            }
+            
             //show the box
             gtk_widget_show(boxes.at(boxes.size()-1));
 
@@ -126,10 +158,11 @@ Window::Window(string xml) {
             boxes.pop_back();
 
             continue;
-        }
-        
-        
-        
+        } 
+
+        //end of elf
+
+
         getline(xmlss,text); //get the text
         getline(xmlss,closetag); //and the closetag
         
@@ -138,9 +171,9 @@ Window::Window(string xml) {
         } else {
             create_content(tagName,text,optionsMap,self_box);
         }
-        
-        
-    }
+    } 
+
+
     //g_print("widgets created\n");
     gtk_widget_show(self_box);
     
@@ -172,102 +205,92 @@ Window::~Window() {
 
 void Window::create_content(string tagName, string text, map<string,string> optionsMap, GtkWidget* box) {
     string msg;
+    GtkWidget* widget;
+
     if(tagName == "title") {
         
         //make the title lable
-        GtkWidget* title_label;
-        title_label = gtk_label_new(text.c_str());
+        widget = gtk_label_new(text.c_str());
         
         //set alignment
-        gtk_misc_set_alignment(GTK_MISC(title_label),0,0);
+        gtk_misc_set_alignment(GTK_MISC(widget),0,0);
         
         //title markup
         char* markup = g_strconcat("<big>", text.c_str(), "</big>", NULL);
-        gtk_label_set_markup(GTK_LABEL(title_label), markup);
+        gtk_label_set_markup(GTK_LABEL(widget), markup);
         g_free(markup);
-        gtk_misc_set_alignment(GTK_MISC(title_label), 0, 0);
-
-        //add title to box
-        gtk_box_pack_start(GTK_BOX(box), title_label, FALSE, FALSE, 0);
-                
-        //show the label
-        gtk_widget_show(title_label);
+        gtk_misc_set_alignment(GTK_MISC(widget), 0, 0);
         
     } else if(tagName == "button") {
 
-        GtkWidget* button;
-        
         //create new button
-        button = gtk_button_new_with_label(text.c_str());
+        widget = gtk_button_new_with_label(text.c_str());
         //set name
-        gtk_widget_set_name(button,optionsMap["options"].c_str());
+        gtk_widget_set_name(widget,optionsMap["options"].c_str());
         
         //set signal connect method
-        g_signal_connect(button, "clicked", G_CALLBACK(button_pressed), FALSE);
+        g_signal_connect(widget, "clicked", G_CALLBACK(button_pressed), FALSE);
         
         //connect it to the destroy event as well
-        g_signal_connect_swapped(button,"clicked",G_CALLBACK(destroy),self_window);
-        
-        //add it to the box
-        gtk_box_pack_start(GTK_BOX(box), button, FALSE, FALSE, 0);
-        
-        //show the button
-        gtk_widget_show(button);
+        g_signal_connect_swapped(widget,"clicked",G_CALLBACK(destroy),self_window);
+
+        //set it to default if it is set to default
+        if (optionsMap["default"] == "true"){
+
+        	msg = "setting button \"" + text + "\" to be default\n";
+        	g_print("%s",msg.c_str());
+
+        	gtk_widget_set_can_default (widget, TRUE);
+        	gtk_widget_grab_default (widget);
+        }
                 
     } else if(tagName == "label") {
-        GtkWidget* label;
-        
+
         //create new label
-        label = gtk_label_new(text.c_str());
+        widget = gtk_label_new(text.c_str());
         
         //set alignment
-        gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
-        
-        //add to box
-        gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 0);
-        
-        //show the label
-        gtk_widget_show(label);
+        gtk_misc_set_alignment(GTK_MISC(widget), 0, 0);
         
     } else if (tagName == "entry") {
         
-        //allocate pointer
-        GtkWidget* entry;
-        
         //create new entry and assign it to the pointer
-        entry = gtk_entry_new();
+        widget = gtk_entry_new();
         
         //set the name
-        gtk_widget_set_name(entry,text.c_str());
+        gtk_widget_set_name(widget,text.c_str());
         
         //check if it's a password box
         if (optionsMap["type"] == "psw") {
-            gtk_entry_set_visibility(GTK_ENTRY(entry),FALSE);
+            gtk_entry_set_visibility(GTK_ENTRY(widget),FALSE);
         }
         
-        //add it to the box
-        gtk_box_pack_start(GTK_BOX(box),entry,FALSE,FALSE,0);
-        
-        //show the entry
-        gtk_widget_show(entry);
-        
         //adding entries to entries map
-        entries.insert(make_pair(text,entry));
+        entries.insert(make_pair(text,widget));
         
     } else if (tagName == "pbar") {
         
         msg = "creating pbar: " + text + "\n";
         g_print("%s",msg.c_str());
         
-        pbar = gtk_progress_bar_new();
+        widget = gtk_progress_bar_new();
         
-        gtk_progress_bar_set_text(GTK_PROGRESS_BAR(pbar),text.c_str());
-        
-        gtk_box_pack_start(GTK_BOX(box),pbar,FALSE,FALSE,0);
-        
-        gtk_widget_show(pbar);
+        gtk_progress_bar_set_text(GTK_PROGRESS_BAR(widget),text.c_str());
         
     }
+
+    string box_name = g_strconcat(G_OBJECT_TYPE_NAME(box),NULL);
+	string window_name = "GtkScrolledWindow";
+	if( box_name == window_name) {
+    	//pack it into the scroll box
+    	gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (box), widget);
+    } else {
+    	//add widget to box
+    	gtk_box_pack_start(GTK_BOX(box), widget, FALSE, FALSE, 0);
+    }
+            
+    //show the widget
+    gtk_widget_show(widget);
 }
 
 void Window::button_pressed(GtkWidget* widget, gpointer data) {
@@ -342,8 +365,8 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
             
             stringstream productsSS;
             products->printToFile(productsSS);
-
-            xml += "<hbox homogeneous=\"false\">\n";
+            xml += "<vbox>\n";
+            xml += "<hbox homogeneous=\"true\">\n";
             xml += create_xml_tag("label","company"); //manf comp
             xml += create_xml_tag("label","model"); //model
             xml += create_xml_tag("label","screen size"); //screen size
@@ -353,39 +376,48 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
             xml += create_xml_tag("label"," "); //order column
             xml += "</hbox>\n";            
 
-            xml += "<sroll>\n";
-
+            xml += "<scroll>\n";
+            xml += "<vbox>\n";
             string attribute;
+            string make;
             
-            while(getline(productsSS,attribute)){
+            while(getline(productsSS,make)){
                 
-                xml += "<hbox homogeneous=\"false\">\n";
+            	if(make == "") break;
+
+                xml += "<hbox homogeneous=\"true\">\n";
+
+                xml += create_xml_tag("label",make); //manf comp
                 
-                xml += create_xml_tag("label",attribute); //manf comp
+                string model;
+                getline(productsSS,model);
+                xml += create_xml_tag("label",model); //model
                 
                 getline(productsSS,attribute);
-                xml += create_xml_tag("label",attribute); //model
+                xml += create_xml_tag("label",attribute+" in."); //screen size
                 
                 getline(productsSS,attribute);
-                xml += create_xml_tag("label",attribute); //screen size
-                
-                getline(productsSS,attribute);
-                xml += create_xml_tag("label",attribute); //cpu gen
+                xml += create_xml_tag("label",attribute+"th gen"); //cpu gen
                 
                 getline(productsSS,attribute);
                 xml += create_xml_tag("label",attribute); //year
                 
                 getline(productsSS,attribute);
-                xml += create_xml_tag("label",attribute); //price
+                xml += create_xml_tag("label","$"+attribute+".00"); //price
 
-                xml += create_xml_tag("button","order!");
+                xml += create_xml_tag("button","options=\"link:customer_view_cart\" value=\"" + make + " " + model + "\"","add to cart");
                 
                 xml += "</hbox>\n";
+                xml += "<hr>\n";
 
                 getline(productsSS,attribute); //skip line in between products
             }
             
-            xml += "</scoll>\n";
+            xml += "</vbox>\n";
+            xml += "</scroll>\n";
+            xml += "</vbox>\n";
+
+            //g_print("%s",xml.c_str());
             
             
         } else if(value == "price"){
@@ -444,10 +476,10 @@ string Window::create_xml_tag(string tag, string text){
     return xml;
 }
 
-string Window::create_xml_tag_with_options(string tag, string text){
+string Window::create_xml_tag(string tag, string options, string text){
     
     string xml;
-    xml += "<" + tag + ">\n";
+    xml += "<" + tag + " " + options + ">\n";
     xml += text + "\n";
     xml += "</" + tag + ">\n";
     return xml;

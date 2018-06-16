@@ -63,7 +63,7 @@ public:
 
 	static string create_xml_tag(string tag, string text);
 
-	static string create_xml_tag_with_options(string tag, string text);
+	static string create_xml_tag(string tag, string options, string text);
 
 };
 

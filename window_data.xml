@@ -42,7 +42,7 @@
 	<entry type="psw">
 		psw
 	</entry>
-	<button options="link:customer_interface,name:customer_sign_in">
+	<button options="link:customer_interface,name:customer_sign_in" default="true">
 		submit
 	</button>
 </window>

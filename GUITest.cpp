@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
     
     
 	WindowManager::loadxml("window_data.xml");
-	WindowManager::go_to_window("boxes","");
+	WindowManager::go_to_window("welcome_screen","");
 
 	g_print("going to gtk_main\n");
 
