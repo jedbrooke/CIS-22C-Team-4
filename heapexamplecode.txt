@@ -1,0 +1,154 @@
+/*
+ * Main.cpp
+ * Mohamed Elgharbawy
+ */
+
+#include <iostream>
+#include <fstream>
+#include "BST.h"
+#include "Customer.h"
+#include "Employee.h"
+#include "HashTable.h"
+#include "ProductS.h"
+#include "Heap.h"
+
+using namespace std;
+
+void printDebug(Order &o) {
+	cout << endl << "getArriveBy: " << o.getArriveBy()
+	<< "getDayPlaced: " << o.getDayPlaced()
+	<< "shipping speed: " << o.getShippingSpeed()
+	<< "price: " << o.getPrice()
+	<< " Is placed? " << o.isPlaced()
+	<< "Is shipped? " << o.isShipped()
+	<< "Is delivered?" << o.isDelivered()
+	<< endl << "Order itself is " << o.printDetailed();
+}
+
+int main() {
+
+	//Creating objects to use to test
+
+	Heap laptops;
+	Product x, y, z;
+	x.setMake("ex");
+	x.setModel("Xbook");
+	y.setMake("wai");
+	y.setModel("Ytop");
+	z.setMake("zee");
+	z.setModel("Flipz");
+	x.setPrice(100);
+	y.setPrice(200);
+	z.setPrice(300);
+	BST<Product> catalog;
+	catalog.insert(x);
+	catalog.insert(y);
+	catalog.insert(z);
+	cout << "Laptop catalog:\n";
+	catalog.printToConsole();
+	Customer bob;
+	bob.setFirstname("Bob");
+	bob.setLastname("Robert");
+	bob.setAddress("3000 Terrace Lane");
+/*
+	Order bobsOrder(&bob);
+	cout << "Empty order test of getter functions: ";
+	printDebug(bobsOrder);
+
+	//adding laptops
+
+	cout << "adding laptop: \n";
+	bobsOrder.addLaptop(&x);
+	cout << bobsOrder.printDetailed();
+	cout << "\nsetting quantity: \n";
+	bobsOrder.setQuantity(0, 3);
+	cout << bobsOrder.printDetailed();
+	cout << "\nAdding the same laptop again: \n";
+	bobsOrder.addLaptop(&x);
+	cout << bobsOrder.printDetailed();
+	cout << "\nSetting the quantity to 0: \n";
+	bobsOrder.setQuantity(0, 0);
+	cout << bobsOrder.printDetailed();
+	cout << "\nAdding more laptops\n";
+	bobsOrder.addLaptop(&x);
+	bobsOrder.addLaptop(&y);
+	bobsOrder.addLaptop(&z);
+	cout << bobsOrder.printDetailed();
+	cout << "\nRemoving the second laptop using removeLaptop\n";
+	bobsOrder.removeLaptop(1);
+	cout << bobsOrder.printDetailed();
+	cout << "\nTesting all of the getter functions again";
+	printDebug(bobsOrder);
+	cout << "placing the order with 4 day shipping time\n";
+	bobsOrder.placeOrder(4);
+	printDebug(bobsOrder);
+	cout << "Shipping the order\n";
+	bobsOrder.ship();
+	printDebug(bobsOrder);*/
+
+	//TODO: test order comparators
+
+	//Testing Heap
+
+	Heap orders;
+	cout << "\nAdding orders automatically to test PrintSorted using a loop";
+	for (int i = 1; i < 10; i++) {
+		orders.sort();
+		cout << orders.printSorted();
+		orders.build_heap();
+		Order * o = new Order(&bob);
+		o -> addLaptop(&x);
+		o -> setQuantity(0, i);
+		cout << endl << "Adding: " <<  o -> printDetailed() << endl;
+		orders.place(o, i % 3 + 3);
+		o = NULL;
+		cout << endl << endl;
+	}
+	orders.sort();
+	cout << orders.printSorted();
+	cout << "\nIndividually printing each order\n";
+	for (int i = 1; i < 10; i++) {
+		cout << orders.printSpecific(i);
+	}
+	int input;
+	while (true) {
+		cout << "\nEnter orders to ship, -1 to stop\n";
+		cin >> input;
+		if (input == -1) {
+			break;
+		}
+		orders.ship(input);
+		cout << orders.printSorted();
+	}
+	cout << "\nRemoving the shipped orders.\n";
+	orders.build_heap();
+	cout << "\nPreremove\n";
+	orders.printRaw(cout);
+	orders.clear();
+	cout << "\nRemoved\n";
+	orders.printRaw(cout);
+	orders.sort();
+	cout << "\nAfter sorting again: \n";
+	cout << orders.printSorted();
+	cout << "\nTesting writing to a file. Writing all of the orders to a file: \n\n";
+	ofstream out;
+	out.open("orders.txt");
+	for (int i = 1; i <= orders.get_size(); i++) {
+		out << endl;
+		orders.get_element(i) -> save(out);
+	}
+	out.close();
+	ifstream in;
+	in.open("orders.txt");
+	string ininput;
+	Heap newHeap;
+	while (getline(in, ininput)) {//there's probably a better way to determine when EOF has been reached
+		Order * o = new Order;
+		newHeap.insert(o -> load(in, catalog));
+	}
+	newHeap.sort();
+	cout << "\nPrinting from orders that have been saved to a file and then loaded again:\n";
+	cout << newHeap.printSorted();
+	return 0;
+
+}

@@ -30,11 +30,11 @@ struct subOrder {
 		return quantity;
 	}
 	friend ostream & operator<<(ostream & out, const subOrder& SO) {
-		out << " " << SO.laptop -> getMake() << SO.laptop -> getModel() << endl << "Quantity: " << SO.quantity;
+		out << " " << SO.laptop -> getMake() << " " <<  SO.laptop -> getModel() << endl << "Quantity: " << SO.quantity;
 		return out;
 	}
 	bool operator==(const subOrder &rhs) {
-		return (*laptop == *rhs.laptop and quantity == rhs.quantity);
+		return (*laptop == *rhs.laptop);
 	}
 };
 
