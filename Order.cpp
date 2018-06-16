@@ -11,6 +11,8 @@
 using namespace std;
 
 
+//TODO: Allow for unplaced orders in comparison operators.
+
 	/** constructors */
 
 	Order::Order() {
@@ -30,6 +32,15 @@ using namespace std;
 	Order::Order(istream &in, BST<Product> &products, Customer * owner) {
 		load(in, products);
 		customer = owner;
+	}
+
+	Order::Order(bool isDummy) {
+		cout << "Creating dummy";
+		shippingSpeed = price = 0;
+		placed = true;
+		shipped = false;
+		timePlaced = arriveBy = 1;
+		customer = NULL;
 	}
 
 	/** management functions - getters and setters*/
@@ -55,15 +66,14 @@ using namespace std;
 	}
 	//returns the shipping speed
 
+	float Order::getPrice() const {
+		return price;
+	}
+
 	bool Order::isPlaced() const {
 		return placed;
 	}
 	//returns whether the order has been placed or not
-
-	/*void Order::setIsPlaced(bool isPlaced) {
-		placed = isPlaced;
-	}*/
-	//I don't anticipate this actually being used for anything. Use placeOrder() instead.
 
 	bool Order::isShipped() const {
 		return shipped;
@@ -71,7 +81,7 @@ using namespace std;
 	//returns whether the order has been shipped. If the order has been shipped, no further modification is allowed.
 
 	bool Order::isDelivered() const {
-		return (time(NULL) > arriveBy);
+		return (shipped and (time(NULL) > arriveBy));
 	}
 
 	void Order::ship() {
@@ -85,7 +95,7 @@ using namespace std;
 		int index = laptops.linearSearch(newLT);
 		if (index > -1) {
 			laptops.moveToIndex(index);
-			setQuantity(index, laptops.getIterator().getQuantity() + 1);
+			setQuantity(index - 1, laptops.getIterator().getQuantity() + 1);
 		} else {
 			laptops.insertStop(newLT);
 			price += newLT.price;
@@ -126,6 +136,7 @@ using namespace std;
 	//changes the quantity variable for laptop at index + updates the price
 
 	void Order::placeOrder(int daysToShip) {
+		assert(!laptops.isEmpty());
 		timePlaced = time(NULL);
 		arriveBy = timePlaced;
 		arriveBy += 86400 * daysToShip;
@@ -135,7 +146,11 @@ using namespace std;
 	//places the order; sets it as ready to ship; sets value of timePlaced and arriveBy.
 
 	bool Order::operator>(const Order& order) {
-		if (arriveBy < order.arriveBy) {
+
+		if (!shipped and order.shipped) {
+			return true;
+		}
+		else if ((!shipped and !order.shipped) and arriveBy/86400 < order.arriveBy/86400) {
 			return true;
 		} else {
 			return false;
@@ -144,48 +159,36 @@ using namespace std;
 	//returns true if the first order is higher priority. That is, compares priority; item on left is greater priority.
 
 	bool Order::operator<(const Order& order) {
-		if (arriveBy > order.arriveBy) {
+		if (shipped and !order.shipped) {
+			return true;
+		}
+		else if ((!shipped and !order.shipped) and arriveBy/86400 > order.arriveBy/86400) {
 			return true;
 		} else {
 			return false;
 		}
 	}
 
-
 	bool Order::operator>=(const Order& order) {
-		if (arriveBy <= order.arriveBy) {
+		if (order.shipped) {
 			return true;
-		} else {
+		} else if (shipped and !order.shipped) {
 			return false;
+		} else {
+			return(arriveBy/86400 >= order.arriveBy/86400);
 		}
 	}
 
 	bool Order::operator<=(const Order& order) {
-		if (arriveBy >= order.arriveBy) {
+		if (shipped) {
 			return true;
-		} else {
+		} else if (!shipped and order.shipped) {
 			return false;
+		} else {
+			return(arriveBy/86400 <= order.arriveBy/86400);
 		}
 	}
 
-	/* OLD VERSION OF PRINT FUNCTION; USES STREAM OUTPUT
-	void Order::print(ostream & out) {	//Prints basic information about the order, including where to ship, etc.
-		out << fixed << setprecision(2) << endl << "Total value: $" << price;
-		if (placed) {
-			out <<" Arrive by: " << getArriveBy() << " Status: ";
-			if (shipped) {
-				if (isDelivered()) {
-					out << "Delivered";
-				} else {
-					out << "En route";
-				}
-			} else {
-				out << "Waiting to be shipped";
-			}
-		}
-	}*/
-
-	//NEW VERSION OF PRINT FUNCTION: RETURNS STRING WITH OUTPUT
 	string Order::print() {	//Prints basic information about the order, including where to ship, etc.
 		stringstream out;
 		out << fixed << setprecision(2) << endl << "Total value: $" << price;
@@ -206,8 +209,8 @@ using namespace std;
 
 	string Order::printDetailed() {	//Prints above information + also the list of all laptops.
 		stringstream out;
-		out.str() += print();
-		//customer -> print(out);
+		out << print();
+		out << "\nShip to " << *customer;
 		if (laptops.getLength() > 0) {
 			out << endl << "Laptops:" << endl;
 			laptops.displayNumberedList(out);

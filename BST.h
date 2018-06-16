@@ -12,6 +12,10 @@
 #include <assert.h>
 #include <iomanip>
 
+#include <fstream>
+#include "Product.h"
+#include "ProductS.h"
+
 using namespace std;
 
 template<class bstdata>
@@ -38,8 +42,10 @@ private:
 	bstdata * findHelper(Node * root, bstdata data) const;
 	void insertHelper(Node* root, bstdata data);
 	Node* removeHelper(Node* root, bstdata data);
-	void printToConsoleHelper(Node* root, int& index) const;
-	void printToFileHelper(ostream& out, Node* root) const;
+	void printListHelper(Node* root, int& index) const;
+	void printByMakeHelper(Node* root, int& index, string make) const;
+	void printByModelHelper(Node* root, int& index, string model) const;
+	void saveHelper(ostream& out, Node*root) const;
 
 public:
 	BST();
@@ -53,17 +59,18 @@ public:
 	bstdata * find(bstdata data) const;
 	void insert(bstdata data);
 	void remove(bstdata data);
-	void printToConsole() const;
-	void printToFile(ostream& out) const;
-	//Used for printing data to file for later reading
-	//Print alphabetically to ostream in the format of:
-	//<make>
-	//<model>
-	//<screenSize>
-	//<cpuGen>
-	//<year>
-	//<price>
-	//-empty line-
+	void printList() const;
+	//Prints list alphabetically
+	void printByMake(string make) const;
+	//Prints product(s) that have certain make name
+	void printByModel(string model) const;
+	//Prints product(s) that have certain model name
+	void loadPrimary(string fname);
+	//Loads products into BST storing Product objects
+	void loadSecondary(string fname);
+	//Loads products into BST storing ProductS objects
+	void save(string fname) const;
+	//Saves products into given file name
 };
 
 //Constructor
@@ -261,43 +268,132 @@ typename BST<bstdata>::Node* BST<bstdata>::removeHelper(Node* root,
 	return root;
 }
 
-//Prints alphabetically to console
 template<class bstdata>
-void BST<bstdata>::printToConsole() const {
+void BST<bstdata>::printList() const {
 	int index = 1;
-	printToConsoleHelper(root, index);
-	cout << endl;
+	printListHelper(root, index);
+	cout << endl << endl;
 }
 
 template<class bstdata>
-void BST<bstdata>::printToConsoleHelper(Node* root, int& index) const {
+void BST<bstdata>::printListHelper(Node* root, int& index) const {
 	if (root == NULL)
 		return;
 	else {
-		printToConsoleHelper(root->left, index);
+		printListHelper(root->left, index);
 		cout << left << setw(16) << index;
 		index++;
 		cout << root->data;
-		printToConsoleHelper(root->right, index);
+		printListHelper(root->right, index);
 	}
 }
 
-//Prints alphabetically to file
 template<class bstdata>
-void BST<bstdata>::printToFile(ostream& out) const {
-	printToFileHelper(out, root);
-	out << endl;
+void BST<bstdata>::printByMake(string make) const {
+	int index = 1;
+	printByMakeHelper(root, index, make);
+	cout << endl << endl;
 }
 
 template<class bstdata>
-void BST<bstdata>::printToFileHelper(ostream& out, Node* root) const {
+void BST<bstdata>::printByMakeHelper(Node* root, int& index, string make) const {
 	if (root == NULL)
 		return;
 	else {
-		printToFileHelper(out, root->left);
+		printByMakeHelper(root->left, index, make);
+		if (root->data.getMake() == make) {
+			cout << left << setw(16) << index;
+			index++;
+			cout << root->data;
+		}
+		printByMakeHelper(root->right, index, make);
+	}
+}
+
+template<class bstdata>
+void BST<bstdata>::printByModel(string model) const {
+	int index = 1;
+	printByModelHelper(root, index, model);
+	cout << endl << endl;
+}
+
+template<class bstdata>
+void BST<bstdata>::printByModelHelper(Node* root, int& index, string model) const {
+	if (root == NULL)
+		return;
+	else {
+		printByModelHelper(root->left, index, model);
+		if (root->data.getModel() == model) {
+			cout << left << setw(16) << index;
+			index++;
+			cout << root->data;
+		}
+		printByModelHelper(root->right, index, model);
+	}
+}
+
+template<class bstdata>
+void BST<bstdata>::loadPrimary(string fname) {
+	string make, model;
+	double screenSize, price;
+	unsigned cpuGen, year;
+	ifstream fin(fname);
+
+	while (fin) {
+		getline(fin, make, '\n');
+		getline(fin, model, '\n');
+		fin >> screenSize;
+		fin >> cpuGen;
+		fin >> year;
+		fin >> price;
+		Product p(make, model, screenSize, cpuGen, year, price);
+		insert(p);
+		while (fin.peek() == '\n')
+			fin.get();
+	}
+
+	fin.close();
+}
+
+template<class bstdata>
+void BST<bstdata>::loadSecondary(string fname) {
+	string make, model;
+	double screenSize, price;
+	unsigned cpuGen, year;
+	ifstream fin(fname);
+
+	while (fin) {
+		getline(fin, make, '\n');
+		getline(fin, model, '\n');
+		fin >> screenSize;
+		fin >> cpuGen;
+		fin >> year;
+		fin >> price;
+		ProductS p(make, model, screenSize, cpuGen, year, price);
+		insert(p);
+		while (fin.peek() == '\n')
+			fin.get();
+	}
+
+	fin.close();
+}
+
+template<class bstdata>
+void BST<bstdata>::save(string fname) const {
+	ofstream fout(fname);
+	saveHelper(fout, root);
+	fout.close();
+}
+
+template<class bstdata>
+void BST<bstdata>::saveHelper(ostream& out, Node*root) const {
+	if (root == NULL)
+		return;
+	else {
+		saveHelper(out, root->left);
 		root->data.print(out);
 		out << endl;
-		printToFileHelper(out, root->right);
+		saveHelper(out, root->right);
 	}
 }
 

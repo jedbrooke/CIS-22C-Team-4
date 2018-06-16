@@ -68,9 +68,15 @@ void Customer::setEmail(string email) {
 	this->email = email;
 }
 
+
+void Customer::getOrder(ostream &out) const {
+	out << order;
+}
+
 /*void Customer::getOrderList(ostream &out) const {
 orders.displayList(out);	//TODO: Change this
 }*/
+
 
 void Customer::insertOrder(Order order) {
 	orders.insertStop(order);
@@ -197,4 +203,6 @@ ss << customer.getZip(); //convert int to a string
 str = customer.firstname + "," + customer.lastname +"," + customer.address+"," +customer.city +"," + ss.str();
 return str;
 }
+
+
 

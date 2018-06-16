@@ -15,6 +15,7 @@ class Heap {
 private:
     int heap_size;
     vector<Order*> *heap;
+    bool heaped;
 
     /**Helper Functions*/
 
@@ -26,6 +27,11 @@ private:
     //helper funciton to insert
     //bubbles an element up to its proper location
 
+    void remove(int index);
+    //removes the node at the provided index of the heap
+    //pre: 1 <= i <= get_size()
+    //Called as a helper function to clear();
+
 public:
 
     /**Constructors*/
@@ -34,22 +40,29 @@ public:
 
     /**Manipulation Procedures*/
 
+    void sort();	//heap sorts.
+
     void build_heap();
     //Takes an unordered vector and builds it into a heap
     //Called as a helper function of the constructor
     //Calls heapify as a helper function
 
-    void place(Order * o, int days);	//TODO: handle empty orders, also test edge cases
+    void place(Order * o, int days);
     //Inserts a new value onto the end of the heap and
     //Bubbles it up to the correct location in the heap
     //Calls heap_increase_key as a helper function
 
+    void insert(Order * o);
+    //Same as place, only doesn't mark the order as placed.
+    //Useful for loading placed orders from a file.
+
     void ship(int index);
     //removes the node at the provided index of the heap
-    //pre: 1 <= i <= get_size()
+    //pre: 1 <= index <= get_size()
 
-    void ship(Order * o);
-    //removes the order from the heap
+    void clear();
+    //removes shipped orders
+    //pre: heaped
 
     /**Access Functions*/
 
@@ -76,15 +89,19 @@ public:
     //returns the element at the specified index i
     //pre: 0 < i <= heap_size
 
+    bool isHeaped() const;
+
     /**Additional Operations*/
 
-    void displayHeap(ostream& out) const;
+    void printRaw(ostream& out) const;
     //prints the heap in level order. USED FOR DEBUGGING ONLY.
+
+    string printSpecific(int index);
 
     string printSorted();
     //prints the heap as a list of orders, highest priority first.
+    //Pre: !heaped
 
-    string print(int index);
 
 };
 
