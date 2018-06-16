@@ -197,11 +197,11 @@ std::ostream& operator<<(ostream& out, const Customer customer) {
 }
 
 string Customer:: toString(const Customer& customer, ostream& out){
-string str;
-stringstream ss;
-ss << customer.getZip(); //convert int to a string
-str = customer.firstname + "," + customer.lastname +"," + customer.address+"," +customer.city +"," + ss.str();
-return str;
+	string str;
+	stringstream ss;
+	ss << customer.getZip(); //convert int to a string
+	str = customer.firstname + "," + customer.lastname +"," + customer.address+"," +customer.city +"," + ss.str();
+	return str;
 }
 
 

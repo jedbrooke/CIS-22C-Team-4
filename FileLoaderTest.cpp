@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include "FileLoader.cpp"
 #include "Product.h"
+#include "Customer.h"
+#include "Employee.h"
 #include <sstream>
 
 class FileLoader;
@@ -20,7 +22,7 @@ int main(){
     
     stringstream ss;
     
-    p.printToFile(ss);
+    p.save(ss);
     
     cout << ss.str();
 }

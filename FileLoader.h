@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <fstream>
 #include "Product.cpp"
+#include "Customer.h"
+#include "Employee.h"
 #include "BST.h"
 
 using namespace std;
