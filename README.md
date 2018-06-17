@@ -7,7 +7,7 @@ Project summary:
 		Alex: File I/O 
 		Andrew: Priority Queue
 		Jasper: GUI
-		Mohammed: Team Coordinator & Main
+		Mohamed: Team Coordinator & Main
 		Tin: Hash Tables
 		Vu: BST Algorithms
 
