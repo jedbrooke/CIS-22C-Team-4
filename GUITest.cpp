@@ -19,8 +19,8 @@ int main(int argc, char *argv[]) {
 
 	Window::set_icon("icon.png");
     
-    string path = "products_in.txt";
     static BST<Product> p(FileLoader::loadProducts("products_in.txt"));
+    //static BST<Customer> c;
 
     g_print("assigning pointers\n");
 

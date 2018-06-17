@@ -71,7 +71,37 @@ public:
 	//Loads products into BST storing ProductS objects
 	void save(string fname) const;
 	//Saves products into given file name
+
+	/********** JASPER TEST FUNCTIONS *** REMOVE BEFORE COMMIT **********/
+	void printToFile(ostream& out) const;
+	void printToFileHelper(ostream& out, Node* root) const;
+
+	/*** END JASPER FUNCTIONS ***/
 };
+
+/********** JASPER TEST FUNCTIONS *** REMOVE BEFORE COMMIT **********/
+template<class bstdata>
+void BST<bstdata>::printToFile(ostream& out) const{
+
+	printToFileHelper(out,root);
+
+}
+
+template<class bstdata>
+void BST<bstdata>::printToFileHelper(ostream& out, Node* root) const{
+
+	if(root == NULL) return;
+
+	printToFileHelper(out, root->left);
+	root->data.print(out);
+	out << endl;
+	printToFileHelper(out, root->right);
+
+
+}
+
+/*** END JASPER FUNCTIONS ***/
+
 
 //Constructor
 template<class bstdata>

@@ -12,12 +12,13 @@
 #include <gtk/gtk.h>
 #include <vector>
 #include <cstddef> //for NULL
-#include "Heap.h"
+//#include "Heap.h"
 #include "BST.h"
 #include "Product.h"
 #include "Customer.h"
 
 
+class Heap;
 class WindowManager; //forward class declaration
 
 using namespace std;
