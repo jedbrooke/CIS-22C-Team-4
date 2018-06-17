@@ -26,7 +26,10 @@ public:
 	void read(ifstream& in);		//read data from file
 	void write(ostream& out);	//write data to file
 
-	friend ostream& operator<<(ostream& out, const Employee& employee);		//display in console
+	friend ostream& operator<<(ostream& out, const Employee& employee);
+
+	//to-String method
+	string toString() const;
 };
 
 
