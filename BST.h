@@ -11,6 +11,8 @@
 #include <string>
 #include <assert.h>
 #include <iomanip>
+#include <vector>
+#include <sstream>
 
 #include <fstream>
 #include "Product.h"
@@ -47,6 +49,11 @@ private:
 	void printByModelHelper(Node* root, int& index, string model) const;
 	void saveHelper(ostream& out, Node*root) const;
 
+	//to-String methods
+	void printListToStringHelper(Node* root, int& index, vector<string> &string) const;
+	void printByMakeToStringHelper(Node* root, int& index, string make, vector<string> &string);
+	void printByModelToStringHelper(Node* root, int& index, string model, vector<string> &string);
+
 public:
 	BST();
 	BST(const BST &bst);
@@ -71,6 +78,14 @@ public:
 	//Loads products into BST storing ProductS objects
 	void save(string fname) const;
 	//Saves products into given file name
+
+	//to-String methods
+	vector<string> printListToString() const;
+	//returns a vector of string for the list of products
+	vector<string> printByMakeToString(string make) const;
+	//returns a vector of string for a list of products that have certain make name
+	vector<string> printByModelToString(string model) const;
+	//returns a vector of string for a list of products that have certain model name
 };
 
 //Constructor
@@ -397,4 +412,73 @@ void BST<bstdata>::saveHelper(ostream& out, Node*root) const {
 	}
 }
 
+template<class bstdata>
+vector<string> BST<bstdata>::printListToString() const {
+	int index = 1;
+	vector<string> string;
+	printListToStringHelper(root, index, string);
+	return string;
+}
+
+template<class bstdata>
+void BST<bstdata>::printListToStringHelper(Node* root, int& index, vector<string> &string) const {
+	if (root == NULL)
+		return;
+	else {
+		printListToStringHelper(root->left, index, string);
+		stringstream ss;
+		ss << index++ << "," << root->data.toString();
+		string.push_back(ss.str());
+		printListToStringHelper(root->right, index, string);
+	}
+}
+
+template<class bstdata>
+vector<string> BST<bstdata>::printByMakeToString(string make) const {
+	int index = 1;
+	vector<string> string;
+	printByMakeToStringHelper(root, index, make, string);
+	return string;
+}
+
+template<class bstdata>
+void BST<bstdata>::printByMakeToStringHelper(Node* root, int& index, string make, vector<string> &string) {
+	if (root == NULL)
+		return;
+	else {
+		printByMakeToStringHelper(root->left, index, make, string);
+		if (root->data.getMake() == make) {
+			stringstream ss;
+			ss << index++ << "," << root->data.toString();
+			string.push_back(ss.str());
+		}
+		printByMakeToStringHelper(root->right, index, make, string);
+	}
+}
+
+template<class bstdata>
+vector<string> BST<bstdata>::printByModelToString(string model) const {
+	int index = 1;
+	vector<string> string;
+	printByModelToStringHelper(root, index, model, string);
+	return string;
+}
+
+template<class bstdata>
+void BST<bstdata>::printByModelToStringHelper(Node* root, int& index, string model, vector<string> &string) {
+	if (root == NULL)
+		return;
+	else {
+		printByModelToStringHelper(root->left, index, model, string);
+		if (root->data.getModel() == model) {
+			stringstream ss;
+			ss << index++ << "," << root->data.toString();
+			string.push_back(ss.str());
+		}
+		printByModelToStringHelper(root->right, index, model, string);
+	}
+}
+
 #endif /* BST_H_ */
+
+
