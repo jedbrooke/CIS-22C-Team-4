@@ -119,3 +119,9 @@ void Product::print(ostream& out) const {
 		<< year << '\n'
 		<< price << '\n';
 }
+
+string Product::toString() const {
+	stringstream ss;
+	ss << make << "," << model << "," << screenSize << "," << cpuGen << "," << year << "," << price;
+	return ss.str();
+}
