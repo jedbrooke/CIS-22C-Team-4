@@ -19,7 +19,7 @@ public:
 	ProductS();
 	ProductS(string make, string model, double screenSize, unsigned cpuGen, unsigned year, double price);
 
-	void operator=(const ProductS& product);
+	void operator=(const Product& product);
 	//copies contents from Product to ProductS
 
 	//Overriding functions
