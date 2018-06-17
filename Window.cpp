@@ -444,8 +444,12 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
             
             stringstream productsSS;
             //products->printToFile(productsSS);
+
+            vector<string> productsV = products->printListToString();
+
             xml += "<vbox>\n";
             xml += "<hbox homogeneous=\"true\">\n";
+            xml += create_xml_tag("label","number"); //index
             xml += create_xml_tag("label","company"); //manf comp
             xml += create_xml_tag("label","model"); //model
             xml += create_xml_tag("label","screen size"); //screen size
@@ -459,7 +463,46 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
             xml += "<vbox>\n";
             string attribute;
             string make;
+
+            for (int i = 0; i < productsV.size(); ++i) {
+            	stringstream product(productsV.at(i));
+
+                xml += "<hbox homogeneous=\"true\">\n";
+
+                getline(product,attribute,',');
+                xml += create_xml_tag("label",attribute); //index
+
+                getline(product,make,',');
+                xml += create_xml_tag("label",make); //manf comp
+                
+                string model;
+                getline(product,model,',');
+                xml += create_xml_tag("label",model); //model
+                
+                getline(product,attribute,',');
+                xml += create_xml_tag("label",attribute+" in."); //screen size
+                
+                getline(product,attribute,',');
+                xml += create_xml_tag("label",attribute+"th gen"); //cpu gen
+                
+                getline(product,attribute,',');
+                xml += create_xml_tag("label",attribute); //year
+                
+                getline(product,attribute,',');
+                xml += create_xml_tag("label","$"+attribute+".00"); //price
+
+                xml += create_xml_tag("button","options=\"link:customer_view_cart,name:add_to_cart,value:" + make + " " + model + "\"","add to cart");
+                
+                xml += "</hbox>\n";
+                xml += "<hr>\n";
+
+                getline(productsSS,attribute); //skip line in between products
+
+
+            }
+
             
+            /*
             while(getline(productsSS,make)){
                 
             	if(make == "") break;
@@ -484,13 +527,13 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
                 getline(productsSS,attribute);
                 xml += create_xml_tag("label","$"+attribute+".00"); //price
 
-                xml += create_xml_tag("button","options=\"link:customer_view_cart,name:add_to_car,value:" + make + " " + model + "\"","add to cart");
+                xml += create_xml_tag("button","options=\"link:customer_view_cart,name:add_to_cart,value:" + make + " " + model + "\"","add to cart");
                 
                 xml += "</hbox>\n";
                 xml += "<hr>\n";
 
                 getline(productsSS,attribute); //skip line in between products
-            }
+            }*/
             
             xml += "</vbox>\n";
             xml += "</scroll>\n";

@@ -27,6 +27,7 @@ int main(int argc, char *argv[]) {
 	g_print("args passed to gtk_init\n");
 
 	BST<Product> bstp;
+	bstp.loadPrimary("Products_in.txt");
 	Product product;
 	ProductS productS;
 	//Heap heap;
