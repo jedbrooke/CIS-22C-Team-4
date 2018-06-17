@@ -11,4 +11,4 @@ Project summary:
 		Tin: Hash Tables
 		Vu: BST Algorithms
 
-g++ Main.cpp -o program `pkg-config --cflags gtk+-2.0` `pkg-config --libs gtk+-2.0`
+g++ Main.cpp -o program \`pkg-config --cflags gtk+-2.0\` \`pkg-config --libs gtk+-2.0\`

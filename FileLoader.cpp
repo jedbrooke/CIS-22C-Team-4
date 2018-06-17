@@ -2,7 +2,7 @@
 //  FileLoader.cpp
 //  
 //
-//  Created by Jasper Edbrooke on 6/10/18.
+//  Created by Alex Rao on 6/10/18.
 //
 
 #include <iostream>
@@ -33,12 +33,12 @@ BST<Product> FileLoader::loadProducts(string path){
             unsigned price;
             fis >> price;
             getline(fis, line); //advance to the next line
-            
+
             Product p(manf_company,model,screen_size,cpuGen,year,price);
             products.insert(p);
-            
+
             getline(fis, line); //skip the emtpy line
-            
+
         }
     }
     fis.close();
