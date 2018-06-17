@@ -6,10 +6,7 @@
 //
 
 #include <stdio.h>
-#include "FileLoader.cpp"
-#include "Product.h"
-#include "Customer.h"
-#include "Employee.h"
+#include "FileLoader.h"
 #include <sstream>
 using namespace std;
 

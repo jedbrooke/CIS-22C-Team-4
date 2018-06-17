@@ -6,6 +6,7 @@
 //
 
 #include "FileLoader.h"
+#include "Product.h"
 #include "Customer.h"
 #include "Employee.h"
 using namespace std;
@@ -34,12 +35,12 @@ BST<Product> FileLoader::loadProducts(string path){
             unsigned price;
             fis >> price;
             getline(fis, line); //advance to the next line
-            
+
             Product p(manf_company,model,screen_size,cpuGen,year,price);
             products.insert(p);
-            
+
             getline(fis, line); //skip the emtpy line
-            
+
         }
     }
     fis.close();
