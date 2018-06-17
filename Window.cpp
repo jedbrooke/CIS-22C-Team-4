@@ -12,7 +12,6 @@
 #include <sstream>
 #include <gtk/gtk.h>
 #include "WindowManager.h"
-//#include "Customer.h"
 
 using namespace std;
 
@@ -37,9 +36,6 @@ Window::Window(string xml) {
     
     //set the box spacing
     gtk_box_set_spacing(GTK_BOX(self_box),3);
-
-    //add the box to the window
-    gtk_container_add(GTK_CONTAINER(self_window), self_box);
     
     //wipe the entries
     map<string, GtkWidget*> m;
@@ -177,8 +173,15 @@ Window::Window(string xml) {
         }
     } 
 
-    //show the box
+
+    //g_print("widgets created\n");
     gtk_widget_show(self_box);
+    
+    //g_print("showing box\n");
+    //g_print("adding box to window\n");
+    
+    gtk_container_add(GTK_CONTAINER(self_window), self_box);
+    //g_print("showing window\n");
     
     //align window in center
     gtk_window_set_position(GTK_WINDOW(self_window), GTK_WIN_POS_CENTER);
@@ -231,19 +234,20 @@ void Window::create_content(string tagName, string text, map<string,string> opti
         //connect it to the destroy event as well
         g_signal_connect_swapped(widget,"clicked",G_CALLBACK(destroy),self_window);
 
+        //set it to default if it is set to default
+        if (optionsMap["default"] == "true"){
+
+        	msg = "setting button \"" + text + "\" to be default\n";
+        	g_print("%s",msg.c_str());
+
+        	gtk_widget_set_can_default (widget, TRUE);
+        	gtk_widget_grab_default (widget);
+        }
                 
     } else if(tagName == "label") {
 
         //create new label
         widget = gtk_label_new(text.c_str());
-
-        //set styles
-        if(optionsMap["style"] == "error"){
-        	//error markup
-        	char* markup = g_strconcat("<span foreground=\"red\">", text.c_str(), "</span>", NULL);
-        	gtk_label_set_markup(GTK_LABEL(widget), markup);
-        	g_free(markup);
-        }
         
         //set alignment
         gtk_misc_set_alignment(GTK_MISC(widget), 0, 0);
@@ -259,8 +263,6 @@ void Window::create_content(string tagName, string text, map<string,string> opti
         //check if it's a password box
         if (optionsMap["type"] == "psw") {
             gtk_entry_set_visibility(GTK_ENTRY(widget),FALSE);
-        } else if (optionsMap["type"] == "hidden"){
-        	gtk_entry_set_text(GTK_ENTRY(widget),optionsMap["value"].c_str());
         }
         
         //adding entries to entries map
@@ -279,33 +281,16 @@ void Window::create_content(string tagName, string text, map<string,string> opti
 
     string box_name = g_strconcat(G_OBJECT_TYPE_NAME(box),NULL);
 	string window_name = "GtkScrolledWindow";
-	if(box_name == window_name) {
+	if( box_name == window_name) {
     	//pack it into the scroll box
     	gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (box), widget);
     } else {
     	//add widget to box
     	gtk_box_pack_start(GTK_BOX(box), widget, FALSE, FALSE, 0);
     }
-
-    //set it to default if it is set to default
-    if (optionsMap["default"] == "true"){
-
-    	msg = "setting button \"" + text + "\" to be default\n";
-    	g_print("%s",msg.c_str());
-
-    	gtk_widget_set_can_default (widget, TRUE);
-    	gtk_widget_grab_default (widget);
-    }
-
-    if(optionsMap["type"] == "hidden"){
-
-    	//don't show the widget
-
-    } else {
-    	//show the widget
-    	gtk_widget_show(widget);
-    }
-    
+            
+    //show the widget
+    gtk_widget_show(widget);
 }
 
 void Window::button_pressed(GtkWidget* widget, gpointer data) {
@@ -327,6 +312,9 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         getline(seperator,value,':'); //get the value
         optionsMap.insert(make_pair(option,value)); //add them to the map
     }
+    
+    //gchar* msg = g_strconcat("hacker voice: button \"",optionsMap["name"].c_str(),"\" clicked\n",NULL);
+    //g_print("%s",msg);
     
     string name = optionsMap["name"];
     string msg;
@@ -367,76 +355,8 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         string conf_psw = gtk_entry_get_text(GTK_ENTRY(entries["conf_psw"]));
         
         //time to check
-        if(email != conf_email || psw != conf_psw){
-        	if(email != conf_email){
-        		xml += create_xml_tag("label","style=\"error\"","error: emails must match");
-        	}
-        	if (psw != conf_psw){
-        		xml += create_xml_tag("label","style=\"error\"","error: passwords must match");
-        	}
-
-        	WindowManager::go_to_window("customer_create_new_account",xml); //go back to the customer create new account window
-        	return;
-
-        } else if(email == "" || psw == ""){
-
-        	xml += create_xml_tag("label","style=\"error\"","error: please do not leave any fields blank");
-
-        	WindowManager::go_to_window("customer_create_new_account",xml); //go back to the customer create new account window
-        	return;
-
-        } else {
-        	string value = email + "`" + psw; 
-        	xml += create_xml_tag("entry","type=\"hidden\" value=\""+value+"\"","values");
-
-        }
-        
-
         
         
-    } else if(name == "customer_create_new_account_2") {
-
-    	map<string,string> values;
-
-    	string email_and_psw = gtk_entry_get_text(GTK_ENTRY(entries["values"]));
-    	size_t sep = email_and_psw.find('`'); //separate the email and the password
-    	values["email"] = email_and_psw.substr(0,sep);
-    	values["psw"] = email_and_psw.substr(sep+1);
-
-    	values["fname"] = gtk_entry_get_text(GTK_ENTRY(entries["fname"]));
-    	values["lname"] = gtk_entry_get_text(GTK_ENTRY(entries["lname"]));
-    	values["address"] = gtk_entry_get_text(GTK_ENTRY(entries["address"]));
-    	values["phone_num"] = gtk_entry_get_text(GTK_ENTRY(entries["phone_num"]));
-    	values["city"] = gtk_entry_get_text(GTK_ENTRY(entries["city"]));
-    	values["zip_str"] = gtk_entry_get_text(GTK_ENTRY(entries["zip"]));
-    	unsigned zip = atoi(values["zip_str"].c_str());
-
-
-    	map<string,string>::iterator it;
-
-    	for(it = values.begin(); it != values.end(); it++){
-
-    		msg = it->first + ": " + it->second + "\n";
-    		g_print("%s",msg.c_str());
-    	}
-
-
-    	if(values["fname"] == "" || values["lname"] == "" || values["address"] == "" || values["phone_num"] == "" || values["city"] == "" || values["zip_str"] == ""){//if any of the fields are blank, reject
-    		xml += create_xml_tag("label","style=\"error\"","error: please do not leave any fields blank");
-    		string value = values["email"] + "`" + values["psw"]; 
-    		xml += create_xml_tag("entry","type=\"hidden\" value=\""+value+"\"","values");
-
-    		WindowManager::go_to_window("customer_create_new_account_cont",xml);
-    		return;
-
-    	} else {
-    		//Customer c(email,psw,fname,lname,false,address,city,zip,email);
-    		//customers->insert(c);
-    	}
-
-
-
-
     } else if(name == "customer_db_search"){
         
         string value = optionsMap["value"];
@@ -485,7 +405,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
                 getline(productsSS,attribute);
                 xml += create_xml_tag("label","$"+attribute+".00"); //price
 
-                xml += create_xml_tag("button","options=\"link:customer_view_cart,value:" + make + " " + model + "\"","add to cart");
+                xml += create_xml_tag("button","options=\"link:customer_view_cart\" value=\"" + make + " " + model + "\"","add to cart");
                 
                 xml += "</hbox>\n";
                 xml += "<hr>\n";
@@ -566,7 +486,11 @@ string Window::create_xml_tag(string tag, string options, string text){
 }
 
 gboolean Window::delete_event(GtkWidget *widget, GdkEvent *event, gpointer data) { //called when close window red button is pressed at app level
-     
+    
+    string msg = "current window id: " + WindowManager::get_current_window_id() + "\n";
+    g_print("%s",msg.c_str());
+    
+    
     if(WindowManager::get_current_window_id() == "end_screen") {
         gtk_main_quit();
         return TRUE;
@@ -612,7 +536,7 @@ void Window::set_icon(string path) {
 void Window::assign_pointers(Heap* heap, BST<Customer>* _customers, BST<Product>* _products) {
     
     //priority_queue = &heap;
-    customers = _customers;
+    //customers = &_customers;
 	products = _products;
 
     g_print("pointers assigned\n");    
