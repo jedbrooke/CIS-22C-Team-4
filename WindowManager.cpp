@@ -31,22 +31,22 @@ WindowManager::~WindowManager() {
 	delete current_window;
 }
 
-void WindowManager::go_to_window(string id){
-	current_window_id = id;
-	string xml = WindowManager::windows[id];
-	Window w(xml);	
-	current_window = &w;
-}
-
 void WindowManager::go_to_window(string id, string options){
-	
-	//do some options stuff
-	string xml = WindowManager::windows[id];
-	Window w(xml);	
-	current_window = &w;	
+
+	if(windows.find(id) == windows.end()){
+		id = "404";
+	}
+
+	current_window_id = id; //set the current window id to the new id
+	string xml = windows[id]; //get the xml
+	string replace = "<variable>\n"; //set the replace string
+	size_t find = xml.find(replace); //find the variable tag in the xml
+	if(find != string::npos){
+		xml.replace(find,replace.length(),options); //replace the variable tag with the options
+	}
+	Window w(xml);	//create the new window
+	current_window = &w; //update the current window pointer
 }
-
-
 
 void WindowManager::loadxml(string path){
 

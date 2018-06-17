@@ -42,7 +42,7 @@
 	<entry type="psw">
 		psw
 	</entry>
-	<button options="link:customer_interface,name:customer_sign_in">
+	<button options="link:customer_interface,name:customer_sign_in" default="true">
 		submit
 	</button>
 </window>
@@ -59,14 +59,12 @@
 	<label>
 		Confirm your email:
 	</label>
-	<variable id="email_err">
 	<entry>
 		conf_email
 	</entry>
 	<label>
 		Enter your password:
 	</label>
-	<variable id="psw_err">
 	<entry type="psw">
 		psw
 	</entry>
@@ -76,6 +74,7 @@
 	<entry type="psw">
 		conf_psw
 	</entry>
+	<variable>
 	<button options="link:customer_create_new_account_cont,name:customer_create_new_account_1">
 		Enter
 	</button>
@@ -103,12 +102,25 @@
 		address
 	</entry>
 	<label>
+		Enter your City:
+	</label>
+	<entry>
+		city
+	</entry>
+	<label>
+		Enter your Zip Code:
+	</label>
+	<entry>
+		zip
+	</entry>
+	<label>
 		Enter your phone number ((xxx) xxx-xxxx):
 	</label>
 	<entry>
 		phone_num
 	</entry>
-	<button options="link:customer_interface,name:customer_create_new_account_2">
+	<variable>
+	<button options="link:customer_interface,name:customer_create_new_account_2" default="true">
 		submit
 	</button>
 </window>
@@ -163,7 +175,6 @@
 		Search Results:
 	</title>
 	<variable>
-	</variable>
 	<button options="link:customer_search_for_a_product">
 		Search again
 	</button>
@@ -173,7 +184,6 @@
 		More information:
 	</title>
 	<variable>
-	</variable>
 	<button options="link:customer_view_cart">
 		add to cart
 	</button>
@@ -203,7 +213,6 @@
 		Here is our Database:
 	</title>
 	<variable>
-	</variable>
 	<button options="link:customer_list_database_for_products">
 		go back
 	</button>
@@ -213,7 +222,6 @@
 		Your Cart:
 	</title>
 	<variable>
-	</variable>
 	<button options="link:customer_checkout">
 		Checkout
 	</button>
@@ -226,7 +234,6 @@
 		Checkout:
 	</title>
 	<variable>
-	</variable>
 	<button options="link:customer_view_purchase_history,name:place_order,value:standard">
 		Standard Shipping
 	</button>
@@ -254,7 +261,6 @@
 		Purchase History
 	</title>
 	<variable>
-	</variable>
 	<button options="link:customer_interface">
 		back
 	</button>
@@ -289,7 +295,7 @@
 	<button options="link:employee_unsorted_customer_information">
 		Display unsorted customer information
 	</button>
-	<button options="link:employee_view_order_by_priority">
+	<button options="link:employee_view_order_by_priority,name:employee_view_orders">
 		View orders by priority
 	</button>
 	<button options="link:employee_list_database_select">
@@ -330,7 +336,6 @@
 		Search Results
 	</title>
 	<variable>
-	</variable>
 	<button options="link:employee_interface">
 		go back
 	</button>
@@ -340,7 +345,6 @@
 		Unsorted Customer Information
 	</title>
 	<variable>
-	</variable>
 	<button options="link:employee_interface">
 		go back
 	</button>
@@ -350,7 +354,6 @@
 		View Orders by priority
 	</title>
 	<variable>
-	</variable>
 	<button options="link:employee_interface">
 		Go back
 	</button>
@@ -360,7 +363,6 @@
 		Review Order for shipping
 	</title>
 	<variable>
-	</variable>
 	<button options="link:employee_confirm_ship_order,name:confirm">
 		Confirm
 	</button>
@@ -393,7 +395,6 @@
 		List Database of products by:
 	</title>
 	<variable>
-	</variable>
 	<button options="link:employee_interface">
 		Go Back
 	</button>
@@ -477,7 +478,6 @@
 		product summary:
 	</label>
 	<variable>
-	</variable>
 	<button options="link:employee_add_product">
 		Add another product
 	</button>
@@ -490,7 +490,6 @@
 		Remove a product
 	</title>
 	<variable>
-	</variable>
 	<button options="link:employee_interface">
 		cancel
 	</button>
@@ -508,4 +507,35 @@
 	<button options="link:end_screen,name:quit">
 		quit
 	</button>
+</window>
+<window id="404">
+	<title>
+		Error: 404, page not found!
+	</title>
+	<button options="link:welcome_screen">
+		back to home
+	</button>
+</window>
+<window id="boxes">
+	<title>
+		THIS IS THE BOXES WINDOW
+	</title>
+	<vbox>
+		<label>
+			FEAR THE BOXES
+		</label>
+		<hbox>
+			<label>
+				MORE BOX
+			</label>
+			<hbox>
+				<label>
+					ONE MORE LEVEL OF BOX
+				</label>
+			</hbox>
+			<button options="link:foo">
+				clicky
+			</button>
+		</hbox>
+	</vbox>
 </window>

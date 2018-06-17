@@ -78,14 +78,6 @@ public:
 	//Loads products into BST storing ProductS objects
 	void save(string fname) const;
 	//Saves products into given file name
-
-	//to-String methods
-	vector<string> printListToString() const;
-	//returns a vector of string for the list of products
-	vector<string> printByMakeToString(string make) const;
-	//returns a vector of string for a list of products that have certain make name
-	vector<string> printByModelToString(string model) const;
-	//returns a vector of string for a list of products that have certain model name
 };
 
 //Constructor
