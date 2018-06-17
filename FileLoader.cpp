@@ -5,10 +5,8 @@
 //  Created by Jasper Edbrooke on 6/10/18.
 //
 
+#include <iostream>
 #include "FileLoader.h"
-#include "Product.h"
-#include "Customer.h"
-#include "Employee.h"
 using namespace std;
 
 BST<Product> FileLoader::loadProducts(string path){

@@ -23,5 +23,4 @@ int main(){
     path = "Employees.txt";
     BST<Employee> e(FileLoader::loadEmployees(path));
 
-    cout << "hi";
 }
