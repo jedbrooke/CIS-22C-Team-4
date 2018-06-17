@@ -8,7 +8,7 @@
 #include "FileLoader.h"
 #include "Customer.h"
 #include "Employee.h"
-
+using namespace std;
 
 BST<Product> FileLoader::loadProducts(string path){
 
@@ -54,7 +54,7 @@ BST<Customer> FileLoader::loadCustomers(string path) {
 	ifstream fis(path.c_str());
 	if (fis.is_open()) {
 		while(fis.peek() != ios_base::end) {
-			Customer c = new Customer();
+			Customer c;
 			c.read(fis);
 			customers.insert(c);
 		}
@@ -71,7 +71,7 @@ BST<Employee> FileLoader::loadEmployees(string path) {
 	ifstream fis(path.c_str());
 	if (fis.is_open()) {
 		while(fis.peek() != ios_base::end) {
-			Employee e = new Employee();
+			Employee e;
 			e.read(fis);
 			employees.insert(e);
 		}
