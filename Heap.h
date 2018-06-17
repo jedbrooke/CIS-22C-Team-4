@@ -47,6 +47,9 @@ public:
     //Called as a helper function of the constructor
     //Calls heapify as a helper function
 
+    void buildHeap();
+    //calls build_heap
+
     void place(Order * o, int days);
     //Inserts a new value onto the end of the heap and
     //Bubbles it up to the correct location in the heap

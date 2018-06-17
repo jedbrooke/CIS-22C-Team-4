@@ -10,9 +10,6 @@
 #include <sstream>
 using namespace std;
 
-
-//TODO: Allow for unplaced orders in comparison operators.
-
 	/** constructors */
 
 	Order::Order() {
@@ -32,15 +29,6 @@ using namespace std;
 	Order::Order(istream &in, BST<Product> &products, Customer * owner) {
 		load(in, products);
 		customer = owner;
-	}
-
-	Order::Order(bool isDummy) {
-		cout << "Creating dummy";
-		shippingSpeed = price = 0;
-		placed = true;
-		shipped = false;
-		timePlaced = arriveBy = 1;
-		customer = NULL;
 	}
 
 	/** management functions - getters and setters*/
@@ -191,9 +179,9 @@ using namespace std;
 
 	string Order::print() {	//Prints basic information about the order, including where to ship, etc.
 		stringstream out;
-		out << fixed << setprecision(2) << endl << "Total value: $" << price;
+		out << fixed << setprecision(2) << price;
 		if (placed) {
-			out <<" Arrive by: " << getArriveBy() << " Status: ";
+			out << "," << getArriveBy() << ",";
 			if (shipped) {
 				if (isDelivered()) {
 					out << "Delivered";
@@ -203,6 +191,8 @@ using namespace std;
 			} else {
 				out << "Waiting to be shipped";
 			}
+		} else {
+			out << ",N/A,Not Yet Placed";
 		}
 		return out.str();
 	}
@@ -210,14 +200,8 @@ using namespace std;
 	string Order::printDetailed() {	//Prints above information + also the list of all laptops.
 		stringstream out;
 		out << print();
-		out << "\nShip to " << *customer;
-		if (laptops.getLength() > 0) {
-			out << endl << "Laptops:" << endl;
-			laptops.displayNumberedList(out);
-		}
-		else {
-			out << "Your cart is empty!";
-		}
+		out << "\n" << *customer;
+		laptops.displayNumberedList(out);
 		out << endl << endl;
 		return out.str();
 	}
