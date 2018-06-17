@@ -6,6 +6,7 @@
 #include "Product.h"
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 using namespace std;
 
 
@@ -118,4 +119,10 @@ void Product::print(ostream& out) const {
 		<< cpuGen << '\n'
 		<< year << '\n'
 		<< price << '\n';
+}
+
+string Product::toString() const {
+	stringstream ss;
+	ss << make << "," << model << "," << screenSize << "," << cpuGen << "," << year << "," << price;
+	return ss.str();
 }
