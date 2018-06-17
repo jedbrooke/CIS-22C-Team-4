@@ -12,7 +12,7 @@ using namespace std;
 
 BST<Product> FileLoader::loadProducts(string path){
 
-	cout << "loading products" << endl;
+	cout << "loading products..." << endl;
 
     BST<Product> products;
     ifstream fis(path.c_str());
@@ -48,7 +48,7 @@ BST<Product> FileLoader::loadProducts(string path){
 
 BST<Customer> FileLoader::loadCustomers(string path) {
 
-	cout << "loading customers" << endl;
+	cout << "loading customers..." << endl;
 
 	BST<Customer> customers;
 	ifstream fis(path.c_str());
@@ -65,7 +65,7 @@ BST<Customer> FileLoader::loadCustomers(string path) {
 
 BST<Employee> FileLoader::loadEmployees(string path) {
 
-	cout << "loading employees" << endl;
+	cout << "loading employees..." << endl;
 
 	BST<Employee> employees;
 	ifstream fis(path.c_str());
