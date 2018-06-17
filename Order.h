@@ -34,8 +34,6 @@ public:
 
 	Order(istream &in, BST <Product> &products, Customer * customer);
 
-	Order(bool isDummy);
-
 	/** getters */
 
 	string getArriveBy() const;
