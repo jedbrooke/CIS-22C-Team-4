@@ -102,12 +102,25 @@
 		address
 	</entry>
 	<label>
+		Enter your City:
+	</label>
+	<entry>
+		city
+	</entry>
+	<label>
+		Enter your Zip Code:
+	</label>
+	<entry>
+		zip
+	</entry>
+	<label>
 		Enter your phone number ((xxx) xxx-xxxx):
 	</label>
 	<entry>
 		phone_num
 	</entry>
-	<button options="link:customer_interface,name:customer_create_new_account_2">
+	<variable>
+	<button options="link:customer_interface,name:customer_create_new_account_2" default="true">
 		submit
 	</button>
 </window>
