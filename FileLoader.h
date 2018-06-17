@@ -20,8 +20,8 @@ private:
     
 public:
     static BST<Product> loadProducts(string path);
-    static void loadCustomers(string path);
-    static void loadEmployees(string path);
+    static BST<Customer> loadCustomers(string path);
+    static BST<Employee> loadEmployees(string path);
 };
 
 #endif /* FileLoader_h */

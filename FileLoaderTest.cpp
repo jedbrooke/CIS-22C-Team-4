@@ -17,12 +17,13 @@ class FileLoader;
 int main(){
     
     string path = "products_in.txt";
-    
     BST<Product> p(FileLoader::loadProducts(path));
     
-    stringstream ss;
-    
-    p.save(ss);
-    
-    cout << ss.str();
+    path = "Customers.txt";
+    BST<Customer> c(FileLoader::loadCustomers(path));
+
+    path = "Employees.txt";
+    BST<Employee> e(FileLoader::loadEmployees(path));
+
+
 }

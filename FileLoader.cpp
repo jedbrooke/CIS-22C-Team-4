@@ -46,7 +46,7 @@ BST<Product> FileLoader::loadProducts(string path){
     return products;
 }
 
-static void loadCustomers(string path) {
+BST<Customer> FileLoader::loadCustomers(string path) {
 
 	cout << "loading customers" << endl;
 
@@ -56,12 +56,14 @@ static void loadCustomers(string path) {
 		while(fis.peek() != ios_base::end) {
 			Customer c = new Customer();
 			c.read(fis);
+			customers.insert(c);
 		}
 	}
 	fis.close();
+	return customers;
 }
 
-static void loadEmployees(string path) {
+BST<Employee> FileLoader::loadEmployees(string path) {
 
 	cout << "loading employees" << endl;
 
@@ -71,7 +73,9 @@ static void loadEmployees(string path) {
 		while(fis.peek() != ios_base::end) {
 			Employee e = new Employee();
 			e.read(fis);
+			employees.insert(e);
 		}
 	}
 	fis.close();
+	return employees;
 }
