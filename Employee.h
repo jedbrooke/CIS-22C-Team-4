@@ -27,6 +27,7 @@ public:
 	void write(ostream& out);	//write data to file
 
 	friend ostream& operator<<(ostream& out, const Employee& employee);		//display in console
+	string toString() const;
 };
 
 

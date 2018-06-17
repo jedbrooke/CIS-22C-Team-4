@@ -1,0 +1,19 @@
+bigfish17
+password123
+John
+Smith
+false
+1520 Mary Lane
+Snoopville
+12202
+johnsmith@gmail.com
+
+Rashaud10
+happyhappy12345
+Lyle
+McKyle
+false
+3230 Tootie Drive
+New Yawk City
+121212
+lyliemckylie@yahoo.com
