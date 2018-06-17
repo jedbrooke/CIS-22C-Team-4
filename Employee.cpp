@@ -111,9 +111,4 @@ ostream& operator<<(ostream& out, const Employee& employee) {
 	return out;
 }
 
-string Employee::toString() const {
-	stringstream ss;
-	ss << username << "," << password << "," << firstname << "," << lastname;
-	return ss.str();
-}
 

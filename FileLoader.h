@@ -9,7 +9,7 @@
 #define FileLoader_h
 #include <stdio.h>
 #include <fstream>
-#include "Product.cpp"
+#include "Product.h"
 #include "Customer.h"
 #include "Employee.h"
 #include "BST.h"

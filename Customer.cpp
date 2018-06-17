@@ -69,9 +69,10 @@ void Customer::setEmail(string email) {
 }
 
 
+/*
 void Customer::getOrder(ostream &out) const {
 	out << order;
-}
+}*/
 
 /*void Customer::getOrderList(ostream &out) const {
 orders.displayList(out);	//TODO: Change this

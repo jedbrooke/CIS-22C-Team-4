@@ -23,7 +23,7 @@ private:
 	string city;
 	unsigned zip;
 	string email;
-	Order order;
+	//Order order;
 	List<Order> orders;
 
 public:

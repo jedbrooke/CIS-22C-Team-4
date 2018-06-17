@@ -11,14 +11,22 @@
 #include <string>
 #include <gtk/gtk.h>
 #include <vector>
+#include <map>
 #include <cstddef> //for NULL
+#include "Heap.h"
+#include "BST.h"
+#include "Product.h"
+#include "Customer.h"
+#include "WindowManager.h"
 
+
+//class Heap;
 
 class WindowManager; //forward class declaration
 
 using namespace std;
 
-class Window{
+class Window {
 	
 protected:
 	string title;
@@ -27,7 +35,10 @@ protected:
 	GtkWidget* pbar;
 	static map<string, GtkWidget*> entries;
 	static GdkPixbuf* icon;
-	
+	static Heap* priority_queue;
+	static BST<Customer>* customers;
+	static BST<Product>* products;
+	//static HashTable* employees;
 
 public:
 	Window();
@@ -49,6 +60,14 @@ public:
 	void increase_pbar();
 
 	static void set_icon(string path);
+
+	static void assign_pointers(Heap* heap, BST<Customer>* _customers, BST<Product>* _products);
+
+	void create_content(string tagName, string text, map<string,string> optionsMap, GtkWidget* box);
+
+	static string create_xml_tag(string tag, string text);
+
+	static string create_xml_tag(string tag, string options, string text);
 
 };
 
