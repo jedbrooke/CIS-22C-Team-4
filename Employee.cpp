@@ -27,7 +27,7 @@ Employee::Employee(string username, string password, string firstName, string la
 }
 
 bool Employee::operator==(const Employee& employee) {
-	return (firstname == employee.firstname && lastname == employee.lastname && username == employee.username && password == employee.password);
+	return (username == employee.username && password == employee.password);
 }
 
 bool Employee::operator<(const Employee& employee) {
