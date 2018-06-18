@@ -38,14 +38,13 @@ protected:
 	static Heap* priority_queue;
 	static BST<Customer>* customers;
 	static BST<Product>* products;
+	//static Customer customer;
 	//static HashTable* employees;
 
 public:
 	Window();
 	
 	Window(string xml);
-	
-	//Window(string title, string labels_text[], string buttons_text[], string layout);
 	
 	~Window();
 	
@@ -68,6 +67,10 @@ public:
 	static string create_xml_tag(string tag, string text);
 
 	static string create_xml_tag(string tag, string options, string text);
+
+	static void create_db_list_xml(string &xml, string link, string name, string text);
+
+	static void string_find_and_replace(string find, string replace, string &subject);
 
 };
 

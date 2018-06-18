@@ -22,6 +22,7 @@ map<string, GtkWidget*> Window::entries;
 Heap* Window::priority_queue;
 BST<Customer>* Window::customers;
 BST<Product>* Window::products;
+//Customer customer;
 
 
 Window::Window(string xml) {
@@ -103,9 +104,15 @@ Window::Window(string xml) {
             
         } else if (tagName == "vbox") {
             
-            //create new box
-            boxes.push_back(gtk_vbox_new(FALSE, 2));
-            
+            //get homogeneous
+            if(optionsMap["homogeneous"] == "true"){
+                //create new box
+                boxes.push_back(gtk_vbox_new(TRUE, 2));
+            } else {
+                //create new box
+                boxes.push_back(gtk_vbox_new(FALSE, 2));
+            }
+
             //set the box spacing
             gtk_box_set_spacing(GTK_BOX(boxes.at(boxes.size()-1)),3);
             
@@ -118,7 +125,7 @@ Window::Window(string xml) {
         	boxes.push_back(scroll_window); //NULL,NULL for auto-generated scroll bars
 
         	//make the window bigger
-        	gtk_widget_set_size_request (scroll_window, 1200, 300);
+        	gtk_widget_set_size_request (scroll_window, 1500, 300);
 
         	//set the box border width
         	gtk_container_set_border_width (GTK_CONTAINER (boxes.at(boxes.size()-1)), 10);
@@ -333,6 +340,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
     if(name == "quit") {
         
         gtk_main_quit();
+
     } else if(name == "customer_sign_in") {
         
         g_print("in customer_sign_in block\n");
@@ -344,9 +352,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         g_print("%s",msg.c_str());
         msg = "password: " + psw + "\n";
         g_print("%s",msg.c_str());
-        
-        
-        
+              
     } else if(name == "employee_login") {
         
         unsigned id = atoi(gtk_entry_get_text(GTK_ENTRY(entries["id"])));
@@ -389,10 +395,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         	xml += create_xml_tag("entry","type=\"hidden\" value=\""+value+"\"","values");
 
         }
-        
-
-        
-        
+            
     } else if(name == "customer_create_new_account_2") {
 
     	map<string,string> values;
@@ -433,114 +436,13 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
     		//customers->insert(c);
     	}
 
-
-
-
     } else if(name == "customer_db_search"){
         
         string value = optionsMap["value"];
         
         if(value == "comp_name"){
             
-            stringstream productsSS;
-            //products->printToFile(productsSS);
-
-            vector<string> productsV = products->printListToString();
-
-            xml += "<vbox>\n";
-            xml += "<hbox homogeneous=\"true\">\n";
-            xml += create_xml_tag("label","number"); //index
-            xml += create_xml_tag("label","company"); //manf comp
-            xml += create_xml_tag("label","model"); //model
-            xml += create_xml_tag("label","screen size"); //screen size
-            xml += create_xml_tag("label","cpu gen"); //cpu gen
-            xml += create_xml_tag("label","year"); //year
-            xml += create_xml_tag("label","price"); //price
-            xml += create_xml_tag("label"," "); //order column
-            xml += "</hbox>\n";            
-
-            xml += "<scroll>\n";
-            xml += "<vbox>\n";
-            string attribute;
-            string make;
-
-            for (int i = 0; i < productsV.size(); ++i) {
-            	stringstream product(productsV.at(i));
-
-                xml += "<hbox homogeneous=\"true\">\n";
-
-                getline(product,attribute,',');
-                xml += create_xml_tag("label",attribute); //index
-
-                getline(product,make,',');
-                xml += create_xml_tag("label",make); //manf comp
-                
-                string model;
-                getline(product,model,',');
-                xml += create_xml_tag("label",model); //model
-                
-                getline(product,attribute,',');
-                xml += create_xml_tag("label",attribute+" in."); //screen size
-                
-                getline(product,attribute,',');
-                xml += create_xml_tag("label",attribute+"th gen"); //cpu gen
-                
-                getline(product,attribute,',');
-                xml += create_xml_tag("label",attribute); //year
-                
-                getline(product,attribute,',');
-                xml += create_xml_tag("label","$"+attribute+".00"); //price
-
-                xml += create_xml_tag("button","options=\"link:customer_view_cart,name:add_to_cart,value:" + make + " " + model + "\"","add to cart");
-                
-                xml += "</hbox>\n";
-                xml += "<hr>\n";
-
-                getline(productsSS,attribute); //skip line in between products
-
-
-            }
-
-            
-            /*
-            while(getline(productsSS,make)){
-                
-            	if(make == "") break;
-
-                xml += "<hbox homogeneous=\"true\">\n";
-
-                xml += create_xml_tag("label",make); //manf comp
-                
-                string model;
-                getline(productsSS,model);
-                xml += create_xml_tag("label",model); //model
-                
-                getline(productsSS,attribute);
-                xml += create_xml_tag("label",attribute+" in."); //screen size
-                
-                getline(productsSS,attribute);
-                xml += create_xml_tag("label",attribute+"th gen"); //cpu gen
-                
-                getline(productsSS,attribute);
-                xml += create_xml_tag("label",attribute); //year
-                
-                getline(productsSS,attribute);
-                xml += create_xml_tag("label","$"+attribute+".00"); //price
-
-                xml += create_xml_tag("button","options=\"link:customer_view_cart,name:add_to_cart,value:" + make + " " + model + "\"","add to cart");
-                
-                xml += "</hbox>\n";
-                xml += "<hr>\n";
-
-                getline(productsSS,attribute); //skip line in between products
-            }*/
-            
-            xml += "</vbox>\n";
-            xml += "</scroll>\n";
-            xml += "</vbox>\n";
-
-            //g_print("%s",xml.c_str());
-            
+            create_db_list_xml(xml,"customer_view_cart","add_to_cart","add to cart");
             
         } else if(value == "price"){
             
@@ -554,6 +456,72 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
     } else if(name == "ship"){
 
         //ship(index)
+
+    } else if (name == "employee_add_product") {
+    	gtk_entry_get_text(GTK_ENTRY(entries["email"]));
+
+    	string make = gtk_entry_get_text(GTK_ENTRY(entries["make"]));
+    	string model = gtk_entry_get_text(GTK_ENTRY(entries["model"]));
+    	string screenSize = gtk_entry_get_text(GTK_ENTRY(entries["screenSize"]));
+    	string cpuGen = gtk_entry_get_text(GTK_ENTRY(entries["cpuGen"]));
+    	string year = gtk_entry_get_text(GTK_ENTRY(entries["year"]));
+    	string price = gtk_entry_get_text(GTK_ENTRY(entries["price"]));
+
+    	Product p(make,model, atoi(screenSize.c_str()), atoi(cpuGen.c_str()), atoi(year.c_str()), atoi(price.c_str()));
+    	products->insert(p);
+
+    	xml += "<hr>\n";
+    	xml += "<vbox homogeneous=\"true\">\n";
+    	xml += create_xml_tag("label", "make: " + make);
+    	xml += create_xml_tag("label", "model: " + model);
+    	xml += create_xml_tag("label", "screen size: " + screenSize);
+    	xml += create_xml_tag("label", "cpu Gen: " + cpuGen + "th gen");
+    	xml += create_xml_tag("label", "year: " + year);
+    	xml += create_xml_tag("label", "price: $" + price + ".00");
+    	xml += "</vbox>\n";
+    	xml += "<hr>\n";
+
+    } else if(name == "employee_remove_product"){
+
+    	create_db_list_xml(xml,"employee_remove_product_confirm","remove_product","remove");
+
+    } else if(name == "remove_product"){
+
+    	string make_and_model = optionsMap["value"];
+
+    	msg = "value: " + make_and_model + "\n";
+
+    	g_print("%s",msg.c_str());
+
+    	size_t pos = make_and_model.find('`');
+    	string make = make_and_model.substr(0,pos);
+    	string model = make_and_model.substr(pos+1);
+
+    	string_find_and_replace("`"," ",model);
+
+    	g_print("%s",g_strconcat("make: ",make.c_str()," model: ", model.c_str(),"\n",NULL));
+
+    	Product pSearch(make,model,0,0,0,0);
+
+    	g_print("product made\n");
+
+    	msg = "product:\n" + products->find(pSearch)->toString() + "\n";
+
+    	g_print("%s",msg.c_str());
+
+    	xml += "<hr>\n";
+    	xml += "<vbox homogeneous=\"true\">\n";
+    	xml += create_xml_tag("label", "make: " + products->find(pSearch)->getMake());
+    	xml += create_xml_tag("label", "model: " + products->find(pSearch)->getModel());
+    	xml += create_xml_tag("label", "screen size: " + to_string(products->find(pSearch)->getScreenSize()));
+    	xml += create_xml_tag("label", "cpu Gen: " + to_string(products->find(pSearch)->getCpuGen()) + "th gen");
+    	xml += create_xml_tag("label", "year: " + to_string(products->find(pSearch)->getYear()));
+    	xml += create_xml_tag("label", "price: $" + to_string(products->find(pSearch)->getPrice()) + ".00");
+    	xml += "</vbox>\n";
+    	xml += "<hr>\n";
+
+    	products->remove(pSearch);
+
     }
     
     /*else if(name == "employee_view_orders") {
@@ -665,72 +633,75 @@ void Window::assign_pointers(Heap* heap, BST<Customer>* _customers, BST<Product>
 }
 
 
-/*
- Deprecated consturctor
- Window::Window(string title, string labels_text[], string buttons_text[], string layout) {
- 
- //create the window
- self_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
- g_signal_connect(self_window, "delete-event", G_CALLBACK(delete_event), NULL);
- gtk_container_set_border_width(GTK_CONTAINER(self_window), 10);
- 
- //create box
- self_box = gtk_vbox_new(FALSE, 2);
- 
- //make the title lable
- GtkWidget* label;
- label = gtk_label_new(title.c_str());
- 
- //title markup
- char* markup = g_strconcat("<big>", title.c_str(), "</big>", NULL);
- gtk_label_set_markup(GTK_LABEL(label), markup);
- g_free(markup);
- gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
- 
- //show the label
- gtk_widget_show(label);
- 
- //add title to box
- gtk_box_pack_start(GTK_BOX(self_box), label, FALSE, FALSE, 0);
- 
- //create secondary labels
- for (int i = 0; i < sizeof(labels_text) / sizeof(string); i++) {
- 
- //create new label
- label = gtk_label_new(labels_text[i].c_str());
- //set alignment
- gtk_misc_set_alignment(GTK_MISC(label), 30, 0);
- //add to box
- gtk_box_pack_start(GTK_BOX(self_box), label, FALSE, FALSE, 0);
- 
- //show the label
- gtk_widget_show(label);
- }
- 
- GtkWidget* button;
- 
- for(int i = 0; i < sizeof(buttons_text) / sizeof(string); i++) {
- 
- //create new button
- button = gtk_button_new_with_label(buttons_text[i].c_str());
- //set name
- gtk_widget_set_name(button,buttons_text[i].c_str());
- 
- //set alignment
- gtk_misc_set_alignment(GTK_MISC(button), 30, 0);
- 
- //set signal connect method
- g_signal_connect(button, "clicked", G_CALLBACK(button_pressed), FALSE);
- 
- //show the button
- gtk_widget_show(button);
- 
- //add it to the box
- gtk_box_pack_start(GTK_BOX(self_box), button, FALSE, FALSE, 0);
- 
- }
- 
- gtk_container_add(GTK_CONTAINER(self_window), self_box);
- 
- gtk_widget_show(self_window);
- }*/
+void Window::create_db_list_xml(string &xml, string link, string name, string text){
+
+	vector<string> productsV = products->printListToString();
+
+	xml += "<vbox>\n";
+	xml += "<hbox homogeneous=\"true\">\n";
+	xml += create_xml_tag("label","number"); //index
+	xml += create_xml_tag("label","company"); //manf comp
+	xml += create_xml_tag("label","model"); //model
+	xml += create_xml_tag("label","screen size"); //screen size
+	xml += create_xml_tag("label","cpu gen"); //cpu gen
+	xml += create_xml_tag("label","year"); //year
+	xml += create_xml_tag("label","price"); //price
+	xml += create_xml_tag("label"," "); //order column
+	xml += "</hbox>\n";            
+
+	xml += "<scroll>\n";
+	xml += "<vbox>\n";
+	string attribute;
+	string make;
+
+	for (int i = 0; i < productsV.size(); ++i) {
+		stringstream product(productsV.at(i));
+
+	    xml += "<hbox homogeneous=\"true\">\n";
+
+	    getline(product,attribute,',');
+	    xml += create_xml_tag("label",attribute); //index
+
+	    getline(product,make,',');
+	    xml += create_xml_tag("label",make); //manf comp
+	    
+	    string model;
+	    getline(product,model,',');
+	    xml += create_xml_tag("label",model); //model
+	    
+	    getline(product,attribute,',');
+	    xml += create_xml_tag("label",attribute+" in."); //screen size
+	    
+	    getline(product,attribute,',');
+	    xml += create_xml_tag("label",attribute+"th gen"); //cpu gen
+	    
+	    getline(product,attribute,',');
+	    xml += create_xml_tag("label",attribute); //year
+	    
+	    getline(product,attribute,',');
+	    xml += create_xml_tag("label","$"+attribute+".00"); //price
+
+	    string_find_and_replace(" ","`",model);
+
+	    xml += create_xml_tag("button","options=\"link:" + link + ",name:" + name + ",value:" + make + "`" + model + "\"",text);
+	    
+	    xml += "</hbox>\n";
+	    xml += "<hr>\n";
+
+	}
+	
+	xml += "</vbox>\n";
+	xml += "</scroll>\n";
+	xml += "</vbox>\n";
+
+}
+
+void Window::string_find_and_replace(string find, string replace, string &subject){
+
+	string::size_type n = 0;
+	while( (n = subject.find(find,n)) != string::npos){
+
+		subject.replace(n,find.size(), replace);
+		n += replace.size();
+	}
+}
