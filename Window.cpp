@@ -124,8 +124,16 @@ Window::Window(string xml) {
         	GtkWidget* scroll_window = gtk_scrolled_window_new(NULL,NULL);
         	boxes.push_back(scroll_window); //NULL,NULL for auto-generated scroll bars
 
-        	//make the window bigger
-        	gtk_widget_set_size_request (scroll_window, 1500, 300);
+        	if (optionsMap.find("columns") != optionsMap.end() && optionsMap.find("width") != optionsMap.end()) { //if the number of columns and the width is present
+        		//set the scroll window size
+        		int size = atoi(optionsMap["columns"].c_str()) * (atoi(optionsMap["width"].c_str())+4) + 15;
+        		gtk_widget_set_size_request (scroll_window, size, 300);
+        	} else {
+        		// just make it big
+        		gtk_widget_set_size_request (scroll_window, 1500, 300);
+        	}
+
+        	
 
         	//set the box border width
         	gtk_container_set_border_width (GTK_CONTAINER (boxes.at(boxes.size()-1)), 10);
@@ -146,6 +154,19 @@ Window::Window(string xml) {
 
         	//show the wdiget
         	gtk_widget_show(hr);
+
+        	continue;
+
+        } else if (tagName == "vr") {
+
+        	//make a horizontal separator
+        	GtkWidget* vr = gtk_vseparator_new();
+
+        	//pack it into the box
+        	gtk_box_pack_start(GTK_BOX(boxes.at(boxes.size()-1)),vr,FALSE,FALSE,0);
+
+        	//show the wdiget
+        	gtk_widget_show(vr);
 
         	continue;
 
@@ -243,6 +264,9 @@ void Window::create_content(string tagName, string text, map<string,string> opti
         //create new label
         widget = gtk_label_new(text.c_str());
 
+        //make the text selectable just for funsies, ok maybe not
+        //gtk_label_set_selectable (GTK_LABEL(widget), TRUE);
+
         //set styles
         if(optionsMap["style"] == "error"){
         	//error markup
@@ -250,9 +274,34 @@ void Window::create_content(string tagName, string text, map<string,string> opti
         	gtk_label_set_markup(GTK_LABEL(widget), markup);
         	g_free(markup);
         }
+
+        if (optionsMap.find("width") != optionsMap.end()) {//if the size option is present
+
+
+        	gtk_widget_set_size_request(widget,atoi(optionsMap["width"].c_str()),-1);
+        	
+        	gtk_label_set_line_wrap (GTK_LABEL(widget),TRUE);
+        }
+
+        if (optionsMap["justify"] == "center") {
+
+        	gtk_label_set_justify(GTK_LABEL(widget),GTK_JUSTIFY_CENTER);
+
+        	//set alignment
+        	gtk_misc_set_padding(GTK_MISC(widget),atoi(optionsMap["width"].c_str())/2.0, 0);
+
+        	//g_print("%s",g_strconcat("width is: ", to_string(atoi(optionsMap["width"].c_str())/2.0).c_str(),"\n",NULL));
+
+        } else if (optionsMap["justify"] == "right") {
+
+        	gtk_label_set_justify(GTK_LABEL(widget),GTK_JUSTIFY_RIGHT);
+        } else {
+
+        	//set alignment
+        	gtk_misc_set_alignment(GTK_MISC(widget), 0, 0);
+        }
         
-        //set alignment
-        gtk_misc_set_alignment(GTK_MISC(widget), 0, 0);
+       
         
     } else if (tagName == "entry") {
         
@@ -522,6 +571,18 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
     	products->remove(pSearch);
 
+    } else if(name == "employee_db_search"){
+        
+        string value = optionsMap["value"];
+        
+        if(value == "comp_name"){
+            xml += create_xml_tag("title","List Database of products by: Company name");
+            create_db_list_xml(xml);
+            
+        } else if(value == "price"){
+            
+            
+        }
     }
     
     /*else if(name == "employee_view_orders") {
@@ -637,19 +698,21 @@ void Window::create_db_list_xml(string &xml, string link, string name, string te
 
 	vector<string> productsV = products->printListToString();
 
-	xml += "<vbox>\n";
-	xml += "<hbox homogeneous=\"true\">\n";
-	xml += create_xml_tag("label","number"); //index
-	xml += create_xml_tag("label","company"); //manf comp
-	xml += create_xml_tag("label","model"); //model
-	xml += create_xml_tag("label","screen size"); //screen size
-	xml += create_xml_tag("label","cpu gen"); //cpu gen
-	xml += create_xml_tag("label","year"); //year
-	xml += create_xml_tag("label","price"); //price
-	xml += create_xml_tag("label"," "); //order column
-	xml += "</hbox>\n";            
+	string size = "width=\"100\""; 
+	string index_options = "width=\"50\" justify=\"center\"";
 
-	xml += "<scroll>\n";
+	xml += "<vbox>\n";
+	xml += "<hbox homogeneous=\"false\">\n";
+	xml += create_xml_tag("label",size,"number"); //index
+	xml += create_xml_tag("label",size,"company"); //manf comp
+	xml += create_xml_tag("label",size,"model"); //model
+	xml += create_xml_tag("label",size,"screen size"); //screen size
+	xml += create_xml_tag("label",size,"cpu gen"); //cpu gen
+	xml += create_xml_tag("label",size,"year"); //year
+	xml += create_xml_tag("label",size,"price"); //price
+	xml += "</hbox>\n";
+
+	xml += "<scroll columns=\"8\" " + size + ">\n";
 	xml += "<vbox>\n";
 	string attribute;
 	string make;
@@ -657,33 +720,120 @@ void Window::create_db_list_xml(string &xml, string link, string name, string te
 	for (int i = 0; i < productsV.size(); ++i) {
 		stringstream product(productsV.at(i));
 
-	    xml += "<hbox homogeneous=\"true\">\n";
+	    xml += "<hbox homogeneous=\"false\">\n";
 
 	    getline(product,attribute,',');
-	    xml += create_xml_tag("label",attribute); //index
+	    xml += create_xml_tag("label",index_options,attribute); //index
+
+	    xml += "<vr>\n";
 
 	    getline(product,make,',');
-	    xml += create_xml_tag("label",make); //manf comp
+	    xml += create_xml_tag("label",size,make); //manf comp
 	    
+	    xml += "<vr>\n";
+
 	    string model;
 	    getline(product,model,',');
-	    xml += create_xml_tag("label",model); //model
+	    xml += create_xml_tag("label",size,model); //model
 	    
+	    xml += "<vr>\n";
+
 	    getline(product,attribute,',');
-	    xml += create_xml_tag("label",attribute+" in."); //screen size
+	    xml += create_xml_tag("label",size,attribute+" in."); //screen size
 	    
+	    xml += "<vr>\n";
+
 	    getline(product,attribute,',');
-	    xml += create_xml_tag("label",attribute+"th gen"); //cpu gen
+	    xml += create_xml_tag("label",size,attribute+"th gen"); //cpu gen
 	    
+	    xml += "<vr>\n";
+
 	    getline(product,attribute,',');
-	    xml += create_xml_tag("label",attribute); //year
+	    xml += create_xml_tag("label",size,attribute); //year
 	    
+	    xml += "<vr>\n";
+
 	    getline(product,attribute,',');
-	    xml += create_xml_tag("label","$"+attribute+".00"); //price
+	    xml += create_xml_tag("label",size,"$"+attribute+".00"); //price
 
 	    string_find_and_replace(" ","`",model);
 
+		xml += "<vr>\n";
+
 	    xml += create_xml_tag("button","options=\"link:" + link + ",name:" + name + ",value:" + make + "`" + model + "\"",text);
+	    
+	    xml += "</hbox>\n";
+	    xml += "<hr>\n";
+
+	}
+	
+	xml += "</vbox>\n";
+	xml += "</scroll>\n";
+	xml += "</vbox>\n";
+
+}
+
+void Window::create_db_list_xml(string &xml){ //no buttons
+
+	vector<string> productsV = products->printListToString();
+
+	string size = "width=\"100\""; 
+	string index_options = "width=\"50\" justify=\"center\"";
+
+	xml += "<vbox>\n";
+	xml += "<hbox homogeneous=\"false\">\n";
+	xml += create_xml_tag("label",size,"number"); //index
+	xml += create_xml_tag("label",size,"company"); //manf comp
+	xml += create_xml_tag("label",size,"model"); //model
+	xml += create_xml_tag("label",size,"screen size"); //screen size
+	xml += create_xml_tag("label",size,"cpu gen"); //cpu gen
+	xml += create_xml_tag("label",size,"year"); //year
+	xml += create_xml_tag("label",size,"price"); //price
+	xml += "</hbox>\n";
+
+	           
+
+	xml += "<scroll columns=\"7\" " + size + ">\n";
+	xml += "<vbox>\n";
+	string attribute;
+
+	for (int i = 0; i < productsV.size(); ++i) {
+		stringstream product(productsV.at(i));
+
+	    xml += "<hbox homogeneous=\"false\">\n";
+
+	    getline(product,attribute,',');
+	    xml += create_xml_tag("label",index_options,attribute); //index
+
+	    xml += "<vr>\n";
+
+	    getline(product,attribute,',');
+	    xml += create_xml_tag("label",size,attribute); //manf comp
+	    
+	    xml += "<vr>\n";
+
+	    getline(product,attribute,',');
+	    xml += create_xml_tag("label",size,attribute); //model
+	    
+	    xml += "<vr>\n";
+
+	    getline(product,attribute,',');
+	    xml += create_xml_tag("label",size,attribute+" in."); //screen size
+	    
+	    xml += "<vr>\n";
+
+	    getline(product,attribute,',');
+	    xml += create_xml_tag("label",size,attribute+"th gen"); //cpu gen
+	    
+	    xml += "<vr>\n";
+
+	    getline(product,attribute,',');
+	    xml += create_xml_tag("label",size,attribute); //year
+	    
+	    xml += "<vr>\n";
+
+	    getline(product,attribute,',');
+	    xml += create_xml_tag("label",size,"$"+attribute+".00"); //price
 	    
 	    xml += "</hbox>\n";
 	    xml += "<hr>\n";

@@ -402,9 +402,6 @@
 	</button>
 </window>
 <window id="employee_list_database_results">
-	<title>
-		List Database of products by:
-	</title>
 	<variable>
 	<button options="link:employee_interface">
 		Go Back

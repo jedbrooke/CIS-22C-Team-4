@@ -70,6 +70,8 @@ public:
 
 	static void create_db_list_xml(string &xml, string link, string name, string text);
 
+	static void create_db_list_xml(string &xml);
+
 	static void string_find_and_replace(string find, string replace, string &subject);
 
 };
