@@ -73,18 +73,17 @@ string Customer::getOrder() const {
 	orders.displayNumberedList(out);
 	return out.str();
 }
+/*
+ void Customer::insertOrder() { //storing list of past order (Shipped);
+ if (r->isPlaced()) {
+ orders.insertStop(*r);
+ }
 
-void Customer::insertOrder() { //storing list of past order (Shipped);
-	if (r->isPlaced()) {
-		orders.insertStop(*r);
-	}
-	/*
-	 Order r;
-	 r.addLaptop(p);
-	 orders.insertStop(r);*/
-}
-
-
+ Order r;
+ r.addLaptop(p);
+ orders.insertStop(r);
+ }
+ */
 
 bool Customer::operator==(const Customer& customer) {
 	return (username == customer.username);
@@ -185,11 +184,12 @@ void Customer::write(ostream& out) {
 }
 
 ostream& operator<<(ostream& out, const Customer& customer) {
-stringstream os;
+	stringstream os;
 	customer.orders.displayNumberedList(os);
 //out << customer.r->printDetailed();
 	out << customer.getFirstname() << "," << customer.getLastname() << ","
-			<< customer.getAddress() <<"," <<customer.getCity()<<","<<customer.getEmail()<<","<<customer.getZip()<<'\n';
+			<< customer.getAddress() << "," << customer.getCity() << ","
+			<< customer.getEmail() << "," << customer.getZip() << '\n';
 	out << os.str();
 	return out;
 }
@@ -210,7 +210,7 @@ string Customer::displayCustomer() {
 
 void Customer::activeOrder(Order *p) {
 
-		r = p; 	//point activeORder to the order passed in.
+	r = p; 	//point activeORder to the order passed in.
 }
 
 string Customer::printActive() {
@@ -225,10 +225,16 @@ void Customer::addToProduct(Product* p) {
 }
 
 void Customer::removeProduct(int index) {
-	if(!r->isPlaced()){
-	r->removeLaptop(index - 1);
-}
+	assert(r->isPlaced());
+	if (!r->isPlaced()) {
+		r->removeLaptop(index - 1);
+	}
 }
 
-
+void Customer::placeOrder(int i) {
+	r->placeOrder(i);
+	if (r->isPlaced()) {
+		orders.insertStop(*r);
+	}
+}
 
