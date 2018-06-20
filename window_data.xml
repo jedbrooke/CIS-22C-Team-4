@@ -163,17 +163,18 @@
 		Search for a product by manufacturing company
 	</label>
 	<entry>
-		manf_company
+		make
 	</entry>
 	<label>
-		Or:
+		And/Or:
 	</label>
 	<label>
 		Search for a product by model
 	</label>
 	<entry>
-		product_model
+		model
 	</entry>
+	<variable>
 	<button options="link:customer_search_results,name:customer_search">
 		Search -O
 	</button>
@@ -182,9 +183,6 @@
 	</button>
 </window>
 <window id="customer_search_results">
-	<title>
-		Search Results:
-	</title>
 	<variable>
 	<button options="link:customer_search_for_a_product">
 		Search again
@@ -209,11 +207,11 @@
 	<label>
 		Do you want to list products sorted by:
 	</label>
-	<button options="link:customer_list_database_for_products_results,name:customer_db_search,value:comp_name">
+	<button options="link:customer_list_database_for_products_results,name:customer_db_list,value:comp_name">
 		Company Name
 	</button>
-	<button options="link:customer_list_database_for_products_results,name:customer_db_search,value:price">
-		Price
+	<button options="link:customer_list_database_for_products_results,name:customer_db_list,value:model">
+		Model Name
 	</button>
 	<button options="link:customer_interface">
 		go back
@@ -391,11 +389,8 @@
 	<button options="link:employee_list_database_results,name:employee_db_search,value:comp_name">
 		Company name
 	</button>
-	<button options="link:employee_list_database_results,name:employee_db_search,value:price_htl">
-		price: highest to lowest
-	</button>
-	<button options="link:employee_list_database_results,name:employee_db_search,value:price_lth">
-		price: lowest to highest
+	<button options="link:employee_list_database_results,name:employee_db_search,value:model">
+		Model name
 	</button>
 	<button options="link:employee_interface">
 		go Back

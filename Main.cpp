@@ -9,11 +9,11 @@
 #include "Customer.h"
 #include "Employee.h"
 #include "HashTable.h"
-#include "Product.cpp"
-#include "ProductS.cpp"
+#include "Product.cpp" //will not compile with .h
+#include "ProductS.cpp" //will not compile with .h
 #include "Heap.h"
 #include "FileLoader.h"
-#include "WindowManager.cpp"
+#include "WindowManager.cpp" //will not compile with .h
 #include <gtk/gtk.h>
 
 using namespace std;
@@ -28,6 +28,8 @@ int main(int argc, char *argv[]) {
 
 	BST<Product> bstp;
 	bstp.loadPrimary("Products_in.txt");
+	BST<ProductS> bsts;
+	bsts.loadSecondary("Products_in.txt");
 	Product product;
 	ProductS productS;
 	//Heap heap;
@@ -35,7 +37,7 @@ int main(int argc, char *argv[]) {
 	cout << "Success!" << endl;
 
 
-	Window::assign_pointers(NULL,NULL,&bstp);
+	Window::assign_pointers(NULL,NULL,&bstp,&bsts);
 	WindowManager::loadxml("window_data.xml");
 	WindowManager::go_to_window("welcome_screen","");
 

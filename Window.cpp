@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string>
 #include <sstream>
+#include <locale>
 #include <gtk/gtk.h>
 //#include "Customer.h"
 
@@ -22,6 +23,7 @@ map<string, GtkWidget*> Window::entries;
 Heap* Window::priority_queue;
 BST<Customer>* Window::customers;
 BST<Product>* Window::products;
+BST<ProductS>* Window::products_secondary;
 //Customer customer;
 
 
@@ -485,17 +487,81 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
     		//customers->insert(c);
     	}
 
-    } else if(name == "customer_db_search"){
+    } else if(name == "customer_search"){
+
+    	string make = gtk_entry_get_text(GTK_ENTRY(entries["make"]));
+        string model = gtk_entry_get_text(GTK_ENTRY(entries["model"]));
+
+        if(make == "" && model == ""){
+        	xml += create_xml_tag("label","style=\"error\"","Please enter the make and/or model you would like to search for.");
+     		WindowManager::go_to_window("customer_search_for_a_product",xml);
+     		return;
+        } 
+
+
+
+        vector<string> productsV = products->printListToString();
+        vector<string> matches;
+
+        if( make != "" && model == ""){ //if they just searched for make
+        	xml += create_xml_tag("title","Search Results for \"" + make + "\":");
+        	//loop through the products in the vector
+        	for (int i = 0; i < productsV.size(); ++i) {
+        		vector<string> p = string_split(productsV[i],','); //vector storing product information from vector of all products
+        		if(to_lower(p[1]).find(to_lower(make)) != string::npos ){ //if the queried make is present in the current porduct
+        			p.at(0) = to_string(matches.size()+1); //set the index
+        			matches.push_back(vector_join(p,",")); //add the product to the vector of matches
+        		}
+        	}
+
+        } else if( make == "" && model != ""){ //if they just searched for model
+        	xml += create_xml_tag("title","Search Results for \"" + model + "\":");
+        	//loop through the products in the vector
+        	for (int i = 0; i < productsV.size(); ++i) {
+        		vector<string> p = string_split(productsV[i],','); //vector storing product information from vector of all products
+        		if(to_lower(p[2]).find(to_lower(model)) != string::npos ){ //if the queried make is present in the current porduct
+        			p.at(0) = to_string(matches.size()+1); //set the index
+        			matches.push_back(vector_join(p,",")); //add the product to the vector of matches
+        		}
+        	}
+
+        } else if( make != "" && model != ""){ //if they search for both
+        	xml += create_xml_tag("title","Search Results for \"" + make + " " + model + "\":");
+        	//loop through the products in the vector
+        	for (int i = 0; i < productsV.size(); ++i) {
+        		vector<string> p = string_split(productsV[i],','); //vector storing product information from vector of all products
+        		if(to_lower(p[1]).find(to_lower(make)) != string::npos && to_lower(p[2]).find(to_lower(model)) != string::npos ){ //if the queried make is present in the current porduct
+        			p.at(0) = to_string(matches.size()+1); //set the index
+        			matches.push_back(vector_join(p,",")); //add the product to the vector of matches
+        		}
+        	}
+
+        }
+
+        if(matches.size() == 0){
+
+        	xml += create_xml_tag("label","No matches");
+        } else {
+        	xml += create_xml_tag("label","There are " + to_string(matches.size()) + " matches.");
+        	create_db_list_xml(matches,xml,"customer_view_cart","add_to_cart","add to cart");
+        }
+
+    } else if(name == "customer_db_list"){
         
         string value = optionsMap["value"];
         
         if(value == "comp_name"){
-            
-            create_db_list_xml(xml,"customer_view_cart","add_to_cart","add to cart");
+
+            vector<string> productsV = products->printListToString();
+            create_db_list_xml(productsV,xml,"customer_view_cart","add_to_cart","add to cart");
             
         } else if(value == "price"){
             
             
+        } else if(value == "model"){
+            
+            vector<string> productsV = products_secondary->printListToString();
+            create_db_list_xml(productsV,xml,"customer_view_cart","add_to_cart","add to cart");
         }
         
     } else if(name == "add_to_cart"){
@@ -532,7 +598,8 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
     } else if(name == "employee_remove_product"){
 
-    	create_db_list_xml(xml,"employee_remove_product_confirm","remove_product","remove");
+    	vector<string> productsV = products->printListToString();
+    	create_db_list_xml(productsV,xml,"employee_remove_product_confirm","remove_product","remove");
 
     } else if(name == "remove_product"){
 
@@ -577,11 +644,18 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         
         if(value == "comp_name"){
             xml += create_xml_tag("title","List Database of products by: Company name");
-            create_db_list_xml(xml);
+            xml += "<hr>\n";
+            vector<string> productsV = products->printListToString();
+            create_db_list_xml(productsV,xml);
             
         } else if(value == "price"){
             
             
+        } else if(value == "model"){
+            xml += create_xml_tag("title","List Database of products by: Company name");
+            xml += "<hr>\n";
+            vector<string> productsV = products_secondary->printListToString();
+            create_db_list_xml(productsV,xml);
         }
     }
     
@@ -684,19 +758,19 @@ void Window::set_icon(string path) {
     
 }
 
-void Window::assign_pointers(Heap* heap, BST<Customer>* _customers, BST<Product>* _products) {
+void Window::assign_pointers(Heap* heap, BST<Customer>* _customers, BST<Product>* _products, BST<ProductS>* _products_secondary) {
     
     //priority_queue = &heap;
-    customers = _customers;
+    //customers = _customers;
 	products = _products;
+
+	products_secondary = _products_secondary;
 
     g_print("pointers assigned\n");    
 }
 
 
-void Window::create_db_list_xml(string &xml, string link, string name, string text){
-
-	vector<string> productsV = products->printListToString();
+void Window::create_db_list_xml(vector<string> productsV, string &xml, string link, string name, string text){
 
 	string size = "width=\"100\""; 
 	string index_options = "width=\"50\" justify=\"center\"";
@@ -712,8 +786,11 @@ void Window::create_db_list_xml(string &xml, string link, string name, string te
 	xml += create_xml_tag("label",size,"price"); //price
 	xml += "</hbox>\n";
 
-	xml += "<scroll columns=\"8\" " + size + ">\n";
-	xml += "<vbox>\n";
+	if(productsV.size() > 9){
+		xml += "<scroll columns=\"8\" " + size + ">\n";
+		xml += "<vbox>\n";
+	}
+	
 	string attribute;
 	string make;
 
@@ -767,15 +844,16 @@ void Window::create_db_list_xml(string &xml, string link, string name, string te
 
 	}
 	
-	xml += "</vbox>\n";
-	xml += "</scroll>\n";
+	if (productsV.size() > 9) {
+		xml += "</vbox>\n";
+		xml += "</scroll>\n";
+	}
+	
 	xml += "</vbox>\n";
 
 }
 
-void Window::create_db_list_xml(string &xml){ //no buttons
-
-	vector<string> productsV = products->printListToString();
+void Window::create_db_list_xml(vector<string> productsV, string &xml){ //no buttons
 
 	string size = "width=\"100\""; 
 	string index_options = "width=\"50\" justify=\"center\"";
@@ -853,5 +931,40 @@ void Window::string_find_and_replace(string find, string replace, string &subjec
 
 		subject.replace(n,find.size(), replace);
 		n += replace.size();
+	}
+
+}
+
+vector<string> Window::string_split(const string &input, char delim){
+
+	vector<string> v;
+	stringstream ss(input);
+	string token;
+	while(getline(ss,token,delim)){v.push_back(token);} 
+	return v;
+
+}
+
+string Window::to_lower(string str){ //Lifted from cplusplus.com http://www.cplusplus.com/reference/locale/tolower/
+	string output;
+	locale loc;
+	for (string::size_type i=0; i<str.length(); ++i){
+		output += tolower(str[i],loc);
+	}
+    return output;
+}
+
+string Window::vector_join(const vector<string> &v, const char* const delim){ //Lifted from SO: https://stackoverflow.com/questions/5288396/c-ostream-out-manipulation/5289170#5289170
+
+	switch(v.size()){
+		case 0:
+			return "";
+		case 1:
+			return v[0];
+		default:
+			ostringstream ss;
+			copy(v.begin(), v.end()-1, ostream_iterator<string>(ss, delim));
+			ss << *v.rbegin();
+			return ss.str();
 	}
 }
