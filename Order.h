@@ -34,8 +34,6 @@ public:
 
 	Order(istream &in, BST <Product> &products, Customer * customer);
 
-	Order(bool isDummy);
-
 	/** getters */
 
 	string getArriveBy() const;
@@ -66,6 +64,8 @@ public:
 	//Adds a new laptop. If laptop matches existing laptop, increment by 1. Changes price of order.
 	//Pre: !isShipped
 	
+	void addLaptop(string laptopKey);
+
 	void removeLaptop(int index);
 	//removes a laptop from the list, by index. Changes price of order.
 	//Pre: !isShipped
@@ -94,8 +94,6 @@ public:
 	void save(ostream & out);
 
 	Order * load(istream & in, BST<Product> & products);
-	friend ostream& operator<<(ostream& out, const Order& order) ;
-
 };
 
 

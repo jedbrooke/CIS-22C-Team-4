@@ -3,9 +3,6 @@
  * Andrew Maxwell
  */
 
-
-
-//TODO: figure out remove items
 #include <vector>
 #include <iostream>
 #include <math.h>
@@ -50,6 +47,16 @@ bool DEBUG = false;
     //helper function to insert
     //bubbles an element up to its proper location
 
+    void Heap::remove(int index) {
+    	assert(heaped);
+    	assert(1 <= index);
+    	assert(index <= heap_size);
+    	heap -> at(index) = heap -> at(heap_size);
+    	heap -> pop_back();
+    	heap_size--;
+    	heapify(index);
+    }
+
     /**Constructors*/
 
     Heap::Heap() {
@@ -63,6 +70,33 @@ bool DEBUG = false;
 
     /**Manipulation Procedures*/
 
+    void Heap::sort() {				//sorts (de-heaps) the vector.
+    	if (heaped) {
+    		int realLength = heap_size;
+    		while (heap_size > 1) {
+    			if (DEBUG) {
+    				cout << "\ninitially\n";
+    				printRaw(cout);
+    			}
+    			Order * swap = heap -> at(1);
+    			heap -> at(1) = heap -> at(heap_size);
+    			heap -> at(heap_size) = swap;
+    			if (DEBUG) {
+    				cout << "\nafter swapping\n";
+    				printRaw(cout);
+    			}
+    			heap_size--;
+    			heapify(1);
+    			if (DEBUG) {
+    				cout << "\nafter decreasing length and heapify\n";
+    				printRaw(cout);
+    			}
+    		}
+    		heap_size = realLength;
+    		heaped = false;
+    	}
+    }
+
     void Heap::build_heap() {
         for (int i = heap_size/2; i > 0; i--) {
             heapify(i);
@@ -72,6 +106,10 @@ bool DEBUG = false;
     //Builds the heap
     //Called as a helper function of the constructor
     //Calls heapify as a helper function
+
+    void Heap::buildHeap() {
+    	build_heap();
+    }
 
     void Heap::place(Order * o, int days) {
     	assert(heaped);
@@ -118,16 +156,6 @@ bool DEBUG = false;
     			remove(i);
     		}
     	}
-    }
-
-    void Heap::remove(int index) {
-    	assert(heaped);
-    	assert(1 <= index);
-    	assert(index <= heap_size);
-    	heap -> at(index) = heap -> at(heap_size);
-    	heap -> pop_back();
-    	heap_size--;
-    	heapify(index);
     }
 
     /**Access Functions*/
@@ -186,33 +214,6 @@ bool DEBUG = false;
 
     /**Additional Operations*/
 
-    void Heap::sort() {				//sorts (de-heaps) the vector.
-    	if (heaped) {
-    		int realLength = heap_size;
-    		while (heap_size > 1) {
-    			if (DEBUG) {
-    				cout << "\ninitially\n";
-    				printRaw(cout);
-    			}
-    			Order * swap = heap -> at(1);
-    			heap -> at(1) = heap -> at(heap_size);
-    			heap -> at(heap_size) = swap;
-    			if (DEBUG) {
-    				cout << "\nafter swapping\n";
-    				printRaw(cout);
-    			}
-    			heap_size--;
-    			heapify(1);
-    			if (DEBUG) {
-    				cout << "\nafter decreasing length and heapify\n";
-    				printRaw(cout);
-    			}
-    		}
-    		heap_size = realLength;
-    		heaped = false;
-    	}
-    }
-
     void Heap::printRaw(ostream& out) const {	//prints all of the orders for debugging without sorting.
         for (int i = 0; i <= heap_size; i++) {
             out << "#" << i << " " << heap -> at(i) -> print() << endl;
@@ -234,7 +235,7 @@ bool DEBUG = false;
     	} else {
     		out << "Unshipped orders:\n";
         	for (int i = heap_size; i >= 1; i--) {
-            	out << (*heap)[i] -> print();
+            	out << (*heap)[i] -> print() << endl;
         	}
     	}
     	heaped = false;
