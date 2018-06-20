@@ -50,6 +50,9 @@
 	<button options="link:customer_interface,name:customer_sign_in" default="true">
 		submit
 	</button>
+	<button options="link:customer_login_screen">
+		back
+	</button>
 </window>
 <window id="customer_create_new_account">
 	<title>
@@ -82,6 +85,9 @@
 	<variable>
 	<button options="link:customer_create_new_account_cont,name:customer_create_new_account_1">
 		Enter
+	</button>
+	<button options="link:customer_login_screen">
+		back
 	</button>
 </window>
 <window id="customer_create_new_account_cont">
@@ -157,17 +163,18 @@
 		Search for a product by manufacturing company
 	</label>
 	<entry>
-		manf_company
+		make
 	</entry>
 	<label>
-		Or:
+		And/Or:
 	</label>
 	<label>
 		Search for a product by model
 	</label>
 	<entry>
-		product_model
+		model
 	</entry>
+	<variable>
 	<button options="link:customer_search_results,name:customer_search">
 		Search -O
 	</button>
@@ -176,9 +183,6 @@
 	</button>
 </window>
 <window id="customer_search_results">
-	<title>
-		Search Results:
-	</title>
 	<variable>
 	<button options="link:customer_search_for_a_product">
 		Search again
@@ -203,11 +207,11 @@
 	<label>
 		Do you want to list products sorted by:
 	</label>
-	<button options="link:customer_list_database_for_products_results,name:customer_db_search,value:comp_name">
+	<button options="link:customer_list_database_for_products_results,name:customer_db_list,value:comp_name">
 		Company Name
 	</button>
-	<button options="link:customer_list_database_for_products_results,name:customer_db_search,value:price">
-		Price
+	<button options="link:customer_list_database_for_products_results,name:customer_db_list,value:model">
+		Model Name
 	</button>
 	<button options="link:customer_interface">
 		go back
@@ -309,7 +313,7 @@
 	<button options="link:employee_add_new_product">
 		Add a new product
 	</button>
-	<button options="link:employee_remove_product">
+	<button options="link:employee_remove_product,name:employee_remove_product">
 		Remove a product
 	</button>
 	<button options="link:end_screen">
@@ -385,20 +389,14 @@
 	<button options="link:employee_list_database_results,name:employee_db_search,value:comp_name">
 		Company name
 	</button>
-	<button options="link:employee_list_database_results,name:employee_db_search,value:price_htl">
-		price: highest to lowest
-	</button>
-	<button options="link:employee_list_database_results,name:employee_db_search,value:price_lth">
-		price: lowest to highest
+	<button options="link:employee_list_database_results,name:employee_db_search,value:model">
+		Model name
 	</button>
 	<button options="link:employee_interface">
 		go Back
 	</button>
 </window>
 <window id="employee_list_database_results">
-	<title>
-		List Database of products by:
-	</title>
 	<variable>
 	<button options="link:employee_interface">
 		Go Back
@@ -412,7 +410,7 @@
 		Enter company:
 	</label>
 	<entry>
-		company
+		make
 	</entry>
 	<label>
 		Enter model:
@@ -421,10 +419,16 @@
 		model
 	</entry>
 	<label>
-		Enter price:
+		Enter Screen Size(in):
 	</label>
 	<entry>
-		price
+		screenSize
+	</entry>
+	<label>
+		Enter CPU Gen:
+	</label>
+	<entry>
+		cpuGen
 	</entry>
 	<label>
 		Enter year:
@@ -433,40 +437,10 @@
 		year
 	</entry>
 	<label>
-		Enter CPU Gen:
+		Enter price:
 	</label>
 	<entry>
-		cpu
-	</entry>
-	<label>
-		Enter Screen Size(in):
-	</label>
-	<entry>
-		screen_size
-	</entry>
-	<label>
-		Enter Resolution:
-	</label>
-	<entry>
-		resolution
-	</entry>
-	<label>
-		Enter Aspect Ratio:
-	</label>
-	<entry>
-		ar
-	</entry>
-	<label>
-		Enter Max RAM:
-	</label>
-	<entry>
-		ram
-	</entry>
-	<label>
-		Enter Weight:
-	</label>
-	<entry>
-		weight
+		price
 	</entry>
 	<button options="link:employee_add_new_product_confirm,name:employee_add_product">
 		submit
@@ -483,7 +457,7 @@
 		product summary:
 	</label>
 	<variable>
-	<button options="link:employee_add_product">
+	<button options="link:employee_add_new_product">
 		Add another product
 	</button>
 	<button options="link:employee_interface">
@@ -497,6 +471,21 @@
 	<variable>
 	<button options="link:employee_interface">
 		cancel
+	</button>
+</window>
+<window id="employee_remove_product_confirm">
+	<title>
+		Removing product
+	</title>
+	<label>
+		product summary:
+	</label>
+	<variable>
+	<button options="link:employee_remove_product">
+		Remove another product
+	</button>
+	<button options="link:employee_interface">
+		go back
 	</button>
 </window>
 <window id="end_screen">
