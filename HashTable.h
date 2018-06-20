@@ -29,21 +29,18 @@ public:
     int hash(string key) const;
 
 
-    void remove(Customer c);
-
-    int search(htdata f) const;
 
 
-    void insert(htdata c);
+
+    void insert(htdata& c);
 
     void displayByLastname(ostream& out, string lastname) ;
     void displayByFirstname(ostream& out, string firstname);
     void displayCustomer(ostream& out);
-    void Display(htdata c,ostream& out) ;
 
 private:
     static const int SIZE = 100;
-    List<htdata> Table[SIZE];
+    List<htdata*> Table[SIZE];
 };
 
 template<class htdata>
@@ -58,36 +55,25 @@ int HashTable<htdata>:: hash(string key) const {
 }
 
 template<class htdata>
-void HashTable<htdata>::insert(htdata c) {
+void HashTable<htdata>::insert(htdata& c) {
 	int index = hash (c.getFirstname()+ c.getLastname());
-	Table[index].insertStop(c);
+	Table[index].insertStop (&c);
+
 }
 
 
-template<class htdata>
-void HashTable<htdata>::Display(htdata c, ostream& out) {
-	int index = hash ( c.getFirstname()+ c.getLastname());
-	//Table[index].displayNumberedList(out);
-	Table[index].displayNumberedList(cout);
-}
 
-template<class htdata>
-int HashTable<htdata>::search (htdata f) const{
-	int index = hash (f.getFirstname()+ f.getLastname());
-		return Table[index].linearSearch(f);
-	/*
-	if(Table[index].linearSearch(f) != -1){
-		return index;			//return index of customer, working on return multiple customer
-	}
-	else return -1; */
-}
+
 
 template <class htdata>
 void HashTable<htdata>::displayCustomer(ostream& out) {
 	for (int i =0; i< SIZE; i++){
-
-			Table[i].displayList(out);
-}
+		Table[i].startIterator();
+		while(!Table[i].offEnd()){
+			out << *(Table[i].getIterator());
+			Table[i].moveIterNext();
+		}
+	}
 }
 
 template <class htdata>
@@ -95,12 +81,13 @@ void HashTable<htdata>::displayByFirstname(ostream& out, string firstname) {
 	for (int i =0; i< SIZE; i++){
 		Table[i].startIterator();
 		for (int j=0; j <Table[i].getLength(); j++){
-			if(Table[i].getIterator().getFirstname() == firstname){
-				out << Table[i].getIterator();
+			if(Table[i].getIterator()->getFirstname() == firstname){
+				out << *(Table[i].getIterator());
 			}
 			Table[i].moveIterNext();
 		}
 	}
+	cout << "Customer not found";
 }
 
 
@@ -109,11 +96,13 @@ void HashTable<htdata>::displayByLastname(ostream& out, string lastname) {
 	for (int i =0; i< SIZE; i++){
 		Table[i].startIterator();
 		for (int j=0; j <Table[i].getLength(); j++){
-			if(Table[i].getIterator().getLastname() == lastname){
-				out << Table[i].getIterator();
+			if(Table[i].getIterator()->getLastname() == lastname){
+				out << *(Table[i].getIterator());
 			}
 			Table[i].moveIterNext();
 		}
 	}
+	cout << "Customer not found" ;
 }
+
 #endif /* HASHTABLE_H_ */
