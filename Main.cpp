@@ -32,7 +32,9 @@ int main(int argc, char *argv[]) {
 	bsts.loadSecondary("Products_in.txt");
 	Product product;
 	ProductS productS;
-	//Heap heap;
+	Heap heap;
+	Customer customer;
+	Employee employee;
 
 	cout << "Success!" << endl;
 
