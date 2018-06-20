@@ -405,9 +405,9 @@ void BST<bstdata>::saveHelper(ostream& out, Node*root) const {
 	if (root == NULL)
 		return;
 	else {
-		saveHelper(out, root->left);
 		root->data.print(out);
 		out << endl;
+		saveHelper(out, root->left);
 		saveHelper(out, root->right);
 	}
 }
