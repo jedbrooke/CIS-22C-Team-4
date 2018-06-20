@@ -10,7 +10,7 @@
 using namespace std;
 
 class Order;
-class Customer : public User {
+class Customer: public User {
 private:
 	string address;
 	string city;
@@ -22,7 +22,9 @@ private:
 
 public:
 	Customer();
-	Customer(string username, string password, string firstName, string lastName, bool isEmployee, string address, string city, unsigned zip, string email);
+	Customer(string username, string password, string firstName,
+			string lastName, bool isEmployee, string address, string city,
+			unsigned zip, string email);
 
 	string getAddress() const;
 	string getCity() const;
@@ -36,7 +38,7 @@ public:
 
 	string displayCustomer(); //print all customers
 	string getOrder() const;		//print list of orders
-	void insertOrder();
+	//void insertOrder();
 
 	bool operator==(const Customer& customer);
 	bool operator<(const Customer& customer);
@@ -48,15 +50,12 @@ public:
 	void read(ifstream& in);	//read data from file
 	void write(ostream& out);	//write data to file
 
-
-	friend ostream& operator<<(ostream& out, const Customer& customer) ;
+	friend ostream& operator<<(ostream& out, const Customer& customer);
 	void activeOrder(Order *p);	//pass in orders to the cart.
-	string printActive();		//return active order detail (Order's printDeTailed() )
-
+	string printActive();//return active order detail (Order's printDeTailed() )
+	void placeOrder(int i);		//place order
 	void addToProduct(Product* p);	//add product to the active Order
-	void removeProduct(int index);	//remove product from cart if order not placed.
+	void removeProduct(int index);//remove product from cart if order not placed.
 };
-
-
 
 #endif /* CUSTOMER_H_ */
