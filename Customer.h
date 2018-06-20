@@ -1,9 +1,3 @@
-/*
- * Customer.h
- * Tin Nguyen
- */
-
-
 #ifndef CUSTOMER_H_
 #define CUSTOMER_H_
 
@@ -16,20 +10,19 @@
 using namespace std;
 
 class Order;
-
 class Customer : public User {
 private:
 	string address;
 	string city;
 	unsigned zip;
 	string email;
-	//Order order;
-	List<Order> orders;
+	subOrder sub;
+	Order * r;	//store active order
+	List<Order> orders; //store history order
 
 public:
 	Customer();
 	Customer(string username, string password, string firstName, string lastName, bool isEmployee, string address, string city, unsigned zip, string email);
-	//No orders in constructor
 
 	string getAddress() const;
 	string getCity() const;
@@ -41,23 +34,27 @@ public:
 	void setZip(unsigned zip);
 	void setEmail(string email);
 
-	void displayCustomer(ostream& out); //print all customers
-	void getOrder(ostream &out) const;		//print list of orders
-	void insertOrder(Order order);				//insert new order to list
-	void removeOrder(Order order);				//remove an order from list
+	string displayCustomer(); //print all customers
+	string getOrder() const;		//print list of orders
+	void insertOrder();
 
 	bool operator==(const Customer& customer);
 	bool operator<(const Customer& customer);
 	bool operator>(const Customer& customer);
 
-	void printCustomerHeader(ostream& out);
-	string toString(const Customer& customer, ostream& out);
+	string toString();	//return customer's info without
+						//order information
 
 	void read(ifstream& in);	//read data from file
 	void write(ostream& out);	//write data to file
 
-	friend ostream& operator<<(ostream& out, const Customer customer);		//display in console
 
+	friend ostream& operator<<(ostream& out, const Customer& customer) ;
+	void activeOrder(Order *p);	//pass in orders to the cart.
+	string printActive();		//return active order detail (Order's printDeTailed() )
+
+	void addToProduct(Product* p);	//add product to the active Order
+	void removeProduct(int index);	//remove product from cart if order not placed.
 };
 
 
