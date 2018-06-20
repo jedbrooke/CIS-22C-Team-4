@@ -269,3 +269,13 @@ using namespace std;
 		}
 
 	}
+ostream& operator<<(ostream& out, const Order& order) {
+		out <<
+				"\nOrder's Info: " <<
+				"\nPrice: $" << order.getPrice()<<
+				"\nOrder Placed: " <<order.isPlaced()<<
+				"\nDate placed: " << order.getDayPlaced() <<
+				"\nShipping speed: "<<order.getShippingSpeed()<<
+				"\nIs Ship:" << order.isShipped() << endl;
+		return out;
+	}

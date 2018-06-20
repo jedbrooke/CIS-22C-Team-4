@@ -1,8 +1,3 @@
-/*
- * Customer.cpp
- * Tin Nguyen
- */
-
 #include "Customer.h"
 #include <iostream>
 #include "Order.h"
@@ -12,6 +7,7 @@
 #include <string>
 using namespace std;
 
+class Order;
 Customer::Customer() {
 	username = "";
 	password = "";
@@ -22,9 +18,12 @@ Customer::Customer() {
 	city = "";
 	zip = 0;
 	email = "";
+	r = NULL;
 }
 
-Customer::Customer(string username, string password, string firstName, string lastName, bool isEmployee, string address, string city, unsigned zip, string email) {
+Customer::Customer(string username, string password, string firstName,
+		string lastName, bool isEmployee, string address, string city,
+		unsigned zip, string email) {
 	this->username = username;
 	this->password = password;
 	this->firstname = firstName;
@@ -34,6 +33,7 @@ Customer::Customer(string username, string password, string firstName, string la
 	this->city = city;
 	this->zip = zip;
 	this->email = email;
+	r = NULL;
 }
 
 string Customer::getAddress() const {
@@ -68,31 +68,25 @@ void Customer::setEmail(string email) {
 	this->email = email;
 }
 
-
+string Customer::getOrder() const {
+	stringstream out;
+	orders.displayNumberedList(out);
+	return out.str();
+}
 /*
-void Customer::getOrder(ostream &out) const {
-	out << order;
-}*/
+ void Customer::insertOrder() { //storing list of past order (Shipped);
+ if (r->isPlaced()) {
+ orders.insertStop(*r);
+ }
 
-/*void Customer::getOrderList(ostream &out) const {
-orders.displayList(out);	//TODO: Change this
-}*/
-
-
-void Customer::insertOrder(Order order) {
-	orders.insertStop(order);
-}
-
-void Customer::removeOrder(Order order) {	// loop through the orders List to find order then remove it.
-	orders.startIterator();
-	while(orders.getIterator().operator <=(order)){
-		orders.moveIterNext();
-	}
-	orders.removeIterator();
-}
+ Order r;
+ r.addLaptop(p);
+ orders.insertStop(r);
+ }
+ */
 
 bool Customer::operator==(const Customer& customer) {
-	return (firstname == customer.firstname && lastname == customer.lastname && username == customer.username && password == customer.password);
+	return (username == customer.username);
 }
 
 bool Customer::operator<(const Customer& customer) {
@@ -109,14 +103,11 @@ bool Customer::operator<(const Customer& customer) {
 					return true;
 				else
 					return false;
-			}
-			else
+			} else
 				return false;
-		}
-		else
+		} else
 			return false;
-	}
-	else
+	} else
 		return false;
 }
 
@@ -134,14 +125,11 @@ bool Customer::operator>(const Customer& customer) {
 					return true;
 				else
 					return false;
-			}
-			else
+			} else
 				return false;
-		}
-		else
+		} else
 			return false;
-	}
-	else
+	} else
 		return false;
 }
 
@@ -182,28 +170,71 @@ void Customer::write(ostream& out) {
 	out << address << '\n';
 	out << city << '\n';
 	out << zip << '\n';
-	out << email << '\n' << '\n';
+	out << email << '\n';
+	orders.startIterator();
+	while (!orders.offEnd()) {
+		out << orders.getIterator().getPrice() << endl;
+		out << orders.getIterator().isPlaced() << endl;
+		out << orders.getIterator().getDayPlaced() << endl;
+		out << orders.getIterator().getShippingSpeed() << endl;
+		out << orders.getIterator().isShipped() << endl;
+		orders.moveIterNext();
+	}
+	out << "End";
 }
 
-
-
-void Customer:: printCustomerHeader(ostream& out){
-	out << left << setw(15) << "Firstname" << setw(15) << "Lastname" << setw(15) << "address" << setw(15) << "city" << setw(15) << "zip" << "email" << '\n';
-}
-
-std::ostream& operator<<(ostream& out, const Customer customer) {
-
-	out << left << setw(15) << customer.firstname << setw(15) << customer.lastname << setw(15) << customer.address << setw(15) << customer.city << setw(15) << customer.zip << customer.email << '\n';
+ostream& operator<<(ostream& out, const Customer& customer) {
+	stringstream os;
+	customer.orders.displayNumberedList(os);
+//out << customer.r->printDetailed();
+	out << customer.getFirstname() << "," << customer.getLastname() << ","
+			<< customer.getAddress() << "," << customer.getCity() << ","
+			<< customer.getEmail() << "," << customer.getZip() << '\n';
+	out << os.str();
 	return out;
 }
 
-string Customer:: toString(const Customer& customer, ostream& out){
-	string str;
+string Customer::toString() { //return a string with customer's data.
 	stringstream ss;
-	ss << customer.getZip(); //convert int to a string
-	str = customer.firstname + "," + customer.lastname +"," + customer.address+"," +customer.city +"," + ss.str();
-	return str;
+	ss << firstname << "," << lastname << "," << address << "," << city << ","
+			<< zip << "," << email;
+	return ss.str();
 }
 
+string Customer::displayCustomer() {
+	stringstream out;
+	out << "\nFirst name: " << firstname << "\nLast name: " << lastname
+			<< "\nAddress:  " << address << endl;
+	return out.str();
+}
 
+void Customer::activeOrder(Order *p) {
+
+	r = p; 	//point activeORder to the order passed in.
+}
+
+string Customer::printActive() {
+	stringstream out;
+	out << "Active Order: " << r->printDetailed();
+	return out.str();
+}
+
+void Customer::addToProduct(Product* p) {
+	r->addLaptop(p);
+
+}
+
+void Customer::removeProduct(int index) {
+	assert(r->isPlaced());
+	if (!r->isPlaced()) {
+		r->removeLaptop(index - 1);
+	}
+}
+
+void Customer::placeOrder(int i) {
+	r->placeOrder(i);
+	if (r->isPlaced()) {
+		orders.insertStop(*r);
+	}
+}
 
