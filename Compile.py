@@ -1,9 +1,13 @@
 from os import listdir
+import os as os
 from os import walk
 
 files = []
 
-mypath = "/Users/Jasper/Documents/GitHub/CIS-22C-Team-4"
+mypath = os.path.realpath(__file__)
+mypath = mypath.split("/")
+mypath.remove(mypath[-1])
+mypath = "/".join(mypath)
 
 outputFile = open("Run.cpp","w")
 
@@ -23,6 +27,7 @@ for i in reversed(range(len(files))):
 
 headers = [file for file in files if file.split(".")[1] == "h"]
 sources = [file for file in files if file.split(".")[1] == "cpp"]
+
 
 headers.insert(0,headers.pop(headers.index("Product.h")))
 headers.insert(1,headers.pop(headers.index("ProductS.h")))
