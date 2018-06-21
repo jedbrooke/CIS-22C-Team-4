@@ -6,7 +6,6 @@
  */
 
 #include "WindowManager.h"
-#include "Window.cpp"
 #include <fstream>
 #include <sstream>
 #include <ctime>

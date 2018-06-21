@@ -9,11 +9,11 @@
 #include "Customer.h"
 #include "Employee.h"
 #include "HashTable.h"
-#include "Product.cpp" //will not compile with .h
-#include "ProductS.cpp" //will not compile with .h
+#include "Product.h"
+#include "ProductS.h"
 #include "Heap.h"
 #include "FileLoader.h"
-#include "WindowManager.cpp" //will not compile with .h
+#include "WindowManager.h" //will not compile with .h
 #include <gtk/gtk.h>
 
 using namespace std;

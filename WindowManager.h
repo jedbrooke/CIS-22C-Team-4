@@ -8,7 +8,7 @@
 #ifndef WINDOWMANAGER_H_
 #define WINDOWMANAGER_H_
 
-
+#include "Window.h"
 #include <vector>
 #include <string>
 #include <iostream>
