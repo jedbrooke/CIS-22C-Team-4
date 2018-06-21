@@ -18,7 +18,9 @@
 #include "Product.h"
 #include "ProductS.h"
 #include "Customer.h"
+#include "Employee.h"
 #include "WindowManager.h"
+#include "HashTable.h"
 
 
 //class Heap;
@@ -37,7 +39,8 @@ protected:
 	static map<string, GtkWidget*> entries;
 	static GdkPixbuf* icon;
 	static Heap* priority_queue;
-	static BST<Customer>* customers;
+	static HashTable<Customer>* customers;
+	static HashTable<Employee>* employees;
 	static BST<Product>* products;
 	static BST<ProductS>* products_secondary;
 	//static Customer customer;
@@ -62,7 +65,7 @@ public:
 
 	static void set_icon(string path);
 
-	static void assign_pointers(Heap* heap, BST<Customer>* _customers, BST<Product>* _products, BST<ProductS>* _products_secondary);
+	static void assign_pointers(Heap* heap, HashTable<Customer>* _customers, HashTable<Employee>* _employees, BST<Product>* _products, BST<ProductS>* _products_secondary);
 
 	void create_content(string tagName, string text, map<string,string> optionsMap, GtkWidget* box);
 
@@ -81,6 +84,8 @@ public:
 	static string to_lower(string str);
 
 	static string vector_join(const vector<string> &v, const char* const delim);
+
+	static bool is_number(const string& s);
 
 };
 

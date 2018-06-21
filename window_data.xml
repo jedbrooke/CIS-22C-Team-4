@@ -36,7 +36,7 @@
 		Sign in using an existing account:
 	</title>
 	<label>
-		Email
+		Username
 	</label>
 	<entry>
 		email
@@ -59,13 +59,13 @@
 		Create a new account
 	</title>
 	<label>
-		Enter your email:
+		Enter your username:
 	</label>
 	<entry>
 		email
 	</entry>
 	<label>
-		Confirm your email:
+		Confirm your username:
 	</label>
 	<entry>
 		conf_email
@@ -176,7 +176,7 @@
 	</entry>
 	<variable>
 	<button options="link:customer_search_results,name:customer_search">
-		Search -O
+		Search
 	</button>
 	<button options="link:customer_interface">
 		Go back
@@ -301,7 +301,7 @@
 	<button options="link:employee_search_customer_by_name">
 		Search for a customer by name
 	</button>
-	<button options="link:employee_unsorted_customer_information">
+	<button options="link:employee_unsorted_customer_information,name:unsorted_customer_information">
 		Display unsorted customer information
 	</button>
 	<button options="link:employee_view_order_by_priority,name:employee_view_orders">
@@ -437,11 +437,12 @@
 		year
 	</entry>
 	<label>
-		Enter price:
+		Enter price ($) :
 	</label>
 	<entry>
 		price
 	</entry>
+	<variable>
 	<button options="link:employee_add_new_product_confirm,name:employee_add_product">
 		submit
 	</button>
@@ -475,13 +476,24 @@
 </window>
 <window id="employee_remove_product_confirm">
 	<title>
-		Removing product
+		Are you sure you wish to remove this product?
 	</title>
 	<label>
 		product summary:
 	</label>
 	<variable>
-	<button options="link:employee_remove_product">
+	<button options="link:employee_remove_product_confirmed,name:remove_product_confirm">
+		Remove
+	</button>
+	<button options="link:employee_interface">
+		Cancel
+	</button>
+</window>
+<window id="employee_remove_product_confirmed">
+	<title>
+		Product Removed
+	</title>
+	<button options="link:employee_remove_product,name:employee_remove_product">
 		Remove another product
 	</button>
 	<button options="link:employee_interface">

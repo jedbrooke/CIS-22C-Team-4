@@ -21,7 +21,8 @@ using namespace std;
 GdkPixbuf* Window::icon;
 map<string, GtkWidget*> Window::entries;
 Heap* Window::priority_queue;
-BST<Customer>* Window::customers;
+HashTable<Customer>* Window::customers;
+HashTable<Employee>* Window::employees;
 BST<Product>* Window::products;
 BST<ProductS>* Window::products_secondary;
 //Customer customer;
@@ -100,6 +101,11 @@ Window::Window(string xml) {
             
             //set the box spacing
             gtk_box_set_spacing(GTK_BOX(boxes.at(boxes.size()-1)),3);
+
+            if (optionsMap.find("left") != optionsMap.end()) {
+
+                gtk_misc_set_alignment(GTK_MISC(boxes.at(boxes.size()-1)),(int)atoi(optionsMap["left"].c_str()),0);
+            }
                        
             //restart the while loop
             continue;
@@ -178,7 +184,7 @@ Window::Window(string xml) {
         	string window_name = "GtkScrolledWindow";
         	if( box_name == window_name) {
             	//pack it into the scroll box
-            	gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (boxes.at(boxes.size()-2)), boxes.at(boxes.size()-1));
+            	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW (boxes.at(boxes.size()-2)), boxes.at(boxes.size()-1));
             } else {
             	//pack the box into the next higher box
             	gtk_box_pack_start(GTK_BOX(boxes.at(boxes.size()-2)),boxes.at(boxes.size()-1),FALSE,FALSE,0);
@@ -421,11 +427,11 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         string conf_email = gtk_entry_get_text(GTK_ENTRY(entries["conf_email"]));
         string psw = gtk_entry_get_text(GTK_ENTRY(entries["psw"]));
         string conf_psw = gtk_entry_get_text(GTK_ENTRY(entries["conf_psw"]));
-        
+
         //time to check
         if(email != conf_email || psw != conf_psw){
         	if(email != conf_email){
-        		xml += create_xml_tag("label","style=\"error\"","error: emails must match");
+        		xml += create_xml_tag("label","style=\"error\"","error: usernames must match");
         	}
         	if (psw != conf_psw){
         		xml += create_xml_tag("label","style=\"error\"","error: passwords must match");
@@ -441,11 +447,10 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         	WindowManager::go_to_window("customer_create_new_account",xml); //go back to the customer create new account window
         	return;
 
-        } else {
-        	string value = email + "`" + psw; 
-        	xml += create_xml_tag("entry","type=\"hidden\" value=\""+value+"\"","values");
-
         }
+
+    	string value = email + "`" + psw; 
+    	xml += create_xml_tag("entry","type=\"hidden\" value=\""+value+"\"","values");
             
     } else if(name == "customer_create_new_account_2") {
 
@@ -462,7 +467,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
     	values["phone_num"] = gtk_entry_get_text(GTK_ENTRY(entries["phone_num"]));
     	values["city"] = gtk_entry_get_text(GTK_ENTRY(entries["city"]));
     	values["zip_str"] = gtk_entry_get_text(GTK_ENTRY(entries["zip"]));
-    	unsigned zip = atoi(values["zip_str"].c_str());
+    	unsigned zip;
 
 
     	map<string,string>::iterator it;
@@ -473,20 +478,30 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
     		g_print("%s",msg.c_str());
     	}
 
+        bool isValid = true;
 
     	if(values["fname"] == "" || values["lname"] == "" || values["address"] == "" || values["phone_num"] == "" || values["city"] == "" || values["zip_str"] == ""){//if any of the fields are blank, reject
-    		xml += create_xml_tag("label","style=\"error\"","error: please do not leave any fields blank");
-    		string value = values["email"] + "`" + values["psw"]; 
-    		xml += create_xml_tag("entry","type=\"hidden\" value=\""+value+"\"","values");
-
-    		WindowManager::go_to_window("customer_create_new_account_cont",xml);
-    		return;
-
-    	} else {
-    		//Customer c(email,psw,fname,lname,false,address,city,zip,email);
-    		//customers->insert(c);
+    		isValid = false;
+            xml += create_xml_tag("label","style=\"error\"","error: please do not leave any fields blank");
     	}
+        
+        if(!is_number(values["zip_str"]) || values["zip_str"].length() != 5){ //if zip is not a number or is not 5 digits exactly
+            isValid = false;
+            xml += create_xml_tag("label","style=\"error\"","please enter a 5 digit number for the ZIP code");
+        } else{
+            zip = atoi(values["zip_str"].c_str());
+        }
 
+        if(!isValid){
+            string value = values["email"] + "`" + values["psw"]; 
+            xml += create_xml_tag("entry","type=\"hidden\" value=\""+value+"\"","values");
+            WindowManager::go_to_window("customer_create_new_account_cont",xml);
+            return;
+        }
+
+		Customer c(values["email"],values["psw"],values["fname"],values["lname"],false,values["address"],values["city"],zip,values["email"]);
+		customers->insert(c);
+    	
     } else if(name == "customer_search"){
 
     	string make = gtk_entry_get_text(GTK_ENTRY(entries["make"]));
@@ -573,7 +588,6 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         //ship(index)
 
     } else if (name == "employee_add_product") {
-    	gtk_entry_get_text(GTK_ENTRY(entries["email"]));
 
     	string make = gtk_entry_get_text(GTK_ENTRY(entries["make"]));
     	string model = gtk_entry_get_text(GTK_ENTRY(entries["model"]));
@@ -581,6 +595,32 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
     	string cpuGen = gtk_entry_get_text(GTK_ENTRY(entries["cpuGen"]));
     	string year = gtk_entry_get_text(GTK_ENTRY(entries["year"]));
     	string price = gtk_entry_get_text(GTK_ENTRY(entries["price"]));
+
+        string_find_and_replace("$","",price); //remove the dollar sign if they added it.
+
+        bool isValid = true;
+
+        if(!is_number(screenSize)){
+            isValid = false;
+            xml += create_xml_tag("label","style=\"error\"","Screen size must be a decimal number");
+        } 
+        if(!is_number(cpuGen)){
+            isValid = false;
+            xml += create_xml_tag("label","style=\"error\"","CPU Gen must be a number");
+        } 
+        if(!is_number(year)){
+            isValid = false;
+            xml += create_xml_tag("label","style=\"error\"","Year must be a number");
+        }
+        if(!is_number(price)){
+            isValid = false;
+            xml += create_xml_tag("label","style=\"error\"","Price must be a decimal number");
+        }
+
+        if(!isValid){
+            WindowManager::go_to_window("employee_add_new_product",xml);
+            return;
+        }
 
     	Product p(make,model, atoi(screenSize.c_str()), atoi(cpuGen.c_str()), atoi(year.c_str()), atoi(price.c_str()));
     	products->insert(p);
@@ -615,28 +655,39 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
     	string_find_and_replace("`"," ",model);
 
-    	g_print("%s",g_strconcat("make: ",make.c_str()," model: ", model.c_str(),"\n",NULL));
-
     	Product pSearch(make,model,0,0,0,0);
-
-    	g_print("product made\n");
-
-    	msg = "product:\n" + products->find(pSearch)->toString() + "\n";
-
-    	g_print("%s",msg.c_str());
 
     	xml += "<hr>\n";
     	xml += "<vbox homogeneous=\"true\">\n";
     	xml += create_xml_tag("label", "make: " + products->find(pSearch)->getMake());
     	xml += create_xml_tag("label", "model: " + products->find(pSearch)->getModel());
-    	xml += create_xml_tag("label", "screen size: " + to_string(products->find(pSearch)->getScreenSize()));
+        string screenSize = to_string(products->find(pSearch)->getScreenSize());
+        vector<string> v = string_split(screenSize,'.');
+        screenSize = v[0] + "." + v[1][0] + " in.";
+    	xml += create_xml_tag("label", "screen size: " + screenSize);
     	xml += create_xml_tag("label", "cpu Gen: " + to_string(products->find(pSearch)->getCpuGen()) + "th gen");
     	xml += create_xml_tag("label", "year: " + to_string(products->find(pSearch)->getYear()));
-    	xml += create_xml_tag("label", "price: $" + to_string(products->find(pSearch)->getPrice()) + ".00");
+    	xml += create_xml_tag("label", "price: $" + to_string((int)products->find(pSearch)->getPrice()) + ".00");
     	xml += "</vbox>\n";
     	xml += "<hr>\n";
+        string_find_and_replace(" ","`",model);
+        string value = make + "`" + model;
+        xml += create_xml_tag("entry","type=\"hidden\" value=\""+value+"\"","values");
 
-    	products->remove(pSearch);
+    	
+
+    } else if(name == "remove_product_confirm"){
+
+        string make_and_model = gtk_entry_get_text(GTK_ENTRY(entries["values"]));
+
+        size_t pos = make_and_model.find('`');
+        string make = make_and_model.substr(0,pos);
+        string model = make_and_model.substr(pos+1);
+
+        string_find_and_replace("`"," ",model);
+
+        Product p(make,model,0,0,0,0);
+        products->remove(p);
 
     } else if(name == "employee_db_search"){
         
@@ -657,6 +708,54 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
             vector<string> productsV = products_secondary->printListToString();
             create_db_list_xml(productsV,xml);
         }
+
+    } else if(name == "unsorted_customer_information"){
+
+        stringstream customersSS;
+
+        customers->displayCustomer(customersSS);
+
+        string width = "width=\"100\"";
+        string zip_width = "width=\"40\"";
+
+        xml += "<hbox homogeneous=\"false\">\n";
+        xml += create_xml_tag("label",zip_width,"     ");
+        xml += create_xml_tag("label",width,"first name");
+        xml += create_xml_tag("label",width,"last name");
+        xml += create_xml_tag("label",width,"address");
+        xml += create_xml_tag("label",width,"City");
+        xml += create_xml_tag("label",width,"username");
+        xml += create_xml_tag("label",width,"zip");
+        xml += "</hbox>\n";
+
+        xml += "<scroll columns=\"6\" " + width + ">\n"; 
+        xml += "<vbox>\n";
+
+        string line;
+        while(getline(customersSS,line,'\n')){
+
+            string field;
+            xml += "<hr>\n";
+            xml+= "<hbox>\n";
+            bool isFirst = true;
+            stringstream customer(line);
+
+            while(getline(customer,field,',')){
+
+                xml += "<vr>\n";
+                if(to_string(atoi(field.c_str())) == field){
+                    xml += create_xml_tag("label",zip_width,field);
+                } else {
+                    xml += create_xml_tag("label",width,field);
+                }
+                
+
+            }
+            xml += "</hbox>\n";
+        }
+
+        xml += "</vbox>\n";
+        xml += "</scroll>\n";
     }
     
     /*else if(name == "employee_view_orders") {
@@ -758,12 +857,12 @@ void Window::set_icon(string path) {
     
 }
 
-void Window::assign_pointers(Heap* heap, BST<Customer>* _customers, BST<Product>* _products, BST<ProductS>* _products_secondary) {
+void Window::assign_pointers(Heap* heap, HashTable<Customer>* _customers, HashTable<Employee>* _employees, BST<Product>* _products, BST<ProductS>* _products_secondary) {
     
-    //priority_queue = &heap;
-    //customers = _customers;
+    priority_queue = heap;
+    customers = _customers;
+    employees = _employees;
 	products = _products;
-
 	products_secondary = _products_secondary;
 
     g_print("pointers assigned\n");    
@@ -967,4 +1066,19 @@ string Window::vector_join(const vector<string> &v, const char* const delim){ //
 			ss << *v.rbegin();
 			return ss.str();
 	}
+}
+
+bool Window::is_number(const string& s) {
+    int i;
+    bool decimal = false;
+    for(i = 0; i < s.length(); i++){
+        if(!isdigit(s[i])){
+            if(s[i] == '.' && !decimal){
+                decimal = true;
+            } else {
+                break;
+            }
+        }
+    }
+    return !s.empty() && i == s.length();
 }
