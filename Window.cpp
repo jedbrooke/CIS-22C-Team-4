@@ -220,9 +220,6 @@ Window::Window(string xml) {
     
     //show the window
     gtk_widget_show(self_window);
-    
-    //make the window active
-    //gtk_window_activate_focus(GTK_WINDOW(self_window));
 }
 
 Window::~Window() {

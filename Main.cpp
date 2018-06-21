@@ -5,15 +5,16 @@
 
 #include <iostream>
 
+#include "Product.h" //will not compile with .h
+#include "ProductS.h" //will not compile with .h
 #include "BST.h"
 #include "Customer.h"
 #include "Employee.h"
 #include "HashTable.h"
-#include "Product.cpp" //will not compile with .h
-#include "ProductS.cpp" //will not compile with .h
 #include "Heap.h"
 #include "FileLoader.h"
-#include "WindowManager.cpp" //will not compile with .h
+#include "WindowManager.h" //will not compile with .h
+#include "Window.h"
 #include <gtk/gtk.h>
 
 using namespace std;
@@ -21,11 +22,10 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-
+	
 	gtk_init (&argc, &argv);
-
 	g_print("args passed to gtk_init\n");
-
+	
 	BST<Product> bstp;
 	bstp.loadPrimary("Products_in.txt");
 	BST<ProductS> bsts;
@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
 
 	cout << "Success!" << endl;
 
-
+	
 	Window::assign_pointers(NULL,NULL,&bstp,&bsts);
 	WindowManager::loadxml("window_data.xml");
 	WindowManager::go_to_window("welcome_screen","");
@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
 	gtk_main();
 
 	g_print("gtk_main has ended\n");
-
+	
 
 
 	return 0;

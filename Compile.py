@@ -43,16 +43,15 @@ files = headers
 
 
 for fileName in files:
-	print("processing: ",fileName)
 	if fileName == "Run.cpp":
 		continue
 	file = open(fileName,encoding="UTF-8")
 
 	for line in file:
-		if not "#include \"" in line:
+		if not "#include \"" in line and not line == "\n":
 			outputFile.write(line)
 
-	outputFile.write("\n\n")
+	outputFile.write("\n")
 
 	file.close()
 
