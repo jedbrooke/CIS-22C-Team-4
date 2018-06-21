@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 
 	Window::assign_pointers(&heap,&htc,&hte,&bstp,&bsts);
 	WindowManager::loadxml("window_data.xml");
-	WindowManager::go_to_window("welcome_screen","");
+	WindowManager::go_to_window("welcome_screen");
 
 	g_print("going to gtk_main\n");
 

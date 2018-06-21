@@ -47,6 +47,10 @@ void WindowManager::go_to_window(string id, string options){
 	current_window = &w; //update the current window pointer
 }
 
+void WindowManager::go_to_window(string id){
+	go_to_window(id,"");
+}
+
 void WindowManager::loadxml(string path){
 
 	ifstream xmlFile(path.c_str());

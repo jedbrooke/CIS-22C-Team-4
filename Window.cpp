@@ -25,7 +25,7 @@ HashTable<Customer>* Window::customers;
 HashTable<Employee>* Window::employees;
 BST<Product>* Window::products;
 BST<ProductS>* Window::products_secondary;
-//Customer customer;
+Customer* Window::customer;
 
 
 Window::Window(string xml) {
@@ -405,10 +405,24 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         string email = gtk_entry_get_text(GTK_ENTRY(entries["email"]));
         string psw = gtk_entry_get_text(GTK_ENTRY(entries["psw"]));
         
-        msg = "email: " + email + "\n";
-        g_print("%s",msg.c_str());
-        msg = "password: " + psw + "\n";
-        g_print("%s",msg.c_str());
+        Customer* c = customers->customerSignIn(email);
+        Customer* c_check = new Customer(email,psw,"","",false,"","",0,"");
+
+        if(c == NULL){
+            xml += create_xml_tag("label","style=\"error\"","That username is not in our Database");
+            WindowManager::go_to_window("customer_sign_in_using_and_existing_account",xml);
+            return;
+        }
+
+        if(!(*c_check == *c)){
+            xml += create_xml_tag("label","style=\"error\"","Incorrect password");
+            WindowManager::go_to_window("customer_sign_in_using_and_existing_account",xml);
+            return;
+        }
+
+        customer = c;
+
+
               
     } else if(name == "employee_login") {
         

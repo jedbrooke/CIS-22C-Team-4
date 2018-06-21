@@ -43,7 +43,7 @@ protected:
 	static HashTable<Employee>* employees;
 	static BST<Product>* products;
 	static BST<ProductS>* products_secondary;
-	//static Customer customer;
+	static Customer* customer;
 	//static HashTable* employees;
 
 public:
