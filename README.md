@@ -29,3 +29,5 @@ and then run it
 
 pkg-config and gtk should be available on windows too, then compile and run it like any other c++ program, but make sure to include the library flags etc.
 >\`pkg-config --cflags gtk+-2.0\` \`pkg-config --libs gtk+-2.0\`
+
+You may need to use the workaround described here: https://sungkwang.wordpress.com/2013/07/10/use-gcc-with-pkg-config-in-windows-7-mingw/
