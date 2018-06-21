@@ -28,15 +28,13 @@ public:
 
     int hash(string key) const;
 
-
-
-
-
     void insert(htdata& c);
 
     void displayByLastname(ostream& out, string lastname) ;
     void displayByFirstname(ostream& out, string firstname);
     void displayCustomer(ostream& out);
+
+    htdata* customerSignIn(string username);
 
 private:
     static const int SIZE = 100;
@@ -60,9 +58,6 @@ void HashTable<htdata>::insert(htdata& c) {
 	Table[index].insertStop (&c);
 
 }
-
-
-
 
 
 template <class htdata>
@@ -105,4 +100,17 @@ void HashTable<htdata>::displayByLastname(ostream& out, string lastname) {
 	cout << "Customer not found" ;
 }
 
+template <class htdata>
+htdata* HashTable<htdata>::customerSignIn(string username){
+for (int i =0; i< SIZE; i++){
+	Table[i].startIterator();
+	for(int j=0; j<Table[i].getLength(); j++){
+		if(Table[i].getIterator()->getUsername()== username){
+			return Table[i].getIterator();
+		}
+		Table[i].moveIterNext();
+	}
+
+}
+}
 #endif /* HASHTABLE_H_ */
