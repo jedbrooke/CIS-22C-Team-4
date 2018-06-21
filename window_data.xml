@@ -280,10 +280,10 @@
 		Enter Login information
 	</title>
 	<label>
-		Employee ID:
+		Employee Username:
 	</label>
 	<entry>
-		id
+		username
 	</entry>
 	<label>
 		Password:
@@ -291,6 +291,7 @@
 	<entry type="psw">
 		psw
 	</entry>
+	<variable>
 	<button options="link:employee_interface,name:employee_login">
 		submit
 	</button>

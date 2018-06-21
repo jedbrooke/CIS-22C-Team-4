@@ -17,6 +17,7 @@
 #include "BST.h"
 #include "Product.h"
 #include "ProductS.h"
+#include "User.h"
 #include "Customer.h"
 #include "Employee.h"
 #include "WindowManager.h"
@@ -43,7 +44,7 @@ protected:
 	static HashTable<Employee>* employees;
 	static BST<Product>* products;
 	static BST<ProductS>* products_secondary;
-	static Customer* customer;
+	static User* user;
 	//static HashTable* employees;
 
 public:

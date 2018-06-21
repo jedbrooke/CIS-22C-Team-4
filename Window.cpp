@@ -25,7 +25,7 @@ HashTable<Customer>* Window::customers;
 HashTable<Employee>* Window::employees;
 BST<Product>* Window::products;
 BST<ProductS>* Window::products_secondary;
-Customer* Window::customer;
+User* Window::user;
 
 
 Window::Window(string xml) {
@@ -395,12 +395,11 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
     string msg;
     
     if(name == "quit") {
+        user = NULL;
         
         gtk_main_quit();
 
     } else if(name == "customer_sign_in") {
-        
-        g_print("in customer_sign_in block\n");
         
         string email = gtk_entry_get_text(GTK_ENTRY(entries["email"]));
         string psw = gtk_entry_get_text(GTK_ENTRY(entries["psw"]));
@@ -420,19 +419,31 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
             return;
         }
 
-        customer = c;
+        user = c;
 
 
               
     } else if(name == "employee_login") {
         
-        unsigned id = atoi(gtk_entry_get_text(GTK_ENTRY(entries["id"])));
+        string username = gtk_entry_get_text(GTK_ENTRY(entries["username"]));
         string psw = gtk_entry_get_text(GTK_ENTRY(entries["psw"]));
         
-        msg = "id: " + to_string(id) + "\n";
-        g_print("%s",msg.c_str());
-        msg = "password: " + psw + "\n";
-        g_print("%s",msg.c_str());
+        Employee* e = employees->customerSignIn(username);
+        Employee* e_check = new Employee(username,psw,"","",true);
+
+        if(e == NULL){
+            xml += create_xml_tag("label","style=\"error\"","That username is not in our Database");
+            WindowManager::go_to_window("employee_login_screen",xml);
+            return;
+        }
+
+        if(!(*e_check == *e)){
+            xml += create_xml_tag("label","style=\"error\"","Incorrect password");
+            WindowManager::go_to_window("employee_login_screen",xml);
+            return;
+        }
+
+        user = e;
         
     } else if(name == "customer_create_new_account_1") {
         
