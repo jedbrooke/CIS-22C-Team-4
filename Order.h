@@ -94,6 +94,7 @@ public:
 	void save(ostream & out);
 
 	Order * load(istream & in, BST<Product> & products);
+	friend ostream& operator<<(ostream& out, const Order& order) ;
 };
 
 
