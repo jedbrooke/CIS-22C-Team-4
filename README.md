@@ -13,6 +13,9 @@ Project summary:
 
 ### To Compile and run the program on Mac:
 
+#### Coming Soon:
+For Mac users we will soon have a .app ready to download, no package installation required!
+
 first install home-brew from [brew.sh](https://brew.sh) if you don't have it already.
 then install two packages:
 >brew install pkg-config
