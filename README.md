@@ -21,7 +21,9 @@ then install two packages:
 
 
 pkg-config manages the includes and libraries for the project
+
 gtk is the graphics library the project uses
+
 make sure install gtk2 and NOT gtk3
 
 then use this command to compile the program (make sure you cd into the correct directory first)
