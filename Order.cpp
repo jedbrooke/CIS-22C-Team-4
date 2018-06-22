@@ -251,8 +251,9 @@ using namespace std;
 		} else {
 			return NULL;
 		}
+	}
 		
-		ostream& operator<<(ostream& out, const Order& order) {
+	ostream& operator<<(ostream& out, const Order& order) {
 		out <<
 				"\nOrder's Info: " <<
 				"\nPrice: $" << order.getPrice()<<

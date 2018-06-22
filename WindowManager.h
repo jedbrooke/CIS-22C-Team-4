@@ -30,13 +30,11 @@ private:
 public:
 	WindowManager();
 	~WindowManager();
-
 	static void go_to_window(string id, string options);
 	static void go_to_window(string id);
 	static void loadxml(string path);
 	static string getxml(string id);
 	static string get_current_window_id();
-	static map<string, GtkWidget*> get_current_window_entries();
 	static void run_pbar();
 };
 

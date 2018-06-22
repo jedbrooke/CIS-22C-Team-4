@@ -32,7 +32,7 @@ using namespace std;
 
 class Window {
 	
-protected:
+private:
 	string title;
 	GtkWidget* self_window;
 	GtkWidget* self_box;
@@ -77,6 +77,8 @@ public:
 	static void create_db_list_xml(vector<string> productsV, string &xml, string link, string name, string text);
 
 	static void create_db_list_xml(vector<string> productsV, string &xml);
+
+	static void create_view_cart_xml(string& xml);
 
 	static void string_find_and_replace(string find, string replace, string &subject);
 

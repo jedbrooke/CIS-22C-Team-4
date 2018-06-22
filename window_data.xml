@@ -137,24 +137,44 @@
 	</button>
 </window>
 <window id="customer_interface">
+	<variable>
 	<title>
-		Customer Menu
+		Customer Menu:
 	</title>
-	<button options="link:customer_search_for_a_product">
-		Search for a product
-	</button>
-	<button options="link:customer_list_database_for_products">
-		List database for products
-	</button>
-	<button options="link:customer_view_cart">
-		View Cart or Place an order
-	</button>
-	<button options="link:customer_view_purchase_history">
-		View purchases
-	</button>
-	<button options="link:end_screen">
-		Sign out
-	</button>
+	<hr>
+	<hbox>
+		<vbox>
+			<label>
+
+			</label>
+		</vbox>
+		<vbox>
+			<button options="link:customer_search_for_a_product">
+				Search for a product
+			</button>
+			<hr>
+			<button options="link:customer_list_database_for_products">
+				List database for products
+			</button>
+			<hr>
+			<button options="link:customer_view_cart,name:customer_view_cart">
+				View Cart or Place an order
+			</button>
+			<hr>
+			<button options="link:customer_view_purchase_history">
+				View purchases
+			</button>
+			<hr>
+			<button options="link:end_screen">
+				Sign out
+			</button>
+		</vbox>
+		<vbox>
+			<label>
+
+			</label>
+		</vbox>
+	</hbox>
 </window>
 <window id="customer_search_for_a_product">
 	<title>
@@ -232,9 +252,6 @@
 		Your Cart:
 	</title>
 	<variable>
-	<button options="link:customer_checkout">
-		Checkout
-	</button>
 	<button options="link:customer_interface">
 		go back
 	</button>
@@ -262,7 +279,7 @@
 	<label>
 		(1-2 business days)
 	</label>
-	<button options="link:customer_view_cart">
+	<button options="link:customer_view_cart,name:customer_view_cart">
 		Cancel
 	</button>
 </window>

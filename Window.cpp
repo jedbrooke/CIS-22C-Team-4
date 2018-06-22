@@ -137,7 +137,14 @@ Window::Window(string xml) {
         		//set the scroll window size
         		int size = atoi(optionsMap["columns"].c_str()) * (atoi(optionsMap["width"].c_str())+4) + 15;
         		gtk_widget_set_size_request (scroll_window, size, 300);
-        	} else {
+
+        	} else if(optionsMap.find("width") != optionsMap.end()){ //if just the width is present
+                //set the scroll window size
+                int size = atoi(optionsMap["width"].c_str()) + 15;
+                gtk_widget_set_size_request (scroll_window, size, 300);
+
+
+            } else {
         		// just make it big
         		gtk_widget_set_size_request (scroll_window, 1500, 300);
         	}
@@ -198,6 +205,7 @@ Window::Window(string xml) {
             boxes.pop_back();
 
             continue;
+
         } 
 
         //end of elf
@@ -206,11 +214,16 @@ Window::Window(string xml) {
         getline(xmlss,text); //get the text
         getline(xmlss,closetag); //and the closetag
         
-        if(boxes.size() > 1) {
-            create_content(tagName,text,optionsMap,boxes.at(boxes.size()-1));
-        } else {
-            create_content(tagName,text,optionsMap,self_box);
+        try{
+            if(boxes.size() > 1) {
+                create_content(tagName,text,optionsMap,boxes.at(boxes.size()-1));
+            } else {
+                create_content(tagName,text,optionsMap,self_box);
+            }
+        } catch(const string msg){
+            cerr << msg << endl;
         }
+
     } 
 
     //show the box
@@ -234,6 +247,7 @@ Window::Window(string xml) {
 
 Window::~Window() {
     // TODO Auto-generated destructor stub
+    //idk, delete some stuff I guess
 }
 
 void Window::create_content(string tagName, string text, map<string,string> optionsMap, GtkWidget* box) {
@@ -266,8 +280,7 @@ void Window::create_content(string tagName, string text, map<string,string> opti
         
         //connect it to the destroy event as well
         g_signal_connect_swapped(widget,"clicked",G_CALLBACK(destroy),self_window);
-
-                
+     
     } else if(tagName == "label") {
 
         //create new label
@@ -309,9 +322,7 @@ void Window::create_content(string tagName, string text, map<string,string> opti
         	//set alignment
         	gtk_misc_set_alignment(GTK_MISC(widget), 0, 0);
         }
-        
-       
-        
+           
     } else if (tagName == "entry") {
         
         //create new entry and assign it to the pointer
@@ -339,6 +350,9 @@ void Window::create_content(string tagName, string text, map<string,string> opti
         
         gtk_progress_bar_set_text(GTK_PROGRESS_BAR(widget),text.c_str());
         
+    } else {
+        string err = "Error: Invalid XML tag: " + tagName;
+        throw err;
     }
 
     string box_name = g_strconcat(G_OBJECT_TYPE_NAME(box),NULL);
@@ -397,7 +411,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
     
     if(name == "quit") {
         user = NULL;
-
+        //do all the write functions
         gtk_main_quit();
 
     } else if(name == "customer_sign_in") {
@@ -427,7 +441,8 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         order = new Order(c);
         c->activeOrder(order);
 
-
+        xml += create_xml_tag("title","Welcome, " + c->getFirstname() + ".");
+        xml += "<hr>\n";
               
     } else if(name == "employee_login") {
         
@@ -626,11 +641,13 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
         c->addToProduct(products->find(pSearch));
 
-        string orders = c->printActive();
-
-        g_print("%s",g_strconcat("orders: ",orders.c_str(),"\n",NULL));
+        create_view_cart_xml(xml);
 
 
+
+    } else if(name == "customer_view_cart"){
+
+        create_view_cart_xml(xml);
 
     } else if(name == "ship"){
 
@@ -719,8 +736,6 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         string value = make + "`" + model;
         xml += create_xml_tag("entry","type=\"hidden\" value=\""+value+"\"","values");
 
-    	
-
     } else if(name == "remove_product_confirm"){
 
         string make_and_model = gtk_entry_get_text(GTK_ENTRY(entries["values"]));
@@ -793,15 +808,16 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
                 } else {
                     xml += create_xml_tag("label",width,field);
                 }
-                
-
             }
+
+            xml += "<vr>\n";
+            xml += create_xml_tag("button","option=\"link:\"","view orders");
             xml += "</hbox>\n";
         }
 
         xml += "</vbox>\n";
         xml += "</scroll>\n";
-        
+
     }
     
     /*else if(name == "employee_view_orders") {
@@ -1067,6 +1083,113 @@ void Window::create_db_list_xml(vector<string> productsV, string &xml){ //no but
 	xml += "</scroll>\n";
 	xml += "</vbox>\n";
 
+}
+
+void Window::create_view_cart_xml(string& xml){
+
+    Customer* c = static_cast<Customer*>(user);
+
+    string active = c->printActive();
+
+    stringstream orderSS(active);
+
+    xml += create_xml_tag("title","Order Summary:");
+
+    string summary;
+    getline(orderSS,summary); //get the order summary line
+
+    //split it up
+    size_t start;
+    size_t end_pos;
+
+
+    stringstream price_sep(summary);
+
+    string price;
+
+    getline(price_sep,price,' '); //skip "active"
+    getline(price_sep,price,' '); //skip "Order: "
+    getline(price_sep,price,','); //this should now contain the price
+
+    if(price == "0.00"){ //order is empty
+
+        xml += create_xml_tag("label","Your Cart is currently empty");
+
+        return;
+    }
+
+    price = "$"+price;
+
+    //price = "$" + summary.substr(start+2,end_pos);
+
+    xml += "<hbox>\n";
+    xml += create_xml_tag("label","Total Price:");
+    xml += create_xml_tag("label",price);
+    xml += "</hbox>\n";
+    xml += "<hr>\n";
+
+    string size = "width=\"100\"";
+    string number_size = "width=\"50\" justify=\"center\"";
+
+    string foo;
+    getline(orderSS,foo); //skip the customer line
+    string product;
+
+    xml += "<hbox>\n";
+    xml += create_xml_tag("label",size,"Number");
+    xml += create_xml_tag("label",size,"Comapny");
+    xml += create_xml_tag("label",size,"Model");
+    xml += create_xml_tag("label",size,"Qty.");
+    xml += "</hbox>\n";
+
+    xml += "<placeholder>\n";
+
+    int count;
+
+    while(getline(orderSS,product)){ //loop through each product in the cart
+
+        if(product == "") break;
+
+        count++;
+        start = product.find("#");
+        end_pos = product.find(":"); // get the number
+
+        string number = product.substr(start+1,end_pos-1);
+
+        xml += "<hr>\n";
+        xml += "<hbox>\n";
+        xml += create_xml_tag("label",number_size,number);
+        xml += "<vr>\n";
+
+        start = product.find(" ");
+
+        stringstream product_info(product.substr(start+1));
+
+        string token;
+
+        getline(product_info,token,','); //company
+        xml += create_xml_tag("label",size,token);
+        xml += "<vr>\n";
+        getline(product_info,token,','); //model
+        xml += create_xml_tag("label",size,token);
+        xml += "<vr>\n";
+        getline(product_info,token,','); //Qty.
+        xml += create_xml_tag("label",number_size,token);
+        xml += "<vr>\n";
+
+        xml += "</hbox>\n";
+    }
+
+    if(count > 8){
+        string_find_and_replace("<placeholder>\n","<scroll width=\"200\">\n<vbox>\n",xml);
+        xml += "</vbox>\n";
+        xml += "</scroll>\n";
+        cout << xml << endl;
+    } else {
+        string_find_and_replace("<placeholder>\n","",xml);
+    } 
+
+    xml += create_xml_tag("button","options=\"link:customer_checkout\"","Checkout");
 }
 
 void Window::string_find_and_replace(string find, string replace, string &subject){
