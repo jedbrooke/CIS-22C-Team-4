@@ -251,5 +251,16 @@ using namespace std;
 		} else {
 			return NULL;
 		}
+		
+		ostream& operator<<(ostream& out, const Order& order) {
+		out <<
+				"\nOrder's Info: " <<
+				"\nPrice: $" << order.getPrice()<<
+				"\nOrder Placed: " <<order.isPlaced()<<
+				"\nDate placed: " << order.getDayPlaced() <<
+				"\nArrive By: " << order.getArriveBy()<<
+				"\nShipping speed: "<<order.getShippingSpeed() << endl;
+		order.laptops.displayNumberedList(out);
+		return out;
 
 	}
