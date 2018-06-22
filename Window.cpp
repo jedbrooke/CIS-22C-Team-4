@@ -26,6 +26,7 @@ HashTable<Employee>* Window::employees;
 BST<Product>* Window::products;
 BST<ProductS>* Window::products_secondary;
 User* Window::user;
+Order* Window::order;
 
 
 Window::Window(string xml) {
@@ -396,7 +397,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
     
     if(name == "quit") {
         user = NULL;
-        
+
         gtk_main_quit();
 
     } else if(name == "customer_sign_in") {
@@ -419,7 +420,12 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
             return;
         }
 
+        
+
         user = c;
+
+        order = new Order(c);
+        c->activeOrder(order);
 
 
               
@@ -606,7 +612,25 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         
     } else if(name == "add_to_cart"){
 
-        //do a bunch of stuff
+        string make_and_model = optionsMap["value"];
+
+        size_t pos = make_and_model.find('`');
+        string make = make_and_model.substr(0,pos);
+        string model = make_and_model.substr(pos+1);
+
+        string_find_and_replace("`"," ",model);
+
+        Product pSearch(make,model,0,0,0,0);
+
+        Customer* c = static_cast<Customer*>(user);
+
+        c->addToProduct(products->find(pSearch));
+
+        string orders = c->printActive();
+
+        g_print("%s",g_strconcat("orders: ",orders.c_str(),"\n",NULL));
+
+
 
     } else if(name == "ship"){
 
@@ -669,10 +693,6 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
     } else if(name == "remove_product"){
 
     	string make_and_model = optionsMap["value"];
-
-    	msg = "value: " + make_and_model + "\n";
-
-    	g_print("%s",msg.c_str());
 
     	size_t pos = make_and_model.find('`');
     	string make = make_and_model.substr(0,pos);
@@ -781,6 +801,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
         xml += "</vbox>\n";
         xml += "</scroll>\n";
+        
     }
     
     /*else if(name == "employee_view_orders") {

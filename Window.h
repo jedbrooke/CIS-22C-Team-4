@@ -45,7 +45,7 @@ protected:
 	static BST<Product>* products;
 	static BST<ProductS>* products_secondary;
 	static User* user;
-	//static HashTable* employees;
+	static Order* order;
 
 public:
 	Window();

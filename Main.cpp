@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
 	HashTable<Customer> htc;
 	HashTable<Employee> hte;
 
-	Product product;
+	Product p("hp","zee book", 120.2, 12000, 2040, 1000000);
 	ProductS productS;
 	Heap heap;
 	
@@ -46,6 +46,13 @@ int main(int argc, char *argv[]) {
 	Customer c("foo@bar.com","Hi1234","Bobby","Mcbobface",false,"123 faké street","Cupertinoville",12345,"helloIamcustomer");
 	Customer c2("foo2@bar.com","2Hi1234","Bobby2","Mcbobface2",false,"123 faké street2","Cupertinoville2",12345,"helloIamcustomer2");
 	Employee e("joe","hi","joe","joeman",true);
+
+	Order order(&c);
+	c.activeOrder(&order);
+	c.addToProduct(&p);
+	string orders = c.printActive();
+
+	cout << "orders:\n" << orders << endl;
 
 	htc.insert(c);
 	htc.insert(c2);

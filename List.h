@@ -563,7 +563,7 @@ void List<listdata>::displayNumberedList(ostream &out) const
     int i = 1;
     while (temp != NULL)
     {
-        out << "#" << i << ": " << &temp -> data << endl;
+        out << "#" << i << ": " << temp -> data << endl;
         temp = temp -> next;
         i++;
     }

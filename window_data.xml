@@ -295,6 +295,9 @@
 	<button options="link:employee_interface,name:employee_login">
 		submit
 	</button>
+	<button options="link:welcome_screen">
+		back
+	</button>
 </window>
 <window id="employee_interface">
 	<title>
