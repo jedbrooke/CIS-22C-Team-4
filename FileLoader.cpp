@@ -6,6 +6,7 @@
 //
 
 #include <iostream>
+#include <fstream>
 #include "FileLoader.h"
 using namespace std;
 
@@ -45,11 +46,11 @@ BST<Product> FileLoader::loadProducts(string path){
     return products;
 }
 
-BST<Customer> FileLoader::loadCustomers(string path) {
+HashTable<Customer> FileLoader::loadCustomers(string path) {
 
 	cout << "loading customers..." << endl;
 
-	BST<Customer> customers;
+	HashTable<Customer> customers;
 	ifstream fis(path.c_str());
 	if (fis.is_open()) {
 		while(fis.peek() != ios_base::end) {
@@ -62,11 +63,11 @@ BST<Customer> FileLoader::loadCustomers(string path) {
 	return customers;
 }
 
-BST<Employee> FileLoader::loadEmployees(string path) {
+HashTable<Employee> FileLoader::loadEmployees(string path) {
 
 	cout << "loading employees..." << endl;
 
-	BST<Employee> employees;
+	HashTable<Employee> employees;
 	ifstream fis(path.c_str());
 	if (fis.is_open()) {
 		while(fis.peek() != ios_base::end) {
