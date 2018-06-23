@@ -231,7 +231,7 @@
 </window>
 <window id="customer_list_database_for_products">
 	<title>
-		List Database
+		List database
 	</title>
 	<hr>
 	<label>
@@ -249,7 +249,7 @@
 </window>
 <window id="customer_list_database_for_products_results">
 	<title>
-		Here is our Database:
+		Here is our database:
 	</title>
 	<hr>
 	<variable>
@@ -305,7 +305,7 @@
 </window>
 <window id="contact_us">
 	<title>
-		Contact Us
+		Contact us
 	</title>
 	<hr>
 	<label width="200">
@@ -441,11 +441,11 @@
 </window>
 <window id="employee_list_database_select">
 	<title>
-		List Database
+		List database
 	</title>
 	<hr>
 	<label>
-		Sort Database by:
+		Sort database by:
 	</label>
 	<button options="link:employee_list_database_results,name:employee_db_search,value:comp_name">
 		Company name
@@ -575,7 +575,7 @@
 		Back
 	</button>
 	<button options="link:end_screen,name:quit">
-		quit
+		Quit
 	</button>
 </window>
 <window id="404">

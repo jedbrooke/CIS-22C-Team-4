@@ -448,7 +448,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         Employee* e_check = new Employee(username,psw,"","",true);
 
         if(e == NULL){
-            xml += create_xml_tag("label","style=\"error\"","That username is not in our Database");
+            xml += create_xml_tag("label","style=\"error\"","That username is not in our database");
             WindowManager::go_to_window("employee_login_screen",xml);
             return;
         }
@@ -799,7 +799,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         string value = optionsMap["value"];
 
         if(value == "comp_name"){
-            xml += create_xml_tag("title","List Database of products by: Company name");
+            xml += create_xml_tag("title","List database of products by: Company name");
             xml += "<hr>\n";
             vector<string> productsV = products->printListToString();
             create_db_list_xml(productsV,xml);
@@ -808,7 +808,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
 
         } else if(value == "model"){
-            xml += create_xml_tag("title","List Database of products by: Company name");
+            xml += create_xml_tag("title","List database of products by: Model name");
             xml += "<hr>\n";
             vector<string> productsV = products_secondary->printListToString();
             create_db_list_xml(productsV,xml);
