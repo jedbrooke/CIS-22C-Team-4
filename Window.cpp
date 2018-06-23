@@ -628,7 +628,14 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
         Customer* c = static_cast<Customer*>(user);
 
-        c->addToProduct(products->find(pSearch));
+        if(products->find(pSearch) != NULL){
+             c->addToProduct(products->find(pSearch));
+         } else {
+            cerr << "Error: Product Not found: " << endl << "product information: " << endl;
+            cerr << "make: " << make << ", model: " << model << endl; 
+         }
+
+       
 
         create_view_cart_xml(xml);
 
@@ -826,7 +833,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
     } else if(name == "employee_view_orders") {
 
-        string orders = priority_queue.printSorted();
+        string orders = priority_queue->printSorted();
     
         stringstream ordersSep(orders);
     
@@ -857,15 +864,17 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
             while(getline(orderSep,item,',')){// price,ship date, status
 
+                xml += "<vr>\n";
                 xml += create_xml_tag("label",item);
+
 
             }
 
-            if(item != "Waiting to be shipped"){
+            if(item == "Waiting to be shipped"){
+                xml += "<vr>\n";
                 xml += create_xml_tag("button","options=\"employee_confirm_ship_order\" value=\"" + to_string(index) + "\"","Ship Order");
             }
 
-            xml += create_xml_tag()
 
             xml += "</hbox>\n";
             xml += "<hr>\n";
@@ -874,10 +883,10 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
     } else if(name == "send_feedback"){
 
-        ofstream of
+        ofstream of;
         of.open("customer_feedback.txt",ios_base::app);
 
-        string comment = gtk_entry_get_text(entries["comment"]);
+        string comment = gtk_entry_get_text(GTK_ENTRY(entries["comment"]));
 
         of << user->getFirstname() << " " << user->getLastname() << endl;
         of << user->getUsername() << endl;
