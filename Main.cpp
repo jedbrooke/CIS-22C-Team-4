@@ -32,10 +32,8 @@ int main(int argc, char *argv[]) {
 	BST<ProductS> bsts;
 	bsts.loadSecondary("Products_in.txt");
 
-	HashTable<Customer> htc;
-	// = FileLoader::loadCustomers("Customers.txt");
-	HashTable<Employee> hte;
-	// = FileLoader::loadEmployees("Employees.txt");
+	HashTable<Customer> htc = FileLoader::loadCustomers("Customers.txt");
+	HashTable<Employee> hte = FileLoader::loadEmployees("Employees.txt");
 
 	Product p("hp","zee book", 120.2, 12000, 2040, 1000000);
 	ProductS productS;
