@@ -405,6 +405,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
     
     if(name == "quit") {
         user = NULL;
+        order = NULL;
         //do all the write functions
         gtk_main_quit();
 
@@ -511,14 +512,6 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
     	values["zip_str"] = gtk_entry_get_text(GTK_ENTRY(entries["zip"]));
     	unsigned zip;
 
-    	map<string,string>::iterator it;
-
-    	for(it = values.begin(); it != values.end(); it++){
-
-    		msg = it->first + ": " + it->second + "\n";
-    		g_print("%s",msg.c_str());
-    	}
-
         bool isValid = true;
 
     	if(values["fname"] == "" || values["lname"] == "" || values["address"] == "" || values["phone_num"] == "" || values["city"] == "" || values["zip_str"] == ""){//if any of the fields are blank, reject
@@ -540,8 +533,18 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
             return;
         }
 
-		Customer c(values["email"],values["psw"],values["fname"],values["lname"],false,values["address"],values["city"],zip,values["email"]);
-		customers->insert(c);
+		Customer* c = new Customer(values["email"],values["psw"],values["fname"],values["lname"],false,values["address"],values["city"],zip,values["email"]);
+		customers->insert(*c);
+
+        user = customers->customerSignIn(values["email"]);
+
+        Customer* c_ptr = static_cast<Customer*>(user);
+
+        order = new Order(c_ptr);
+        c_ptr->activeOrder(order);
+
+        xml += create_xml_tag("title","Welcome, " + user->getFirstname() + ".");
+        xml += "<hr>\n";
     	
     } else if(name == "customer_search"){
 
@@ -820,7 +823,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
             while(getline(customer,field,',')){
 
                 xml += "<vr>\n";
-                if(to_string(atoi(field.c_str())) == field){
+                if(is_number(field)){ // if it's a number
                     xml += create_xml_tag("label",zip_width,field);
                 } else {
                     xml += create_xml_tag("label",width,field);
