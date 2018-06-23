@@ -52,12 +52,40 @@ HashTable<Customer> FileLoader::loadCustomers(string path) {
 
 	HashTable<Customer> customers;
 	ifstream fis(path.c_str());
+	string line;
 	if (fis.is_open()) {
-		while(fis.peek() != ios_base::end) {
-			Customer c;
-			c.read(fis);
-			customers.insert(c);
-		}
+		while (getline(fis, line)) {
+            string username = line;
+            string password;
+            getline(fis, password);
+            string first_name;
+            fis >> first_name;
+            getline(fis, line); //advance to the next line
+            string last_name;
+            fis >> last_name;
+            getline(fis, line); //advance to the next line
+            bool isEmployee;
+            fis >> isEmployee;
+            getline(fis, line); //advance to the next line
+            string address;
+            fis >> address;
+            getline(fis, line); //advance to the next line
+            string city;
+            fis >> city;
+            getline(fis, line); //advance to the next line
+            unsigned zip;
+            fis >> zip;
+            getline(fis, line); //advance to the next line
+            string email;
+            fis >> email;
+            getline(fis, line); //advance to the next line
+
+            Customer c(username, password, first_name, last_name, isEmployee, address, city, zip, email);
+            customers.insert(c);
+
+            getline(fis, line); //skip the emtpy line
+
+        }
 	}
 	fis.close();
 	return customers;
@@ -69,11 +97,27 @@ HashTable<Employee> FileLoader::loadEmployees(string path) {
 
 	HashTable<Employee> employees;
 	ifstream fis(path.c_str());
+	string line;
 	if (fis.is_open()) {
-		while(fis.peek() != ios_base::end) {
-			Employee e;
-			e.read(fis);
-			employees.insert(e);
+		while (getline(fis, line)) {
+            string username = line;
+            string password;
+            getline(fis, password);
+            string first_name;
+            fis >> first_name;
+            getline(fis, line); //advance to the next line
+            string last_name;
+            fis >> last_name;
+            getline(fis, line); //advance to the next line
+            bool isEmployee;
+            fis >> isEmployee;
+            getline(fis, line); //advance to the next line
+
+            Employee e(username, password, first_name, last_name, isEmployee);
+            employees.insert(e);
+
+            getline(fis, line); //skip the emtpy line
+
 		}
 	}
 	fis.close();
