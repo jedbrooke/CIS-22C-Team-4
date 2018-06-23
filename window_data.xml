@@ -36,7 +36,7 @@
 		Sign in using an existing account:
 	</title>
 	<label>
-		Email
+		Username
 	</label>
 	<entry>
 		email
@@ -47,6 +47,7 @@
 	<entry type="psw">
 		psw
 	</entry>
+	<variable>
 	<button options="link:customer_interface,name:customer_sign_in" default="true">
 		submit
 	</button>
@@ -59,13 +60,13 @@
 		Create a new account
 	</title>
 	<label>
-		Enter your email:
+		Enter your username:
 	</label>
 	<entry>
 		email
 	</entry>
 	<label>
-		Confirm your email:
+		Confirm your username:
 	</label>
 	<entry>
 		conf_email
@@ -136,24 +137,47 @@
 	</button>
 </window>
 <window id="customer_interface">
+	<variable>
 	<title>
-		Customer Menu
+		Customer Menu:
 	</title>
-	<button options="link:customer_search_for_a_product">
-		Search for a product
-	</button>
-	<button options="link:customer_list_database_for_products">
-		List database for products
-	</button>
-	<button options="link:customer_view_cart">
-		View Cart or Place an order
-	</button>
-	<button options="link:customer_view_purchase_history">
-		View purchases
-	</button>
-	<button options="link:end_screen">
-		Sign out
-	</button>
+	<hr>
+	<hbox>
+		<vbox>
+			<label>
+
+			</label>
+		</vbox>
+		<vbox>
+			<button options="link:customer_search_for_a_product">
+				Search for a product
+			</button>
+			<hr>
+			<button options="link:customer_list_database_for_products">
+				List database for products
+			</button>
+			<hr>
+			<button options="link:customer_view_cart,name:customer_view_cart">
+				View Cart or Place an order
+			</button>
+			<hr>
+			<button options="link:customer_view_purchase_history,name:purchase_history">
+				View purchases
+			</button>
+			<hr>
+			<button options="link:contact_us">
+				Send Feedback
+			</button>
+			<button options="link:end_screen">
+				Sign out
+			</button>
+		</vbox>
+		<vbox>
+			<label>
+
+			</label>
+		</vbox>
+	</hbox>
 </window>
 <window id="customer_search_for_a_product">
 	<title>
@@ -176,7 +200,7 @@
 	</entry>
 	<variable>
 	<button options="link:customer_search_results,name:customer_search">
-		Search -O
+		Search
 	</button>
 	<button options="link:customer_interface">
 		Go back
@@ -231,9 +255,6 @@
 		Your Cart:
 	</title>
 	<variable>
-	<button options="link:customer_checkout">
-		Checkout
-	</button>
 	<button options="link:customer_interface">
 		go back
 	</button>
@@ -243,25 +264,25 @@
 		Checkout:
 	</title>
 	<variable>
-	<button options="link:customer_view_purchase_history,name:place_order,value:standard">
+	<button options="link:customer_view_purchase_history,name:place_order,value:5">
 		Standard Shipping
 	</button>
 	<label>
-		(5-7 business days)
+		(5 business days)
 	</label>
-	<button options="link:customer_view_purchase_history,name:place_order,value:rush">
+	<button options="link:customer_view_purchase_history,name:place_order,value:3">
 		Rush Shipping
 	</button>
 	<label>
-		(3-5 business days)
+		(3 business days)
 	</label>
-	<button options="link:customer_view_purchase_history,name:place_order,value:overnight">
+	<button options="link:customer_view_purchase_history,name:place_order,value:1">
 		Overnight Shipping
 	</button>
 	<label>
-		(1-2 business days)
+		(1 business day)
 	</label>
-	<button options="link:customer_view_cart">
+	<button options="link:customer_view_cart,name:customer_view_cart">
 		Cancel
 	</button>
 </window>
@@ -274,15 +295,29 @@
 		back
 	</button>
 </window>
+<window id="contact_us">
+	<title>
+		Contact us
+	</title>
+	<label width="200">
+		Leave your message here and we will get back to your shortly, using the email assosiated with your account.
+	</label>
+	<entry>
+		comment
+	</entry>
+	<button options="link:customer_interface,name:send_feedback">
+		Send
+	</button>
+</window>
 <window id="employee_login_screen">
 	<title>
 		Enter Login information
 	</title>
 	<label>
-		Employee ID:
+		Employee Username:
 	</label>
 	<entry>
-		id
+		username
 	</entry>
 	<label>
 		Password:
@@ -290,8 +325,12 @@
 	<entry type="psw">
 		psw
 	</entry>
+	<variable>
 	<button options="link:employee_interface,name:employee_login">
 		submit
+	</button>
+	<button options="link:welcome_screen">
+		back
 	</button>
 </window>
 <window id="employee_interface">
@@ -301,7 +340,7 @@
 	<button options="link:employee_search_customer_by_name">
 		Search for a customer by name
 	</button>
-	<button options="link:employee_unsorted_customer_information">
+	<button options="link:employee_unsorted_customer_information,name:unsorted_customer_information">
 		Display unsorted customer information
 	</button>
 	<button options="link:employee_view_order_by_priority,name:employee_view_orders">
@@ -358,6 +397,12 @@
 		go back
 	</button>
 </window>
+<window id="employee_view_customer">
+	<variable>
+	<button options="link:employee_unsorted_customer_information,name:unsorted_customer_information">
+		back
+	</button>
+</window>
 <window id="employee_view_order_by_priority">
 	<title>
 		View Orders by priority
@@ -371,12 +416,18 @@
 	<title>
 		Review Order for shipping
 	</title>
+	<hr>
 	<variable>
-	<button options="link:employee_confirm_ship_order,name:confirm">
-		Confirm
-	</button>
-	<button options="link:employee_view_order_by_priority">
+	<button options="link:employee_view_order_by_priority,name:employee_view_orders">
 		Cancel
+	</button>
+</window>
+<window id="employee_shipping_confirmation">
+	<title>
+		The Order has been shipped
+	</title>
+	<button options="link:employee_interface">
+		Back
 	</button>
 </window>
 <window id="employee_list_database_select">
@@ -437,11 +488,12 @@
 		year
 	</entry>
 	<label>
-		Enter price:
+		Enter price ($) :
 	</label>
 	<entry>
 		price
 	</entry>
+	<variable>
 	<button options="link:employee_add_new_product_confirm,name:employee_add_product">
 		submit
 	</button>
@@ -475,13 +527,24 @@
 </window>
 <window id="employee_remove_product_confirm">
 	<title>
-		Removing product
+		Are you sure you wish to remove this product?
 	</title>
 	<label>
 		product summary:
 	</label>
 	<variable>
-	<button options="link:employee_remove_product">
+	<button options="link:employee_remove_product_confirmed,name:remove_product_confirm">
+		Remove
+	</button>
+	<button options="link:employee_interface">
+		Cancel
+	</button>
+</window>
+<window id="employee_remove_product_confirmed">
+	<title>
+		Product Removed
+	</title>
+	<button options="link:employee_remove_product,name:employee_remove_product">
 		Remove another product
 	</button>
 	<button options="link:employee_interface">

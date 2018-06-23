@@ -33,6 +33,7 @@ WindowManager::~WindowManager() {
 void WindowManager::go_to_window(string id, string options){
 
 	if(windows.find(id) == windows.end()){
+		cout << "unknown link: " + id << endl;
 		id = "404";
 	}
 
@@ -45,6 +46,10 @@ void WindowManager::go_to_window(string id, string options){
 	}
 	Window w(xml);	//create the new window
 	current_window = &w; //update the current window pointer
+}
+
+void WindowManager::go_to_window(string id){
+	go_to_window(id,"");
 }
 
 void WindowManager::loadxml(string path){

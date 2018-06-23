@@ -17,8 +17,13 @@
 #include "BST.h"
 #include "Product.h"
 #include "ProductS.h"
+#include "User.h"
 #include "Customer.h"
+#include "Employee.h"
 #include "WindowManager.h"
+#include "HashTable.h"
+#include <iostream>
+#include <fstream>
 
 
 //class Heap;
@@ -29,7 +34,7 @@ using namespace std;
 
 class Window {
 	
-protected:
+private:
 	string title;
 	GtkWidget* self_window;
 	GtkWidget* self_box;
@@ -37,11 +42,12 @@ protected:
 	static map<string, GtkWidget*> entries;
 	static GdkPixbuf* icon;
 	static Heap* priority_queue;
-	static BST<Customer>* customers;
+	static HashTable<Customer>* customers;
+	static HashTable<Employee>* employees;
 	static BST<Product>* products;
 	static BST<ProductS>* products_secondary;
-	//static Customer customer;
-	//static HashTable* employees;
+	static User* user;
+	static Order* order;
 
 public:
 	Window();
@@ -62,7 +68,7 @@ public:
 
 	static void set_icon(string path);
 
-	static void assign_pointers(Heap* heap, BST<Customer>* _customers, BST<Product>* _products, BST<ProductS>* _products_secondary);
+	static void assign_pointers(Heap* heap, HashTable<Customer>* _customers, HashTable<Employee>* _employees, BST<Product>* _products, BST<ProductS>* _products_secondary);
 
 	void create_content(string tagName, string text, map<string,string> optionsMap, GtkWidget* box);
 
@@ -74,13 +80,23 @@ public:
 
 	static void create_db_list_xml(vector<string> productsV, string &xml);
 
+	static void create_view_cart_xml(string& xml);
+
+	static void create_order_laptop_list_xml(stringstream& OrderSS,string size,string number_size,string& xml);
+
+	static void create_purchase_history_xml(string& xml);
+
+	static void create_purchase_history_xml(string& xml, Customer* c);
+
 	static void string_find_and_replace(string find, string replace, string &subject);
 
-	static vector<string> string_split(const string &input, char delim);
+	static vector<string> string_split(const string &input, char delim = ',');
 
 	static string to_lower(string str);
 
-	static string vector_join(const vector<string> &v, const char* const delim);
+	static string vector_join(const vector<string> &v, const char* const delim = ",");
+
+	static bool is_number(const string& s);
 
 };
 

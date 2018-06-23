@@ -102,15 +102,16 @@ void HashTable<htdata>::displayByLastname(ostream& out, string lastname) {
 
 template <class htdata>
 htdata* HashTable<htdata>::customerSignIn(string username){
-for (int i =0; i< SIZE; i++){
-	Table[i].startIterator();
-	for(int j=0; j<Table[i].getLength(); j++){
-		if(Table[i].getIterator()->getUsername()== username){
-			return Table[i].getIterator();
+	for (int i =0; i< SIZE; i++){
+		Table[i].startIterator();
+		for(int j=0; j<Table[i].getLength(); j++){
+			if(Table[i].getIterator()->getUsername()== username){
+				return Table[i].getIterator();
+			}
+			Table[i].moveIterNext();
 		}
-		Table[i].moveIterNext();
-	}
 
-}
+	}
+	return NULL;
 }
 #endif /* HASHTABLE_H_ */
