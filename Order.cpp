@@ -130,6 +130,7 @@ using namespace std;
 		arriveBy += 86400 * daysToShip;
 		shippingSpeed = daysToShip;
 		placed = true;
+		customer->placeOrder();
 	}
 	//places the order; sets it as ready to ship; sets value of timePlaced and arriveBy.
 
