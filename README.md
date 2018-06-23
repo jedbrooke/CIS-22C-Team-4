@@ -19,11 +19,21 @@ then install two packages:
 
 >brew install gtk
 
+
+pkg-config manages the includes and libraries for the project
+
+gtk is the graphics library the project uses
+
+make sure install gtk2 and NOT gtk3
+
 then use this command to compile the program (make sure you cd into the correct directory first)
 >g++ \*.cpp -o program \`pkg-config --cflags gtk+-2.0\` \`pkg-config --libs gtk+-2.0\`
 
 and then run it
 >./program
+
+#### Coming Soon:
+For Mac users we will soon have a .app ready to download, no package installation required!
 
 ### For Windows:
 
