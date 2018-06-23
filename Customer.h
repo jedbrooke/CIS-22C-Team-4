@@ -53,7 +53,7 @@ public:
 	friend ostream& operator<<(ostream& out, const Customer& customer);
 	void activeOrder(Order *p);	//pass in orders to the cart.
 	string printActive();//return active order detail (Order's printDeTailed() )
-	void placeOrder(int i);		//place order
+	void placeOrder();		//place order
 	void addToProduct(Product* p);	//add product to the active Order
 	void removeProduct(int index);//remove product from cart if order not placed.
 };
