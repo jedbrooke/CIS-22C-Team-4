@@ -173,11 +173,11 @@ void Customer::write(ostream& out) {
 	out << email << '\n';
 	orders.startIterator();
 	while (!orders.offEnd()) {
-		out << orders.getIterator().getPrice() << endl;
-		out << orders.getIterator().isPlaced() << endl;
-		out << orders.getIterator().getDayPlaced() << endl;
-		out << orders.getIterator().getShippingSpeed() << endl;
-		out << orders.getIterator().isShipped() << endl;
+		out << orders.getIterator()->getPrice() << endl;
+		out << orders.getIterator()->isPlaced() << endl;
+		out << orders.getIterator()->getDayPlaced() << endl;
+		out << orders.getIterator()->getShippingSpeed() << endl;
+		out << orders.getIterator()->isShipped() << endl;
 		orders.moveIterNext();
 	}
 	out << "End";
@@ -232,6 +232,6 @@ void Customer::removeProduct(int index) {
 }
 
 void Customer::placeOrder() {
-		orders.insertStop(*r); //add order to list 
+		orders.insertStop(r); //add order to list 
 }
 

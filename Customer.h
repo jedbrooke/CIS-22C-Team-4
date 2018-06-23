@@ -18,7 +18,7 @@ private:
 	string email;
 	subOrder sub;
 	Order * r;	//store active order
-	List<Order> orders; //store history order
+	List<Order*> orders; //store history order
 
 public:
 	Customer();
