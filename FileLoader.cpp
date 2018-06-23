@@ -113,7 +113,6 @@ HashTable<Employee> FileLoader::loadEmployees(string path) {
 			fis >> isEmployee;
 			getline(fis, line); //advance to the next line
 
-			cout << first_name;
 			Employee *e = new Employee(username, password, first_name, last_name, isEmployee);
 			employees.insert(*e);
 
