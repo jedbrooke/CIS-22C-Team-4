@@ -37,7 +37,9 @@ bool DEBUG = false;
     //bubbles an element down to its proper location within the heap
 
     void Heap::heap_increase_key(int i, Order * key) {
-    	assert(heaped);
+    	if(!heaped) {
+    		build_heap();
+    	}
     	if (*(heap -> at(floor(i/2))) < *key) {
     		heap -> at(i) = heap -> at(floor(i/2));
     		heap -> at(floor(i/2)) = key;
@@ -48,7 +50,9 @@ bool DEBUG = false;
     //bubbles an element up to its proper location
 
     void Heap::remove(int index) {
-    	assert(heaped);
+    	if(!heaped) {
+    		build_heap();
+    	}
     	assert(1 <= index);
     	assert(index <= heap_size);
     	heap -> at(index) = heap -> at(heap_size);
@@ -112,7 +116,9 @@ bool DEBUG = false;
     }
 
     void Heap::place(Order * o, int days) {
-    	assert(heaped);
+    	if(!heaped) {
+    		build_heap();
+    	}
     	if (o == NULL) {
     		return;
     	}
@@ -126,7 +132,9 @@ bool DEBUG = false;
     //Places an order while simultaneously putting it on the heap
 
     void Heap::insert(Order * o) {
-    	assert(heaped);
+    	if(!heaped) {
+    		build_heap();
+    	}
     	if (o == NULL) {
     		return;
     	}
@@ -138,7 +146,9 @@ bool DEBUG = false;
     }
 
     void Heap::ship(int index) {
-    	assert(!heaped);
+    	if(heaped) {
+    		sort();
+    	}
     	assert(1 <= index);
     	assert(index <= heap_size);
     	heap -> at(heap_size - index + 1) -> ship();
@@ -146,7 +156,9 @@ bool DEBUG = false;
     //Ships an order and removes it from the heap.
 
     void Heap::clear() {	//Removes the shipped orders. pre: is a heap.
-    	assert(heaped);
+    	if(!heaped) {
+    		build_heap();
+    	}
     	while (heap -> at(heap_size) -> isShipped()) {	//Remove all shipped orders at the end of the vector manually so that they don't get swapped with other shipped orders by the remove function and then not get removed.
     		heap -> pop_back();
     		heap_size--;
@@ -179,7 +191,7 @@ bool DEBUG = false;
 
      Order * Heap::get_left(int i)  const {
     	assert(heaped);
-        assert(0 < i);
+    	assert(0 < i);
         assert(i <= heap_size);
         return heap -> at(i * 2);
     }
@@ -191,7 +203,6 @@ bool DEBUG = false;
         assert(0 < i);
         assert(i <= heap_size);
         return heap -> at((i * 2) + 1);
-
     }
     //returns the location (index) of the right child of the element stored at i
     //pre: 0 < i <= heap_size
@@ -221,14 +232,18 @@ bool DEBUG = false;
     }
 
     string Heap::printSpecific(int index) {	//Prints the order at the given index in the sorted vector
-    	assert(!heaped);
+    	if(heaped) {
+    		sort();
+    	}
     	assert(1 <= index);
     	assert(index <= heap_size);
     	return heap -> at(heap_size - index + 1) -> printDetailed();
     }
 
     string Heap::printSorted() {			//Prints all of the orders in sorted order. Pre: must be sorted (!heaped).
-    	assert(!heaped);
+    	if(heaped) {
+    		sort();
+    	}
     	stringstream out;
     	if (heap_size == 0) {
     		out << "No orders to ship!\n";
