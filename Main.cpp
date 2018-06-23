@@ -60,8 +60,8 @@ int main(int argc, char *argv[]) {
 
 	cout << "Success!" << endl;
 
-
 	Window::assign_pointers(&heap,&htc,&hte,&bstp,&bsts);
+	Window::set_icon("icon.png");
 	WindowManager::loadxml("window_data.xml");
 	WindowManager::go_to_window("welcome_screen");
 

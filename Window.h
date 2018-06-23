@@ -22,6 +22,8 @@
 #include "Employee.h"
 #include "WindowManager.h"
 #include "HashTable.h"
+#include <iostream>
+#include <fstream>
 
 
 //class Heap;
@@ -79,6 +81,8 @@ public:
 	static void create_db_list_xml(vector<string> productsV, string &xml);
 
 	static void create_view_cart_xml(string& xml);
+
+	static void create_purchase_history_xml(string& xml);
 
 	static void string_find_and_replace(string find, string replace, string &subject);
 

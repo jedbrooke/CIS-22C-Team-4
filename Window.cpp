@@ -16,7 +16,6 @@
 
 using namespace std;
 
-
 //static variables
 GdkPixbuf* Window::icon;
 map<string, GtkWidget*> Window::entries;
@@ -27,7 +26,6 @@ BST<Product>* Window::products;
 BST<ProductS>* Window::products_secondary;
 User* Window::user;
 Order* Window::order;
-
 
 Window::Window(string xml) {
 
@@ -143,7 +141,6 @@ Window::Window(string xml) {
                 int size = atoi(optionsMap["width"].c_str()) + 15;
                 gtk_widget_set_size_request (scroll_window, size, 300);
 
-
             } else {
         		// just make it big
         		gtk_widget_set_size_request (scroll_window, 1500, 300);
@@ -156,7 +153,6 @@ Window::Window(string xml) {
 
         	//set the box policy
         	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (boxes.at(boxes.size()-1)), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
-
 
         	continue;
 
@@ -209,7 +205,6 @@ Window::Window(string xml) {
         } 
 
         //end of elf
-
 
         getline(xmlss,text); //get the text
         getline(xmlss,closetag); //and the closetag
@@ -298,7 +293,6 @@ void Window::create_content(string tagName, string text, map<string,string> opti
         }
 
         if (optionsMap.find("width") != optionsMap.end()) {//if the size option is present
-
 
         	gtk_widget_set_size_request(widget,atoi(optionsMap["width"].c_str()),-1);
         	
@@ -434,8 +428,6 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
             return;
         }
 
-        
-
         user = c;
 
         order = new Order(c);
@@ -515,7 +507,6 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
     	values["zip_str"] = gtk_entry_get_text(GTK_ENTRY(entries["zip"]));
     	unsigned zip;
 
-
     	map<string,string>::iterator it;
 
     	for(it = values.begin(); it != values.end(); it++){
@@ -557,9 +548,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         	xml += create_xml_tag("label","style=\"error\"","Please enter the make and/or model you would like to search for.");
      		WindowManager::go_to_window("customer_search_for_a_product",xml);
      		return;
-        } 
-
-
+        }
 
         vector<string> productsV = products->printListToString();
         vector<string> matches;
@@ -643,11 +632,28 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
         create_view_cart_xml(xml);
 
-
-
     } else if(name == "customer_view_cart"){
 
         create_view_cart_xml(xml);
+
+    } else if(name == "place_order"){
+
+        cout << "placing order" << endl;
+
+        //place order
+
+        int days = atoi(optionsMap["value"].c_str());
+        
+        priority_queue->place(order,days);
+
+
+        Customer* c = static_cast<Customer*>(user);
+
+        order = new Order(c);
+        c->activeOrder(order);
+
+        //prepare purchase history page
+        create_purchase_history_xml(xml);
 
     } else if(name == "ship"){
 
@@ -788,7 +794,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         xml += create_xml_tag("label",width,"zip");
         xml += "</hbox>\n";
 
-        xml += "<scroll columns=\"6\" " + width + ">\n"; 
+        xml += "<scroll columns=\"7\" " + width + ">\n"; 
         xml += "<vbox>\n";
 
         string line;
@@ -818,41 +824,69 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         xml += "</vbox>\n";
         xml += "</scroll>\n";
 
-    }
+    } else if(name == "employee_view_orders") {
+
+        string orders = priority_queue.printSorted();
     
-    /*else if(name == "employee_view_orders") {
-       string orders = priority_queue.printSorted();
+        stringstream ordersSep(orders);
+    
+        string order;
 
-       stringstream ordersSep(orders);
+        int index;
+        xml += "<hbox>\n";
+        xml += create_xml_tag("label","Price");
+        xml += create_xml_tag("label","Price");
+        xml += create_xml_tag("label","Arrive by:");
+        xml += create_xml_tag("label","Status");
+        xml += create_xml_tag("label",""); //empty slot for ship button to go
+        xml += "</hbox>\n";
 
-       string order;
+        xml += "<placeholder>\n";
 
-       xml += "<hbox homogeneous\"true\">\n";
 
-       while(getline(ordersSep,order)){
+        while(getline(ordersSep,order)){
+
+            xml += "<hbox homogeneous\"false\">\n";
 
             //get each order in the queue
             stringstream orderSep(order);
 
             string item;
-            xml += "<scroll>"
-            while(getline(orderSep,item,',')){
+
+            xml += create_xml_tag("level",to_string(index));
+
+            while(getline(orderSep,item,',')){// price,ship date, status
 
                 xml += create_xml_tag("label",item);
 
             }
+
+            if(item != "Waiting to be shipped"){
+                xml += create_xml_tag("button","options=\"employee_confirm_ship_order\" value=\"" + to_string(index) + "\"","Ship Order");
+            }
+
+            xml += create_xml_tag()
+
+            xml += "</hbox>\n";
+            xml += "<hr>\n";
+            index++;
         }
 
-        xml += "</hbox>";
-    }*/
-    
-    /**
-     @TODO
-     - execute options based on if else to detect name and proceed accordingly
-     (so we will still need the huge if-elif stack)
-     [begun]
-     - destroy this window [done]
-     */
+    } else if(name == "send_feedback"){
+
+        ofstream of
+        of.open("customer_feedback.txt",ios_base::app);
+
+        string comment = gtk_entry_get_text(entries["comment"]);
+
+        of << user->getFirstname() << " " << user->getLastname() << endl;
+        of << user->getUsername() << endl;
+        of << comment << endl << endl;
+
+        of.flush();
+        of.close();
+
+    }
     
     WindowManager::go_to_window(optionsMap["link"],xml); //go to the new window
 }
@@ -885,14 +919,12 @@ gboolean Window::delete_event(GtkWidget *widget, GdkEvent *event, gpointer data)
         WindowManager::go_to_window("end_screen","");
         //WindowManager::run_pbar();
         return FALSE;
-    }
-    
+    }  
 }
 
 void Window::destroy(GtkWidget* widget, gpointer data) { //called from regular buttons
-    
-    gtk_widget_destroy(widget);
-    
+
+    gtk_widget_destroy(widget);   
 }
 
 void Window::increase_pbar() {
@@ -929,7 +961,6 @@ void Window::assign_pointers(Heap* heap, HashTable<Customer>* _customers, HashTa
 
     g_print("pointers assigned\n");    
 }
-
 
 void Window::create_db_list_xml(vector<string> productsV, string &xml, string link, string name, string text){
 
@@ -1102,7 +1133,6 @@ void Window::create_view_cart_xml(string& xml){
     size_t start;
     size_t end_pos;
 
-
     stringstream price_sep(summary);
 
     string price;
@@ -1184,12 +1214,22 @@ void Window::create_view_cart_xml(string& xml){
         string_find_and_replace("<placeholder>\n","<scroll width=\"200\">\n<vbox>\n",xml);
         xml += "</vbox>\n";
         xml += "</scroll>\n";
-        cout << xml << endl;
     } else {
         string_find_and_replace("<placeholder>\n","",xml);
     } 
 
     xml += create_xml_tag("button","options=\"link:customer_checkout\"","Checkout");
+
+}
+
+void Window::create_purchase_history_xml(string& xml){
+
+    Customer* c = static_cast<Customer*>(user);
+
+    string orders = c->getOrder();
+
+    cout << "orders: " << orders << endl;
+
 }
 
 void Window::string_find_and_replace(string find, string replace, string &subject){
