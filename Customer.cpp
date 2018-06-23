@@ -86,7 +86,7 @@ string Customer::getOrder() const {
  */
 
 bool Customer::operator==(const Customer& customer) {
-	return (username == customer.username);
+	return (username == customer.username && password == customer.password);
 }
 
 bool Customer::operator<(const Customer& customer) {
@@ -226,7 +226,7 @@ void Customer::addToProduct(Product* p) {
 
 void Customer::removeProduct(int index) {
 	assert(!r->isPlaced());
-		r->removeLaptop(index - 1);
+		r->removeLaptop(index);
 }
 
 void Customer::placeOrder() {
