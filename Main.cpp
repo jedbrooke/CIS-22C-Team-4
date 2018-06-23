@@ -32,16 +32,16 @@ int main(int argc, char *argv[]) {
 	BST<ProductS> bsts;
 	bsts.loadSecondary("Products_in.txt");
 
-	//HashTable<Customer> htc = FileLoader::loadCustomers("Customers.txt");
-	//  HashTable<Employee> hte = FileLoader::loadEmployees("Employees.txt");
-
 	HashTable<Customer> htc;
+	// = FileLoader::loadCustomers("Customers.txt");
 	HashTable<Employee> hte;
+	// = FileLoader::loadEmployees("Employees.txt");
 
 	Product p("hp","zee book", 120.2, 12000, 2040, 1000000);
 	ProductS productS;
 	Heap heap;
-	
+
+	cout << "the file has changed" << endl;
 
 	Customer c("foo@bar.com","Hi1234","Bobby","Mcbobface",false,"123 faké street","Cupertinoville",12345,"foo@bar.com");
 	Customer c2("foo2@bar.com","2Hi1234","Bobby2","Mcbobface2",false,"123 faké street2","Cupertinoville2",12345,"foo2@bar.com");
