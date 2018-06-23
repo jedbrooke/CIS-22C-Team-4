@@ -232,9 +232,6 @@ void Customer::removeProduct(int index) {
 }
 
 void Customer::placeOrder(int i) {
-	r->placeOrder(i);
-	if (r->isPlaced()) {
-		orders.insertStop(*r);
-	}
+		orders.insertStop(*r); //add order to list 
 }
 
