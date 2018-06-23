@@ -853,7 +853,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
         cout << title << endl;
 
-        int index;
+        int index = 1;
         xml += "<hbox>\n";
         xml += create_xml_tag("label","Number");
         xml += create_xml_tag("label","Price");
@@ -874,7 +874,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
             string item;
 
-            xml += create_xml_tag("level",to_string(index));
+            xml += create_xml_tag("label",to_string(index));
 
             while(getline(orderSep,item,',')){// price,ship date, status
 
@@ -1149,6 +1149,8 @@ void Window::create_view_cart_xml(string& xml){
 
     string active = c->printActive();
 
+    cout << active << endl;
+
     stringstream orderSS(active);
 
     xml += create_xml_tag("title","Order Summary:");
@@ -1188,15 +1190,15 @@ void Window::create_view_cart_xml(string& xml){
     string size = "width=\"100\"";
     string number_size = "width=\"50\" justify=\"center\"";
 
-    string foo;
-    getline(orderSS,foo); //skip the customer line
+    //string foo;
+    //getline(orderSS,foo); //skip the customer line
     string product;
 
     xml += "<hbox>\n";
     xml += create_xml_tag("label",size,"Number");
     xml += create_xml_tag("label",size,"Comapny");
     xml += create_xml_tag("label",size,"Model");
-    xml += create_xml_tag("label",size,"Qty.");
+    xml += create_xml_tag("label",number_size,"Qty.");
     xml += "</hbox>\n";
 
     xml += "<placeholder>\n";
@@ -1232,8 +1234,6 @@ void Window::create_view_cart_xml(string& xml){
         xml += "<vr>\n";
         getline(product_info,token,','); //Qty.
         xml += create_xml_tag("label",number_size,token);
-        xml += "<vr>\n";
-
         xml += "</hbox>\n";
     }
 

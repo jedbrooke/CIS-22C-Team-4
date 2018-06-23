@@ -200,10 +200,9 @@ using namespace std;
 
 	string Order::printDetailed() {	//Prints above information + also the list of all laptops.
 		stringstream out;
-		out << print();
-		out << "\n" << *customer;
+		out << print() << endl;
+		//out << "\n" << *customer;
 		laptops.displayNumberedList(out);
-		out << endl << endl;
 		return out.str();
 	}
 
