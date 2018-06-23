@@ -82,15 +82,19 @@ public:
 
 	static void create_view_cart_xml(string& xml);
 
+	static void create_order_laptop_list_xml(stringstream& OrderSS,string size,string number_size,string& xml);
+
 	static void create_purchase_history_xml(string& xml);
+
+	static void create_purchase_history_xml(string& xml, Customer* c);
 
 	static void string_find_and_replace(string find, string replace, string &subject);
 
-	static vector<string> string_split(const string &input, char delim);
+	static vector<string> string_split(const string &input, char delim = ',');
 
 	static string to_lower(string str);
 
-	static string vector_join(const vector<string> &v, const char* const delim);
+	static string vector_join(const vector<string> &v, const char* const delim = ",");
 
 	static bool is_number(const string& s);
 

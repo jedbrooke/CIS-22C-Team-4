@@ -33,6 +33,7 @@ WindowManager::~WindowManager() {
 void WindowManager::go_to_window(string id, string options){
 
 	if(windows.find(id) == windows.end()){
+		cout << "unknown link: " + id << endl;
 		id = "404";
 	}
 

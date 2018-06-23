@@ -161,7 +161,7 @@
 				View Cart or Place an order
 			</button>
 			<hr>
-			<button options="link:customer_view_purchase_history">
+			<button options="link:customer_view_purchase_history,name:purchase_history">
 				View purchases
 			</button>
 			<hr>
@@ -397,6 +397,12 @@
 		go back
 	</button>
 </window>
+<window id="employee_view_customer">
+	<variable>
+	<button options="link:employee_unsorted_customer_information,name:unsorted_customer_information">
+		back
+	</button>
+</window>
 <window id="employee_view_order_by_priority">
 	<title>
 		View Orders by priority
@@ -410,12 +416,18 @@
 	<title>
 		Review Order for shipping
 	</title>
+	<hr>
 	<variable>
-	<button options="link:employee_confirm_ship_order,name:confirm">
-		Confirm
-	</button>
-	<button options="link:employee_view_order_by_priority">
+	<button options="link:employee_view_order_by_priority,name:employee_view_orders">
 		Cancel
+	</button>
+</window>
+<window id="employee_shipping_confirmation">
+	<title>
+		The Order has been shipped
+	</title>
+	<button options="link:employee_interface">
+		Back
 	</button>
 </window>
 <window id="employee_list_database_select">

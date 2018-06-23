@@ -669,9 +669,34 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         //prepare purchase history page
         create_purchase_history_xml(xml);
 
-    } else if(name == "ship"){
+    } else if(name == "purchase_history"){
 
-        //ship(index)
+        //prepare purchase history page
+        create_purchase_history_xml(xml);
+
+    } else if(name == "preship"){
+        int index = atoi(optionsMap["value"].c_str());
+        string order_str = priority_queue->printSpecific(index);
+
+        cout << "in preship func" << endl << order_str << endl; 
+
+        stringstream orderSS(order_str);
+
+        string line;
+
+        getline(orderSS,line); //get the order summary line
+
+        std::vector<string> v = string_split(line);
+        xml += create_xml_tag("label","Price: " + v[0]);
+        xml += create_xml_tag("label","Arrive by: " + v[1]);
+
+        create_order_laptop_list_xml(orderSS,"width=\"100\"","width=\"50\"",xml);
+
+        xml += create_xml_tag("button","options=\"link:employee_shipping_confirmation,name:ship,value:" + to_string(index) + "\"","Confirm");
+
+    }else if(name == "ship"){
+        int index = atoi(optionsMap["value"].c_str());
+        priority_queue->ship(index);
 
     } else if (name == "employee_add_product") {
 
@@ -813,13 +838,14 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
         string line;
         while(getline(customersSS,line,'\n')){
-
+            if(line[0] == '#') continue;
             string field;
             xml += "<hr>\n";
             xml+= "<hbox>\n";
             bool isFirst = true;
             stringstream customer(line);
-
+            int index;
+            string username;
             while(getline(customer,field,',')){
 
                 xml += "<vr>\n";
@@ -828,15 +854,32 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
                 } else {
                     xml += create_xml_tag("label",width,field);
                 }
+                if(index == 4) username = field;
+                index++;
             }
 
             xml += "<vr>\n";
-            xml += create_xml_tag("button","option=\"link:\"","view orders");
+            xml += create_xml_tag("button","options=\"link:employee_view_customer,value:" + username + ",name:view_customer\"","view orders");
             xml += "</hbox>\n";
         }
 
         xml += "</vbox>\n";
         xml += "</scroll>\n";
+
+    } else if(name == "view_customer"){
+        string username = optionsMap["value"];
+
+        Customer* c = customers->customerSignIn(username);
+
+        if(c != NULL){
+            xml += create_xml_tag("title","View orders for " + c->getFirstname());
+            create_purchase_history_xml(xml, c);
+            
+        } else {
+            cerr << "Customer \"" << username << "\" not found!";
+        }
+        
+
 
     } else if(name == "employee_view_orders") {
 
@@ -847,7 +890,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         stringstream ordersSep(orders);
         
         string title;
-        string order;
+        string order_str;
 
         getline(ordersSep,title);
 
@@ -865,16 +908,16 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         xml += "<placeholder>\n";
 
 
-        while(getline(ordersSep,order)){
+        while(getline(ordersSep,order_str)){
 
             xml += "<hbox homogeneous\"false\">\n";
 
             //get each order in the queue
-            stringstream orderSep(order);
+            stringstream orderSep(order_str);
 
             string item;
 
-            xml += create_xml_tag("label",to_string(index));
+            xml += create_xml_tag("label","width=\"50\"",to_string(index));
 
             while(getline(orderSep,item,',')){// price,ship date, status
 
@@ -884,7 +927,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
             if(item == "Waiting to be shipped"){
                 xml += "<vr>\n";
-                xml += create_xml_tag("button","options=\"employee_confirm_ship_order\" value=\"" + to_string(index) + "\"","Ship Order");
+                xml += create_xml_tag("button","options=\"link:employee_confirm_ship_order,name:preship,value:"+to_string(index)+"\"","Ship Order");
             }
             xml += "</hbox>\n";
             xml += "<hr>\n";
@@ -1159,9 +1202,6 @@ void Window::create_view_cart_xml(string& xml){
     getline(orderSS,summary); //get the order summary line
 
     //split it up
-    size_t start;
-    size_t end_pos;
-
     stringstream price_sep(summary);
 
     string price;
@@ -1179,8 +1219,6 @@ void Window::create_view_cart_xml(string& xml){
 
     price = "$"+price;
 
-    //price = "$" + summary.substr(start+2,end_pos);
-
     xml += "<hbox>\n";
     xml += create_xml_tag("label","Total Price:");
     xml += create_xml_tag("label",price);
@@ -1190,8 +1228,20 @@ void Window::create_view_cart_xml(string& xml){
     string size = "width=\"100\"";
     string number_size = "width=\"50\" justify=\"center\"";
 
-    //string foo;
-    //getline(orderSS,foo); //skip the customer line
+    
+
+    create_order_laptop_list_xml(orderSS,size,number_size,xml);
+
+
+    xml += create_xml_tag("button","options=\"link:customer_checkout\"","Checkout");
+
+}
+
+void Window::create_order_laptop_list_xml(stringstream& orderSS,string size,string number_size,string& xml){
+
+    size_t start;
+    size_t end_pos;
+
     string product;
 
     xml += "<hbox>\n";
@@ -1245,21 +1295,64 @@ void Window::create_view_cart_xml(string& xml){
         string_find_and_replace("<placeholder>\n","",xml);
     } 
 
-    xml += create_xml_tag("button","options=\"link:customer_checkout\"","Checkout");
-
 }
 
 void Window::create_purchase_history_xml(string& xml){
 
-
-
     Customer* c = static_cast<Customer*>(user);
+    create_purchase_history_xml(xml, c);
+
+}
+
+void Window::create_purchase_history_xml(string& xml, Customer* c){
 
     g_print("%s",g_strconcat("placing order for: ",c->getFirstname().c_str(),"\n",NULL));
 
     string orders = c->getOrder();
 
     g_print("%s",g_strconcat("orders: ",orders.c_str(),"\n",NULL));
+
+    stringstream orderSS(orders);
+
+    string order_str;
+    int index = 1;
+
+    string size = "width=\"100\"";
+    string number_size = "width=\"50\" justify=\"center\"";
+
+    xml += "<hbox>\n";
+    xml += create_xml_tag("label",number_size,""); // index
+    xml += create_xml_tag("label",size,"Price:");
+    xml += create_xml_tag("label",size,"Arrive By:");
+    xml += create_xml_tag("label",size,"Shipping Status:");
+    xml += "</hbox>\n";
+
+    while(getline(orderSS,order_str)){
+
+        size_t pos = order_str.find(" ");
+        string orderHex = order_str.substr(pos+1); //get the address hex value
+        stringstream hex_convert;
+        hex_convert << orderHex;
+        long order_address;
+        hex_convert >> hex >> order_address; //convert hex into long
+        Order* o = reinterpret_cast<Order*>(order_address); //reinterpret cast that sob and store it in a pointer
+        
+        order_str = o->print(); //get the order information
+
+        vector<string> orderV = string_split(order_str);
+        orderV.at(0) = "$" + orderV.at(0);
+
+        xml += "<hr>\n";
+        xml += "<hbox>\n";
+        xml += create_xml_tag("label",number_size,to_string(index));
+        for(int i = 0; i < orderV.size(); i++){
+            xml += "<vr>\n";
+            xml += create_xml_tag("label",size,orderV[i]);
+        }
+        xml += "</hbox>\n";
+        index++;
+
+    }
 
 }
 

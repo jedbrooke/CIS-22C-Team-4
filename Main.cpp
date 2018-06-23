@@ -43,8 +43,8 @@ int main(int argc, char *argv[]) {
 	Heap heap;
 	
 
-	Customer c("foo@bar.com","Hi1234","Bobby","Mcbobface",false,"123 faké street","Cupertinoville",12345,"helloIamcustomer");
-	Customer c2("foo2@bar.com","2Hi1234","Bobby2","Mcbobface2",false,"123 faké street2","Cupertinoville2",12345,"helloIamcustomer2");
+	Customer c("foo@bar.com","Hi1234","Bobby","Mcbobface",false,"123 faké street","Cupertinoville",12345,"foo@bar.com");
+	Customer c2("foo2@bar.com","2Hi1234","Bobby2","Mcbobface2",false,"123 faké street2","Cupertinoville2",12345,"foo2@bar.com");
 	Employee e("joe","hi","joe","joeman",true);
 
 	Order order(&c);
