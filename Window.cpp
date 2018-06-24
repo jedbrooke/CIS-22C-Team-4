@@ -409,6 +409,14 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         //do all the write functions
         gtk_main_quit();
 
+    } else if(name == "open"){
+        string make_and_model = optionsMap["value"];
+        string_find_and_replace("`"," ",make_and_model);
+        string url = "https://google.com/search?q=" + make_and_model;
+        string cmd = "open \"" + url + "\"";
+        system(cmd.c_str());
+
+
     } else if(name == "customer_sign_in") {
 
         string email = gtk_entry_get_text(GTK_ENTRY(entries["email"]));
@@ -602,7 +610,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         	xml += create_xml_tag("label","No matches");
         } else {
         	xml += create_xml_tag("label","There are " + to_string(matches.size()) + " matches.");
-        	create_db_list_xml(matches,xml,"customer_view_cart","add_to_cart","add to cart");
+        	create_db_list_xml(matches,xml,"customer_view_cart","add_to_cart","add to cart",true);
         }
 
     } else if(name == "customer_db_list"){
@@ -612,7 +620,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         if(value == "comp_name"){
 
             vector<string> productsV = products->printListToString();
-            create_db_list_xml(productsV,xml,"customer_view_cart","add_to_cart","add to cart");
+            create_db_list_xml(productsV,xml,"customer_view_cart","add_to_cart","add to cart",true);
 
         } else if(value == "price"){
 
@@ -620,7 +628,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         } else if(value == "model"){
 
             vector<string> productsV = products_secondary->printListToString();
-            create_db_list_xml(productsV,xml,"customer_view_cart","add_to_cart","add to cart");
+            create_db_list_xml(productsV,xml,"customer_view_cart","add_to_cart","add to cart",true);
         }
 
     } else if(name == "add_to_cart"){
@@ -1027,7 +1035,7 @@ void Window::assign_pointers(Heap* heap, HashTable<Customer>* _customers, HashTa
     g_print("pointers assigned\n");
 }
 
-void Window::create_db_list_xml(vector<string> productsV, string &xml, string link, string name, string text){
+void Window::create_db_list_xml(vector<string> productsV, string &xml, string link, string name, string text, bool glink){
 
 	string size = "width=\"100\"";
 	string index_options = "width=\"50\" justify=\"center\"";
@@ -1044,7 +1052,12 @@ void Window::create_db_list_xml(vector<string> productsV, string &xml, string li
 	xml += "</hbox>\n";
 
 	if(productsV.size() > 9){
-		xml += "<scroll columns=\"8\" " + size + ">\n";
+        if(glink){
+            xml += "<scroll columns=\"9\" " + size + ">\n";
+        } else {
+            xml += "<scroll columns=\"8\" " + size + ">\n";
+        }
+		
 		xml += "<vbox>\n";
 	}
 
@@ -1095,6 +1108,13 @@ void Window::create_db_list_xml(vector<string> productsV, string &xml, string li
 		xml += "<vr>\n";
 
 	    xml += create_xml_tag("button","options=\"link:" + link + ",name:" + name + ",value:" + make + "`" + model + "\"",text);
+
+        if(glink){
+
+            xml += "<vr>\n";
+            xml += create_xml_tag("button","options=\"link:stay,name:open,value:" + make + "`" + model + "\"","Search on web");
+
+        }
 
 	    xml += "</hbox>\n";
 	    xml += "<hr>\n";
@@ -1414,7 +1434,6 @@ void Window::create_customer_list_xml(string& xml, stringstream& customersSS){
         string_find_and_replace("<placeholder>\n","",xml);
     }
     
-
 }
 
 void Window::string_find_and_replace(string find, string replace, string &subject){

@@ -24,6 +24,7 @@
 #include "HashTable.h"
 #include <iostream>
 #include <fstream>
+#include <unistd.h>
 
 
 //class Heap;
@@ -76,7 +77,7 @@ public:
 
 	static string create_xml_tag(string tag, string options, string text);
 
-	static void create_db_list_xml(vector<string> productsV, string &xml, string link, string name, string text);
+	static void create_db_list_xml(vector<string> productsV, string &xml, string link, string name, string text, bool glink=false);
 
 	static void create_db_list_xml(vector<string> productsV, string &xml);
 
