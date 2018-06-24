@@ -32,8 +32,10 @@ HashTable<Customer> FileLoader::loadCustomers(string path) {
 	if (fis.is_open()) {
 		while (getline(fis, line)) {
             string username = line;
+						cout << username << endl;
             string password;
             getline(fis, password);
+						cout << password << endl;
             string first_name;
             fis >> first_name;
             getline(fis, line); //advance to the next line

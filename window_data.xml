@@ -345,8 +345,9 @@
 </window>
 <window id="employee_interface">
 	<title>
-
+		Employee Menu
 	</title>
+	<hr>
 	<button options="link:employee_search_customer_by_name">
 		Search for a customer by name
 	</button>
