@@ -1364,7 +1364,7 @@ void Window::create_customer_list_xml(string& xml, stringstream& customersSS){
 
     xml += "<hbox homogeneous=\"false\">\n";
     xml += create_xml_tag("label",zip_width,"     ");
-    xml += create_xml_tag("label",width,"First Nme");
+    xml += create_xml_tag("label",width,"First Name");
     xml += create_xml_tag("label",width,"Last Name");
     xml += create_xml_tag("label",width,"Address");
     xml += create_xml_tag("label",width,"City");

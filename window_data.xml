@@ -322,6 +322,7 @@
 	<title>
 		Enter Login information
 	</title>
+	<hr>
 	<label>
 		Employee Username:
 	</label>
@@ -344,7 +345,7 @@
 </window>
 <window id="employee_interface">
 	<title>
-		Employee Menu
+
 	</title>
 	<button options="link:employee_search_customer_by_name">
 		Search for a customer by name
@@ -372,14 +373,15 @@
 	<title>
 		Search for a customer by name
 	</title>
+	<hr>
 	<label>
-		first name:
+		First name:
 	</label>
 	<entry>
 		fname
 	</entry>
 	<label>
-		last name:
+		Last name:
 	</label>
 	<entry>
 		lname
@@ -393,6 +395,7 @@
 	<title>
 		Search Results
 	</title>
+	<hr>
 	<variable>
 	<button options="link:employee_interface">
 		Go back
@@ -402,6 +405,7 @@
 	<title>
 		Unsorted Customer Information
 	</title>
+	<hr>
 	<variable>
 	<button options="link:employee_interface">
 		Go back
@@ -411,6 +415,7 @@
 	<title>
 		View Orders by priority
 	</title>
+	<hr>
 	<variable>
 	<button options="link:employee_interface">
 		Go back
@@ -563,6 +568,7 @@
 	<title>
 		Writing data to files...
 	</title>
+	<hr>
 	<pbar>
 		writing
 	</pbar>
