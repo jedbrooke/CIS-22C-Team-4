@@ -774,6 +774,9 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
     	Product p(make,model, atoi(screenSize.c_str()), atoi(cpuGen.c_str()), atoi(year.c_str()), atoi(price.c_str()));
     	products->insert(p);
+	
+	Product ps(make,model, atoi(screenSize.c_str()), atoi(cpuGen.c_str()), atoi(year.c_str()), atoi(price.c_str()));
+	products_secondary->insert(ps);
 
     	xml += "<hr>\n";
     	xml += "<vbox homogeneous=\"true\">\n";
