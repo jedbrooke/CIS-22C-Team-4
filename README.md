@@ -36,8 +36,18 @@ and then run it
 For Mac users we will soon have a .app ready to download, no package installation required!
 
 ### For Windows:
+Make sure you have GTK installed. Tested with GTK3.
+Use a makefile, or copy the following into a .bat file:
+~~~~
+@echo off
+  
+set gtk_ver=gtk+-3.0
+pkg-config %gtk_ver% --cflags --libs >tmp.txt
+set /p pkg-info= <tmp.txt
+del tmp.txt
 
-pkg-config and gtk should be available on windows too, then compile and run it like any other c++ program, but make sure to include the library flags etc.
->\`pkg-config --cflags gtk+-2.0\` \`pkg-config --libs gtk+-2.0\`
-
-You may need to use the workaround described here: https://sungkwang.wordpress.com/2013/07/10/use-gcc-with-pkg-config-in-windows-7-mingw/
+rem echo %pkg-info%
+g++ *.cpp -o program.exe -Wall %pkg-info%
+pause
+~~~~
+and put it in the directory with your code. Edit Windowmanager.cpp and Window.cpp to #include \<algorithm>\, then run the bat file.
