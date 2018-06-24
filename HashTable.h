@@ -23,7 +23,6 @@ public:
     ~HashTable(){}
     //destructor
 
-
     /**Access Functions*/
 
     int hash(string key) const;
@@ -35,6 +34,8 @@ public:
     void displayCustomer(ostream& out);
 
     htdata* customerSignIn(string username);
+
+    List<htdata*> getAll();
 
 private:
     static const int SIZE = 100;
@@ -114,4 +115,18 @@ htdata* HashTable<htdata>::customerSignIn(string username){
 	}
 	return NULL;
 }
+
+template <class htdata>
+List<htdata*> HashTable<htdata>::getAll(){
+  List<htdata*> l;
+  for(int i = 0; i < SIZE; i++){
+    Table[i].startIterator();
+    for(int j = 0; j < Table[i].getLength(); j++){
+      l.insertStop(Table[i].getIterator());
+      Table[i].moveIterNext();
+    }
+  }
+  return l;
+}
+
 #endif /* HASHTABLE_H_ */

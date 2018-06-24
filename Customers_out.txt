@@ -28,9 +28,4 @@ Acer
 Switch 7 Black Edition
 1
 end
-5	740	1	1	1529878931	1530310931
-Lenovo
-ThinkPad L380 Yoga
-1
-end
 

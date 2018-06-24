@@ -586,7 +586,3 @@ void List<listdata>::displayReverse(Node * node, ostream &out) const
         displayReverse(node -> previous, out);
     }
 }
-
-
-
-

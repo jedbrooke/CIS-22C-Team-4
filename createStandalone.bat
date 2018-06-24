@@ -6,6 +6,6 @@ set /p pkg-info= <tmp.txt
 del tmp.txt
  
 rem echo %pkg-info%
-g++ *.cpp -o program.exe -Wall %pkg-info%
+g++ *.cpp -o program.exe -static -static-libgcc -static-libstdc++ -Wall %pkg-info%
 program.exe
 pause

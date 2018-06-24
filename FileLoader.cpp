@@ -22,9 +22,9 @@ BST<ProductS> FileLoader::loadProductsS(string path) {
 	return p;
 }
 
-HashTable<Customer> FileLoader::loadCustomers(string path) {
+HashTable<Customer> FileLoader::loadCustomers(string path, Heap& heap, BST<Product>& catalog) {
 
-	cout << "loading customers..." << endl;
+	cout << "loading customers from " << path << endl;
 
 	HashTable<Customer> customers;
 	ifstream fis(path.c_str());
@@ -37,30 +37,34 @@ HashTable<Customer> FileLoader::loadCustomers(string path) {
             getline(fis, password);
 						cout << password << endl;
             string first_name;
-            fis >> first_name;
-            getline(fis, line); //advance to the next line
+            getline(fis, first_name); //advance to the next line
             string last_name;
-            fis >> last_name;
-            getline(fis, line); //advance to the next line
-            bool isEmployee;
-            fis >> isEmployee;
+            getline(fis, last_name); //advance to the next line
+            bool isEmployee = false;
             getline(fis, line); //advance to the next line
             string address;
             getline(fis, address);
             string city;
-            fis >> city;
-            getline(fis, line); //advance to the next line
+            getline(fis, city); //advance to the next line
+            string zip_string;
             unsigned zip;
-            fis >> zip;
-            getline(fis, line); //advance to the next line
+            getline(fis, zip_string); //advance to the next line
+            zip = atoi(zip_string.c_str());
             string email;
-            fis >> email;
-            getline(fis, line); //advance to the next line
-
+            getline(fis,email);
+            cout << "email: " << email << endl;
             Customer* c = new Customer(username, password, first_name, last_name, isEmployee, address, city, zip, email);
             customers.insert(*c);
 
-						
+						while(not (fis.peek() == '\n')){
+							Order * o = new Order;
+							heap.insert(o -> load(fis, catalog));
+							c->insertOrder(o);
+						}
+
+
+
+
 
             getline(fis, line); //skip the emtpy line
 
@@ -105,6 +109,37 @@ HashTable<Employee> FileLoader::loadEmployees(string path) {
 	return employees;
 }
 
-static void saveProducts(string path, BST<Product> p);
-static void saveCustomers(string path, HashTable<Customer> c);
-static void saveEmployees(string path, HashTable<Employee> e);
+void FileLoader::saveProducts(string path, BST<Product> p){
+		p.save(path);
+}
+void FileLoader::saveCustomers(string path, HashTable<Customer> c){
+	ofstream of;
+	of.open(path.c_str(),ios_base::out);
+
+	List<Customer*> l(c.getAll());
+
+	l.startIterator();
+
+	while(not l.offEnd()){
+
+			l.getIterator()->write(of);
+			l.moveIterNext();
+	}
+
+}
+void FileLoader::saveEmployees(string path, HashTable<Employee> e){
+
+	ofstream of;
+	of.open(path.c_str(),ios_base::out);
+
+	List<Employee*> l(e.getAll());
+
+	l.startIterator();
+
+	while(not l.offEnd()){
+
+			l.getIterator()->write(of);
+			l.moveIterNext();
+	}
+
+}

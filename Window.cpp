@@ -5,6 +5,10 @@
  *      Author: Jasper
  */
 
+#ifdef _WIN32
+#include <algorithm>
+#endif // _WIN32
+
 #include "Window.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,7 +16,6 @@
 #include <sstream>
 #include <locale>
 #include <iterator>
-#include <algorithm>
 #include <gtk/gtk.h>
 //#include "Customer.h"
 
@@ -278,9 +281,9 @@ void Window::create_content(string tagName, string text, map<string,string> opti
         if(optionsMap["stay"] != "true"){
             //connect it to the destroy event as well
             g_signal_connect_swapped(widget,"clicked",G_CALLBACK(destroy),self_window);
-        } 
+        }
 
-        
+
 
 
 
@@ -421,9 +424,10 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         string make_and_model = optionsMap["value"];
         string_find_and_replace("`"," ",make_and_model);
         string url = "https://google.com/search?q=" + make_and_model;
-        string cmd = "open \"" + url + "\"";
-        system(cmd.c_str());
-
+        string cmd_win = "explorer \"" + url + "\"";
+        system(cmd_win.c_str());
+        string cmd_unix = "open \"" + url + "\"";
+        system(cmd_unix.c_str());
 
     } else if(name == "customer_sign_in") {
 
@@ -790,7 +794,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
     	Product p(make,model, atoi(screenSize.c_str()), atoi(cpuGen.c_str()), atoi(year.c_str()), atoi(price.c_str()));
     	products->insert(p);
-	
+
 	ProductS ps(make,model, atoi(screenSize.c_str()), atoi(cpuGen.c_str()), atoi(year.c_str()), atoi(price.c_str()));
 	products_secondary->insert(ps);
 
@@ -974,7 +978,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
     if(optionsMap["link"] != "stay"){
         WindowManager::go_to_window(optionsMap["link"],xml); //go to the new window
     }
-    
+
 }
 
 string Window::create_xml_tag(string tag, string text){
@@ -1070,7 +1074,7 @@ void Window::create_db_list_xml(vector<string> productsV, string &xml, string li
         } else {
             xml += "<scroll columns=\"8\" " + size + ">\n";
         }
-		
+
 		xml += "<vbox>\n";
 	}
 
