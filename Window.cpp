@@ -83,7 +83,7 @@ Window::Window(string xml) {
             optionsMap.insert(make_pair(attribute,value));
         }
 
-        if(tagName == "variable") { //skip unassigned variable tag
+        if(tagName == "variable") { //skip unassigned variable tag, should not happen but just in case
 
             continue;
 
@@ -444,6 +444,8 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         string username = gtk_entry_get_text(GTK_ENTRY(entries["username"]));
         string psw = gtk_entry_get_text(GTK_ENTRY(entries["psw"]));
 
+        username.erase(remove(username.begin(),username.end(),' '),username.end()); //remove white space
+
         Employee* e = employees->customerSignIn(username);
         Employee* e_check = new Employee(username,psw,"","",true);
 
@@ -694,11 +696,48 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
         xml += create_xml_tag("button","options=\"link:employee_shipping_confirmation,name:ship,value:" + to_string(index) + "\"","Confirm");
 
-    }else if(name == "ship"){
+    } else if(name == "ship"){
         int index = atoi(optionsMap["value"].c_str());
         priority_queue->ship(index);
 
-    } else if (name == "employee_add_product") {
+    } else if(name == "employee_customer_search"){
+
+        string fname = gtk_entry_get_text(GTK_ENTRY(entries["fname"]));
+        string lname = gtk_entry_get_text(GTK_ENTRY(entries["lname"]));
+
+        stringstream matches;
+
+        if (fname == "" and lname == "") {
+            //wa- hey man you can't just leave the fields blank
+            xml += create_xml_tag("label","Please enter a first and/or last name to search");
+            WindowManager::go_to_window("employee_search_customer_by_name");
+            return;
+
+        } else if(not (fname == "") and lname == ""){ //just the first name
+
+            customers->displayByFirstname(matches,fname);
+            xml += create_xml_tag("label","Matches for \"" + fname + "\":");
+
+        } else if(fname == "" and not (lname == "")){ //just last name
+
+            customers->displayByFirstname(matches,lname);
+            xml += create_xml_tag("label","Matches for \"" + lname + "\":");
+
+        } else { //we got both
+
+            customers->displayByFirstname(matches,fname);
+            customers->displayByFirstname(matches,lname);
+            xml += create_xml_tag("label","Matches for \"" + fname + " " + lname + "\":");
+
+        }
+
+
+        cout << "matches:" << endl << matches.str() << endl;
+
+        /*** checkpoint ***/
+        create_customer_list_xml(xml,matches);
+
+    } else if(name == "employee_add_product") {
 
     	string make = gtk_entry_get_text(GTK_ENTRY(entries["make"]));
     	string model = gtk_entry_get_text(GTK_ENTRY(entries["model"]));
@@ -820,51 +859,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
         customers->displayCustomer(customersSS);
 
-        string width = "width=\"100\"";
-        string zip_width = "width=\"40\"";
-
-        xml += "<hbox homogeneous=\"false\">\n";
-        xml += create_xml_tag("label",zip_width,"     ");
-        xml += create_xml_tag("label",width,"first name");
-        xml += create_xml_tag("label",width,"last name");
-        xml += create_xml_tag("label",width,"address");
-        xml += create_xml_tag("label",width,"City");
-        xml += create_xml_tag("label",width,"username");
-        xml += create_xml_tag("label",width,"zip");
-        xml += "</hbox>\n";
-
-        xml += "<scroll columns=\"7\" " + width + ">\n";
-        xml += "<vbox>\n";
-
-        string line;
-        while(getline(customersSS,line,'\n')){
-            if(line[0] == '#') continue;
-            string field;
-            xml += "<hr>\n";
-            xml+= "<hbox>\n";
-            bool isFirst = true;
-            stringstream customer(line);
-            int index;
-            string username;
-            while(getline(customer,field,',')){
-
-                xml += "<vr>\n";
-                if(is_number(field)){ // if it's a number
-                    xml += create_xml_tag("label",zip_width,field);
-                } else {
-                    xml += create_xml_tag("label",width,field);
-                }
-                if(index == 4) username = field;
-                index++;
-            }
-
-            xml += "<vr>\n";
-            xml += create_xml_tag("button","options=\"link:employee_view_customer,value:" + username + ",name:view_customer\"","view orders");
-            xml += "</hbox>\n";
-        }
-
-        xml += "</vbox>\n";
-        xml += "</scroll>\n";
+        create_customer_list_xml(xml, customersSS);
 
     } else if(name == "view_customer"){
         string username = optionsMap["value"];
@@ -873,14 +868,13 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
         if(c != NULL){
             xml += create_xml_tag("title","View orders for " + c->getFirstname());
+            xml += "<hr>\n";
             create_purchase_history_xml(xml, c);
 
         } else {
             xml += create_xml_tag("title","Customer not found!");
-            cerr << "Customer \"" << username << "\" not found!";
+            cerr << "Customer \"" << username << "\" not found!" << endl;
         }
-
-
 
     } else if(name == "employee_view_orders") {
 
@@ -1312,6 +1306,11 @@ void Window::create_purchase_history_xml(string& xml, Customer* c){
 
     string orders = c->getOrder();
 
+    if(orders == ""){
+        xml += create_xml_tag("label","No orders have been placed yet");
+        return;
+    }
+
     g_print("%s",g_strconcat("orders: ",orders.c_str(),"\n",NULL));
 
     stringstream orderSS(orders);
@@ -1355,6 +1354,66 @@ void Window::create_purchase_history_xml(string& xml, Customer* c){
         index++;
 
     }
+
+}
+
+void Window::create_customer_list_xml(string& xml, stringstream& customersSS){
+
+    string width = "width=\"100\"";
+    string zip_width = "width=\"40\"";
+
+    xml += "<hbox homogeneous=\"false\">\n";
+    xml += create_xml_tag("label",zip_width,"     ");
+    xml += create_xml_tag("label",width,"first name");
+    xml += create_xml_tag("label",width,"last name");
+    xml += create_xml_tag("label",width,"address");
+    xml += create_xml_tag("label",width,"City");
+    xml += create_xml_tag("label",width,"username");
+    xml += create_xml_tag("label",width,"zip");
+    xml += "</hbox>\n";
+
+    xml += "<placeholder>\n";
+
+    string line;
+    int count = 0;
+    while(getline(customersSS,line,'\n')){
+        if(line[0] == '#') continue;
+        string field;
+        xml += "<hr>\n";
+        xml+= "<hbox>\n";
+        bool isFirst = true;
+        stringstream customer(line);
+        int index = 0;
+        string username;
+        while(getline(customer,field,',')){
+
+            xml += "<vr>\n";
+            if(is_number(field)){ // if it's a number
+                xml += create_xml_tag("label",zip_width,field);
+            } else {
+                xml += create_xml_tag("label",width,field);
+            }
+            if(index == 4){
+                username = field;
+                cout << username << endl;
+            } 
+
+            index++;
+        }
+
+        xml += "<vr>\n";
+        xml += create_xml_tag("button","options=\"link:employee_search_customer_results,value:" + username + ",name:view_customer\"","view orders");
+        xml += "</hbox>\n";
+        count ++;
+    }
+    if(count > 8){
+        string_find_and_replace("<placeholder>\n","<scroll columns=\"7\" " + width + ">\n<vbox>\n",xml);
+        xml += "</vbox>\n";
+        xml += "</scroll>\n";
+    } else {
+        string_find_and_replace("<placeholder>\n","",xml);
+    }
+    
 
 }
 

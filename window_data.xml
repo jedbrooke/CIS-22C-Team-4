@@ -384,6 +384,7 @@
 	<entry>
 		lname
 	</entry>
+	<variable>
 	<button options="link:employee_search_customer_results,name:employee_customer_search">
 		Submit
 	</button>
@@ -404,12 +405,6 @@
 	<variable>
 	<button options="link:employee_interface">
 		Go back
-	</button>
-</window>
-<window id="employee_view_customer">
-	<variable>
-	<button options="link:employee_unsorted_customer_information,name:unsorted_customer_information">
-		Back
 	</button>
 </window>
 <window id="employee_view_order_by_priority">
