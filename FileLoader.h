@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <fstream>
 #include "Product.h"
+#include "ProductS.h"
 #include "Customer.h"
 #include "Employee.h"
 #include "HashTable.h"
@@ -21,8 +22,12 @@ private:
     
 public:
     static BST<Product> loadProducts(string path);
+    static BST<ProductS> loadProductsS(string path);
     static HashTable<Customer> loadCustomers(string path);
     static HashTable<Employee> loadEmployees(string path);
+    static void saveProducts(string path, BST<Product> p);
+    static void saveCustomers(string path, HashTable<Customer> c);
+    static void saveEmployees(string path, HashTable<Employee> e);
 };
 
 #endif /* FileLoader_h */
