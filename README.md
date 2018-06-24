@@ -38,6 +38,7 @@ For Mac users we will soon have a .app ready to download, no package installatio
 ### For Windows:
 Make sure you have GTK installed. Tested with GTK3.
 Use a makefile, or copy the following into a .bat file:
+~~~~
   @echo off
   
   set gtk_ver=gtk+-3.0
@@ -48,5 +49,5 @@ Use a makefile, or copy the following into a .bat file:
   rem echo %pkg-info%
   g++ *.cpp -o program.exe -Wall %pkg-info%
   pause
-
+~~~~
 and put it in the directory with your code. Edit Windowmanager.cpp and Window.cpp to #include <algorithm>, then run the bat file.
