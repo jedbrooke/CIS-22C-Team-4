@@ -80,8 +80,8 @@ HashTable<Customer> FileLoader::loadCustomers(string path) {
             fis >> email;
             getline(fis, line); //advance to the next line
 
-            Customer c(username, password, first_name, last_name, isEmployee, address, city, zip, email);
-            customers.insert(c);
+            Customer* c = new Customer(username, password, first_name, last_name, isEmployee, address, city, zip, email);
+            customers.insert(*c);
 
             getline(fis, line); //skip the emtpy line
 
@@ -113,8 +113,8 @@ HashTable<Employee> FileLoader::loadEmployees(string path) {
             fis >> isEmployee;
             getline(fis, line); //advance to the next line
 
-            Employee e(username, password, first_name, last_name, isEmployee);
-            employees.insert(e);
+            Employee* e = new Employee(username, password, first_name, last_name, isEmployee);
+            employees.insert(*e);
 
             getline(fis, line); //skip the emtpy line
 
