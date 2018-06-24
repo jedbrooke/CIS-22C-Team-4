@@ -28,9 +28,9 @@ int main(int argc, char *argv[]) {
 	g_print("args passed to gtk_init\n");
 	Heap heap;
 	BST<Product> bstp;
-	bstp.loadPrimary("Products_out.txt");
+	bstp.loadPrimary("Products_in.txt");
 	BST<ProductS> bsts;
-	bsts.loadSecondary("Products_out.txt");
+	bsts.loadSecondary("Products_in.txt");
 
 	HashTable<Customer> htc = FileLoader::loadCustomers("Customers.txt",heap,bstp);
 	HashTable<Employee> hte = FileLoader::loadEmployees("Employees.txt");
@@ -48,9 +48,9 @@ int main(int argc, char *argv[]) {
 
 	g_print("gtk_main has ended\n");
 
-	FileLoader::saveProducts("Products_out.txt",bstp);
-	FileLoader::saveCustomers("Customers_out.txt", htc);
-	FileLoader::saveEmployees("Employee_out.txt", hte);
+	FileLoader::saveProducts("Products_in.txt",bstp);
+	FileLoader::saveCustomers("Customers.txt", htc);
+	FileLoader::saveEmployees("Employees.txt", hte);
 
 
 	return 0;

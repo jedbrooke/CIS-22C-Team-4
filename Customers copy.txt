@@ -8,32 +8,6 @@ Cupertino
 19001
 testboi@email.com
 
-foo@bar.com
-Hi1234
-Bobby
-Mcbobface
-0
-123 faké street
-Cupertinoville
-12345
-foo@bar.com
-1	700	1	0	1529883084	1529969484
-Acer
-Aspire Switch Alpha 12
-1
-end
-5	3750	1	0	1529883104	1530315104
-Acer
-Switch 5
-1
-Acer
-Switch 7 Black Edition
-1
-HP
-EliteBook x360 (1030 G2)
-1
-end
-
 memegmail@email.com
 password1234
 Fish
