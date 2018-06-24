@@ -1364,12 +1364,12 @@ void Window::create_customer_list_xml(string& xml, stringstream& customersSS){
 
     xml += "<hbox homogeneous=\"false\">\n";
     xml += create_xml_tag("label",zip_width,"     ");
-    xml += create_xml_tag("label",width,"first name");
-    xml += create_xml_tag("label",width,"last name");
-    xml += create_xml_tag("label",width,"address");
+    xml += create_xml_tag("label",width,"First Nme");
+    xml += create_xml_tag("label",width,"Last Name");
+    xml += create_xml_tag("label",width,"Address");
     xml += create_xml_tag("label",width,"City");
-    xml += create_xml_tag("label",width,"username");
-    xml += create_xml_tag("label",width,"zip");
+    xml += create_xml_tag("label",width,"Email");
+    xml += create_xml_tag("label",width,"Zip");
     xml += "</hbox>\n";
 
     xml += "<placeholder>\n";
@@ -1396,7 +1396,7 @@ void Window::create_customer_list_xml(string& xml, stringstream& customersSS){
             if(index == 4){
                 username = field;
                 cout << username << endl;
-            } 
+            }
 
             index++;
         }
@@ -1413,7 +1413,7 @@ void Window::create_customer_list_xml(string& xml, stringstream& customersSS){
     } else {
         string_find_and_replace("<placeholder>\n","",xml);
     }
-    
+
 
 }
 

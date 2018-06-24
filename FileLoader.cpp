@@ -1,6 +1,6 @@
 //
 //  FileLoader.cpp
-//  
+//
 //
 //  Created by Alex Rao on 6/10/18.
 //
@@ -44,8 +44,8 @@ HashTable<Customer> FileLoader::loadCustomers(string path) {
             fis >> isEmployee;
             getline(fis, line); //advance to the next line
             string address;
-            fis >> address;
-            getline(fis, line); //advance to the next line
+            getline(fis, address);
+            //getline(fis, line); //advance to the next line
             string city;
             fis >> city;
             getline(fis, line); //advance to the next line
@@ -62,7 +62,7 @@ HashTable<Customer> FileLoader::loadCustomers(string path) {
             getline(fis, line); //skip the emtpy line
 
         }
-			
+
 	}
 	fis.close();
 	return customers;
@@ -77,7 +77,7 @@ HashTable<Employee> FileLoader::loadEmployees(string path) {
 	string line;
 	if (fis.is_open()) {
 		while (getline(fis, line)) {
-            
+
             string username = line;
             string password;
             getline(fis, password);
