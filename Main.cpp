@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
 	BST<ProductS> bsts;
 	bsts.loadSecondary("Products_out.txt");
 
-	HashTable<Customer> htc = FileLoader::loadCustomers("Customers_out2.txt",heap,bstp);
+	HashTable<Customer> htc = FileLoader::loadCustomers("Customers.txt",heap,bstp);
 	HashTable<Employee> hte = FileLoader::loadEmployees("Employees.txt");
 
 	cout << "Success!" << endl;
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 	g_print("gtk_main has ended\n");
 
 	FileLoader::saveProducts("Products_out.txt",bstp);
-	FileLoader::saveCustomers("Customers_out2.txt", htc);
+	FileLoader::saveCustomers("Customers.txt", htc);
 	FileLoader::saveEmployees("Employee_out.txt", hte);
 
 

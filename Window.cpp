@@ -425,9 +425,9 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         string_find_and_replace("`"," ",make_and_model);
         string url = "https://google.com/search?q=" + make_and_model;
         string cmd_win = "explorer \"" + url + "\"";
-        system(cmd.c_str());
-        string cmd = "open \"" + url + "\"";
-        system(cmd.c_str());
+        system(cmd_win.c_str());
+        string cmd_unix = "open \"" + url + "\"";
+        system(cmd_unix.c_str());
 
     } else if(name == "customer_sign_in") {
 
