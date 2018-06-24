@@ -1,6 +1,6 @@
 //
 //  FileLoader.h
-//  
+//
 //
 //  Created by Alex Rao on 6/10/18.
 //
@@ -15,15 +15,17 @@
 #include "Employee.h"
 #include "HashTable.h"
 #include "BST.h"
+#include "Heap.h"
 
 using namespace std;
 class FileLoader{
 private:
-    
+
 public:
+    static void writeAll();
     static BST<Product> loadProducts(string path);
     static BST<ProductS> loadProductsS(string path);
-    static HashTable<Customer> loadCustomers(string path);
+    static HashTable<Customer> loadCustomers(string path, Heap& heap, BST<Product>& catalog);
     static HashTable<Employee> loadEmployees(string path);
     static void saveProducts(string path, BST<Product> p);
     static void saveCustomers(string path, HashTable<Customer> c);
