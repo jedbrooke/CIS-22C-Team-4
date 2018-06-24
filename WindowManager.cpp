@@ -12,6 +12,7 @@
 #include <string>
 #include <iostream>
 #include <cstddef> //for NULL
+#include <algorithm>
 
 using namespace std;
 

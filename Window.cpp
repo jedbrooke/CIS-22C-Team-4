@@ -11,6 +11,8 @@
 #include <string>
 #include <sstream>
 #include <locale>
+#include <iterator>
+#include <algorithm>
 #include <gtk/gtk.h>
 //#include "Customer.h"
 
