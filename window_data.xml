@@ -509,7 +509,7 @@
 		Submit
 	</button>
 	<button options="link:employee_interface">
-		cancel
+		Cancel
 	</button>
 </window>
 <window id="employee_add_new_product_confirm">
@@ -534,7 +534,7 @@
 	<hr>
 	<variable>
 	<button options="link:employee_interface">
-		cancel
+		Cancel
 	</button>
 </window>
 <window id="employee_remove_product_confirm">
