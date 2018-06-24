@@ -24,4 +24,9 @@ int main(){
     path = "Employees.txt";
     HashTable<Employee> e(FileLoader::loadEmployees(path));
 
+    Employee* em = e.customerSignIn("sandhater50");
+
+
+    cout << "employee:" << endl;
+    em->write(cout);
 }
