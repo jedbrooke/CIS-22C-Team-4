@@ -694,7 +694,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
         xml += create_xml_tag("button","options=\"link:employee_shipping_confirmation,name:ship,value:" + to_string(index) + "\"","Confirm");
 
-    }else if(name == "ship"){
+    } else if(name == "ship"){
         int index = atoi(optionsMap["value"].c_str());
         priority_queue->ship(index);
 
@@ -879,8 +879,6 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
             xml += create_xml_tag("title","Customer not found!");
             cerr << "Customer \"" << username << "\" not found!";
         }
-
-
 
     } else if(name == "employee_view_orders") {
 

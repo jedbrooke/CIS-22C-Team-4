@@ -76,7 +76,7 @@ void HashTable<htdata>::displayByFirstname(ostream& out, string firstname) {
 	for (int i =0; i< SIZE; i++){
 		Table[i].startIterator();
 		for (int j=0; j <Table[i].getLength(); j++){
-			if(Table[i].getIterator()->getFirstname() == firstname){
+			if(Table[i].getIterator()->getFirstname().find(firstname) != string::npos){
 				out << *(Table[i].getIterator());
 			}
 			Table[i].moveIterNext();
@@ -91,7 +91,7 @@ void HashTable<htdata>::displayByLastname(ostream& out, string lastname) {
 	for (int i =0; i< SIZE; i++){
 		Table[i].startIterator();
 		for (int j=0; j <Table[i].getLength(); j++){
-			if(Table[i].getIterator()->getLastname() == lastname){
+			if(Table[i].getIterator()->getLastname().find(lastname) != string::npos){
 				out << *(Table[i].getIterator());
 			}
 			Table[i].moveIterNext();
