@@ -12,7 +12,7 @@
 #include <sstream>
 #include <locale>
 #include <iterator>
-#include <algorithm>
+//#include <algorithm> Windows OS only
 #include <gtk/gtk.h>
 //#include "Customer.h"
 
@@ -421,7 +421,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         string make_and_model = optionsMap["value"];
         string_find_and_replace("`"," ",make_and_model);
         string url = "https://google.com/search?q=" + make_and_model;
-        string cmd = "explorer \"" + url + "\"";
+        string cmd = "open \"" + url + "\"";
         system(cmd.c_str());
 
 

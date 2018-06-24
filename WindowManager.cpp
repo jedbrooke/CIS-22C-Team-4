@@ -12,7 +12,7 @@
 #include <string>
 #include <iostream>
 #include <cstddef> //for NULL
-#include <algorithm>
+//#include <algorithm> WindowsOS only
 
 using namespace std;
 
