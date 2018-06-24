@@ -25,16 +25,17 @@
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
+#include <iterator>
 
 
-//class Heap;
+
 
 class WindowManager; //forward class declaration
 
 using namespace std;
 
 class Window {
-	
+
 private:
 	string title;
 	GtkWidget* self_window;
@@ -52,11 +53,11 @@ private:
 
 public:
 	Window();
-	
+
 	Window(string xml);
-	
+
 	~Window();
-	
+
 	static void button_pressed(GtkWidget *widget, gpointer data);
 
 	//called when close window red button is pressed at app level
@@ -105,4 +106,3 @@ public:
 
 
 #endif /* WINDOW_H_ */
-

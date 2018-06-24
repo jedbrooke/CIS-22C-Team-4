@@ -1,4 +1,4 @@
-un
+testboi@email.com
 pass
 Mohamed
 E
@@ -8,7 +8,7 @@ Cupertino
 19001
 testboi@email.com
 
-bigfish17
+memegmail@email.com
 password1234
 Fish
 Man
