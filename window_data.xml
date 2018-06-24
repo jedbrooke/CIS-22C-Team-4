@@ -391,6 +391,9 @@
 	<button options="link:employee_search_customer_results,name:employee_customer_search">
 		Submit
 	</button>
+	<button options="link:employee_interface">
+		Back
+	</button>
 </window>
 <window id="employee_search_customer_results">
 	<title>
