@@ -5,6 +5,10 @@
  *      Author: Jasper
  */
 
+#ifdef _WIN32
+#include <algorithm>
+#endif // _WIN32
+
 #include "WindowManager.h"
 #include <fstream>
 #include <sstream>
@@ -12,7 +16,7 @@
 #include <string>
 #include <iostream>
 #include <cstddef> //for NULL
-//#include <algorithm> WindowsOS only
+
 
 using namespace std;
 
@@ -22,9 +26,9 @@ Window* WindowManager::current_window;
 string WindowManager::current_window_id;
 
 WindowManager::WindowManager() {
-	
+
 	current_window = NULL;
-	
+
 }
 
 WindowManager::~WindowManager() {
@@ -64,7 +68,7 @@ void WindowManager::loadxml(string path){
 			//this is the window line
 			stringstream ss(line);
 			string window_id;
-			getline(ss, window_id, '\"'); //skip the first part 
+			getline(ss, window_id, '\"'); //skip the first part
 			getline(ss, window_id, '\"'); //get the actual id
 			string tag = "";
 			getline(xmlFile, tag);
@@ -98,6 +102,6 @@ void WindowManager::run_pbar(){
 			g_print("increasing pbar\n");
 			current_window->increase_pbar();
 		}
-		
+
 	}
 }

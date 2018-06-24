@@ -5,6 +5,10 @@
  *      Author: Jasper
  */
 
+#ifdef _WIN32
+#include <algorithm>
+#endif // _WIN32
+
 
 #include "Window.h"
 #include <stdio.h>
@@ -13,9 +17,8 @@
 #include <sstream>
 #include <locale>
 #include <iterator>
-//#include <algorithm> Windows OS only
 #include <gtk/gtk.h>
-//#include "Customer.h"
+
 
 using namespace std;
 
@@ -422,9 +425,16 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         string make_and_model = optionsMap["value"];
         string_find_and_replace("`"," ",make_and_model);
         string url = "https://google.com/search?q=" + make_and_model;
+<<<<<<< HEAD
         string cmd = "open \"" + url + "\"";
         system(cmd.c_str());
 
+=======
+        string cmd_win = "explorer \"" + url + "\"";
+        system(cmd_win.c_str());
+        string cmd_unix = "open \"" + url + "\"";
+        system(cmd_unix.c_str());
+>>>>>>> Windows-support
 
     } else if(name == "customer_sign_in") {
 
