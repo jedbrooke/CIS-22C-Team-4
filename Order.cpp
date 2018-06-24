@@ -94,7 +94,8 @@ using namespace std;
 
 	void Order::removeLaptop(int index) {
 		assert(!placed);
-		assert(index < laptops.getLength());
+		assert(index <= laptops.getLength());
+		assert(index > 0);
 		laptops.moveToIndex(index);
 		price -= laptops.getIterator().price;
 		laptops.removeIterator();
