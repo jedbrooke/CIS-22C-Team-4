@@ -2,6 +2,7 @@
 	<title>
 		Welcome to the store!
 	</title>
+	<hr>
 	<label>
 		Are you a:
 	</label>
@@ -16,6 +17,7 @@
 	<title>
 		What do you want to do?
 	</title>
+	<hr>
 	<button options="link:customer_sign_in_using_and_existing_account">
 		Sign in using an existing account
 	</button>
@@ -35,6 +37,7 @@
 	<title>
 		Sign in using an existing account:
 	</title>
+	<hr>
 	<label>
 		Username
 	</label>
@@ -49,16 +52,17 @@
 	</entry>
 	<variable>
 	<button options="link:customer_interface,name:customer_sign_in" default="true">
-		submit
+		Submit
 	</button>
 	<button options="link:customer_login_screen">
-		back
+		Back
 	</button>
 </window>
 <window id="customer_create_new_account">
 	<title>
 		Create a new account
 	</title>
+	<hr>
 	<label>
 		Enter your username:
 	</label>
@@ -79,7 +83,7 @@
 	</entry>
 	<label>
 		Confirm your password:
-	</label>	
+	</label>
 	<entry type="psw">
 		conf_psw
 	</entry>
@@ -88,13 +92,14 @@
 		Enter
 	</button>
 	<button options="link:customer_login_screen">
-		back
+		Back
 	</button>
 </window>
 <window id="customer_create_new_account_cont">
 	<title>
 		Please provide us with the following information:
 	</title>
+	<hr>
 	<label>
 		Enter your first name:
 	</label>
@@ -114,26 +119,26 @@
 		address
 	</entry>
 	<label>
-		Enter your City:
+		Enter your city:
 	</label>
 	<entry>
 		city
 	</entry>
 	<label>
-		Enter your Zip Code:
+		Enter your zip code:
 	</label>
 	<entry>
 		zip
 	</entry>
 	<label>
-		Enter your phone number ((xxx) xxx-xxxx):
+		Enter your phone number:
 	</label>
 	<entry>
 		phone_num
 	</entry>
 	<variable>
 	<button options="link:customer_interface,name:customer_create_new_account_2" default="true">
-		submit
+		Submit
 	</button>
 </window>
 <window id="customer_interface">
@@ -141,7 +146,6 @@
 	<title>
 		Customer Menu:
 	</title>
-	<hr>
 	<hbox>
 		<vbox>
 			<label>
@@ -158,7 +162,7 @@
 			</button>
 			<hr>
 			<button options="link:customer_view_cart,name:customer_view_cart">
-				View Cart or Place an order
+				View cart or place an order
 			</button>
 			<hr>
 			<button options="link:customer_view_purchase_history,name:purchase_history">
@@ -166,7 +170,7 @@
 			</button>
 			<hr>
 			<button options="link:contact_us">
-				Send Feedback
+				Send feedback
 			</button>
 			<button options="link:end_screen">
 				Sign out
@@ -183,6 +187,7 @@
 	<title>
 		Search for a product
 	</title>
+	<hr>
 	<label>
 		Search for a product by manufacturing company
 	</label>
@@ -226,8 +231,9 @@
 </window>
 <window id="customer_list_database_for_products">
 	<title>
-		List Database
+		List database
 	</title>
+	<hr>
 	<label>
 		Do you want to list products sorted by:
 	</label>
@@ -238,16 +244,17 @@
 		Model Name
 	</button>
 	<button options="link:customer_interface">
-		go back
+		Go back
 	</button>
 </window>
 <window id="customer_list_database_for_products_results">
 	<title>
-		Here is our Database:
+		Here is our database:
 	</title>
+	<hr>
 	<variable>
 	<button options="link:customer_list_database_for_products">
-		go back
+		Go back
 	</button>
 </window>
 <window id="customer_view_cart">
@@ -256,7 +263,7 @@
 	</title>
 	<variable>
 	<button options="link:customer_interface">
-		go back
+		Go back
 	</button>
 </window>
 <window id="customer_checkout">
@@ -290,17 +297,19 @@
 	<title>
 		Purchase History
 	</title>
+	<hr>
 	<variable>
 	<button options="link:customer_interface">
-		back
+		Back
 	</button>
 </window>
 <window id="contact_us">
 	<title>
 		Contact us
 	</title>
+	<hr>
 	<label width="200">
-		Leave your message here and we will get back to your shortly, using the email assosiated with your account.
+		Leave your message here, and we will get back to your shortly, using the email assosiated with your account.
 	</label>
 	<entry>
 		comment
@@ -327,10 +336,10 @@
 	</entry>
 	<variable>
 	<button options="link:employee_interface,name:employee_login">
-		submit
+		Submit
 	</button>
 	<button options="link:welcome_screen">
-		back
+		Back
 	</button>
 </window>
 <window id="employee_interface">
@@ -376,7 +385,7 @@
 		lname
 	</entry>
 	<button options="link:employee_search_customer_results,name:employee_customer_search">
-		submit
+		Submit
 	</button>
 </window>
 <window id="employee_search_customer_results">
@@ -385,7 +394,7 @@
 	</title>
 	<variable>
 	<button options="link:employee_interface">
-		go back
+		Go back
 	</button>
 </window>
 <window id="employee_unsorted_customer_information">
@@ -394,13 +403,13 @@
 	</title>
 	<variable>
 	<button options="link:employee_interface">
-		go back
+		Go back
 	</button>
 </window>
 <window id="employee_view_customer">
 	<variable>
 	<button options="link:employee_unsorted_customer_information,name:unsorted_customer_information">
-		back
+		Back
 	</button>
 </window>
 <window id="employee_view_order_by_priority">
@@ -432,10 +441,11 @@
 </window>
 <window id="employee_list_database_select">
 	<title>
-		List Database
+		List database
 	</title>
+	<hr>
 	<label>
-		Sort Database by:
+		Sort database by:
 	</label>
 	<button options="link:employee_list_database_results,name:employee_db_search,value:comp_name">
 		Company name
@@ -444,19 +454,20 @@
 		Model name
 	</button>
 	<button options="link:employee_interface">
-		go Back
+		Go back
 	</button>
 </window>
 <window id="employee_list_database_results">
 	<variable>
 	<button options="link:employee_interface">
-		Go Back
+		Go back
 	</button>
 </window>
 <window id="employee_add_new_product">
 	<title>
 		Add a new product
 	</title>
+	<hr>
 	<label>
 		Enter company:
 	</label>
@@ -470,7 +481,7 @@
 		model
 	</entry>
 	<label>
-		Enter Screen Size(in):
+		Enter Screen Size (in):
 	</label>
 	<entry>
 		screenSize
@@ -488,17 +499,17 @@
 		year
 	</entry>
 	<label>
-		Enter price ($) :
+		Enter price ($):
 	</label>
 	<entry>
 		price
 	</entry>
 	<variable>
 	<button options="link:employee_add_new_product_confirm,name:employee_add_product">
-		submit
+		Submit
 	</button>
 	<button options="link:employee_interface">
-		cancel
+		Cancel
 	</button>
 </window>
 <window id="employee_add_new_product_confirm">
@@ -513,16 +524,17 @@
 		Add another product
 	</button>
 	<button options="link:employee_interface">
-		go back
+		Go back
 	</button>
 </window>
 <window id="employee_remove_product">
 	<title>
 		Remove a product
 	</title>
+	<hr>
 	<variable>
 	<button options="link:employee_interface">
-		cancel
+		Cancel
 	</button>
 </window>
 <window id="employee_remove_product_confirm">
@@ -544,11 +556,12 @@
 	<title>
 		Product Removed
 	</title>
+	<hr>
 	<button options="link:employee_remove_product,name:employee_remove_product">
 		Remove another product
 	</button>
 	<button options="link:employee_interface">
-		go back
+		Go back
 	</button>
 </window>
 <window id="end_screen">
@@ -559,10 +572,10 @@
 		writing
 	</pbar>
 	<button options="link:welcome_screen">
-		back
+		Back
 	</button>
 	<button options="link:end_screen,name:quit">
-		quit
+		Quit
 	</button>
 </window>
 <window id="404">
@@ -570,7 +583,7 @@
 		Error: 404, page not found!
 	</title>
 	<button options="link:welcome_screen">
-		back to home
+		Back to home
 	</button>
 </window>
 <window id="boxes">

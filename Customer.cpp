@@ -225,10 +225,8 @@ void Customer::addToProduct(Product* p) {
 }
 
 void Customer::removeProduct(int index) {
-	assert(r->isPlaced());
-	if (!r->isPlaced()) {
-		r->removeLaptop(index - 1);
-	}
+	assert(!r->isPlaced());
+		r->removeLaptop(index);
 }
 
 void Customer::placeOrder() {
