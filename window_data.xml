@@ -345,8 +345,9 @@
 </window>
 <window id="employee_interface">
 	<title>
-
+		Employee Menu
 	</title>
+	<hr>
 	<button options="link:employee_search_customer_by_name">
 		Search for a customer by name
 	</button>
@@ -389,6 +390,9 @@
 	<variable>
 	<button options="link:employee_search_customer_results,name:employee_customer_search">
 		Submit
+	</button>
+	<button options="link:employee_interface">
+		Back
 	</button>
 </window>
 <window id="employee_search_customer_results">
@@ -573,7 +577,7 @@
 		writing
 	</pbar>
 	<button options="link:welcome_screen">
-		Back
+		Main Menu
 	</button>
 	<button options="link:end_screen,name:quit">
 		Quit

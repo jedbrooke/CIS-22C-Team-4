@@ -275,8 +275,14 @@ void Window::create_content(string tagName, string text, map<string,string> opti
         //set signal connect method
         g_signal_connect(widget, "clicked", G_CALLBACK(button_pressed), FALSE);
 
-        //connect it to the destroy event as well
-        g_signal_connect_swapped(widget,"clicked",G_CALLBACK(destroy),self_window);
+        if(optionsMap["stay"] != "true"){
+            //connect it to the destroy event as well
+            g_signal_connect_swapped(widget,"clicked",G_CALLBACK(destroy),self_window);
+        } 
+
+        
+
+
 
     } else if(tagName == "label") {
 
@@ -410,6 +416,14 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         order = NULL;
         //do all the write functions
         gtk_main_quit();
+
+    } else if(name == "open"){
+        string make_and_model = optionsMap["value"];
+        string_find_and_replace("`"," ",make_and_model);
+        string url = "https://google.com/search?q=" + make_and_model;
+        string cmd = "open \"" + url + "\"";
+        system(cmd.c_str());
+
 
     } else if(name == "customer_sign_in") {
 
@@ -604,7 +618,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         	xml += create_xml_tag("label","No matches");
         } else {
         	xml += create_xml_tag("label","There are " + to_string(matches.size()) + " matches.");
-        	create_db_list_xml(matches,xml,"customer_view_cart","add_to_cart","add to cart");
+        	create_db_list_xml(matches,xml,"customer_view_cart","add_to_cart","add to cart",true);
         }
 
     } else if(name == "customer_db_list"){
@@ -614,7 +628,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         if(value == "comp_name"){
 
             vector<string> productsV = products->printListToString();
-            create_db_list_xml(productsV,xml,"customer_view_cart","add_to_cart","add to cart");
+            create_db_list_xml(productsV,xml,"customer_view_cart","add_to_cart","add to cart",true);
 
         } else if(value == "price"){
 
@@ -622,7 +636,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         } else if(value == "model"){
 
             vector<string> productsV = products_secondary->printListToString();
-            create_db_list_xml(productsV,xml,"customer_view_cart","add_to_cart","add to cart");
+            create_db_list_xml(productsV,xml,"customer_view_cart","add_to_cart","add to cart",true);
         }
 
     } else if(name == "add_to_cart"){
@@ -776,6 +790,9 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
     	Product p(make,model, atoi(screenSize.c_str()), atoi(cpuGen.c_str()), atoi(year.c_str()), atoi(price.c_str()));
     	products->insert(p);
+	
+	ProductS ps(make,model, atoi(screenSize.c_str()), atoi(cpuGen.c_str()), atoi(year.c_str()), atoi(price.c_str()));
+	products_secondary->insert(ps);
 
     	xml += "<hr>\n";
     	xml += "<vbox homogeneous=\"true\">\n";
@@ -954,8 +971,10 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         of.close();
 
     }
-
-    WindowManager::go_to_window(optionsMap["link"],xml); //go to the new window
+    if(optionsMap["link"] != "stay"){
+        WindowManager::go_to_window(optionsMap["link"],xml); //go to the new window
+    }
+    
 }
 
 string Window::create_xml_tag(string tag, string text){
@@ -1029,7 +1048,7 @@ void Window::assign_pointers(Heap* heap, HashTable<Customer>* _customers, HashTa
     g_print("pointers assigned\n");
 }
 
-void Window::create_db_list_xml(vector<string> productsV, string &xml, string link, string name, string text){
+void Window::create_db_list_xml(vector<string> productsV, string &xml, string link, string name, string text, bool glink){
 
 	string size = "width=\"100\"";
 	string index_options = "width=\"50\" justify=\"center\"";
@@ -1046,7 +1065,12 @@ void Window::create_db_list_xml(vector<string> productsV, string &xml, string li
 	xml += "</hbox>\n";
 
 	if(productsV.size() > 9){
-		xml += "<scroll columns=\"8\" " + size + ">\n";
+        if(glink){
+            xml += "<scroll columns=\"9\" " + size + ">\n";
+        } else {
+            xml += "<scroll columns=\"8\" " + size + ">\n";
+        }
+		
 		xml += "<vbox>\n";
 	}
 
@@ -1097,6 +1121,13 @@ void Window::create_db_list_xml(vector<string> productsV, string &xml, string li
 		xml += "<vr>\n";
 
 	    xml += create_xml_tag("button","options=\"link:" + link + ",name:" + name + ",value:" + make + "`" + model + "\"",text);
+
+        if(glink){
+
+            xml += "<vr>\n";
+            xml += create_xml_tag("button","stay=\"true\" options=\"link:stay,name:open,value:" + make + "`" + model + "\"","Search on web");
+
+        }
 
 	    xml += "</hbox>\n";
 	    xml += "<hr>\n";
@@ -1415,8 +1446,6 @@ void Window::create_customer_list_xml(string& xml, stringstream& customersSS){
     } else {
         string_find_and_replace("<placeholder>\n","",xml);
     }
-
-
 }
 
 void Window::string_find_and_replace(string find, string replace, string &subject){
