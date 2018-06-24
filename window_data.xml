@@ -574,7 +574,7 @@
 		writing
 	</pbar>
 	<button options="link:welcome_screen">
-		Back
+		Main Menu
 	</button>
 	<button options="link:end_screen,name:quit">
 		Quit

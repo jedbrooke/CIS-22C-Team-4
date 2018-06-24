@@ -253,7 +253,7 @@ using namespace std;
 			return NULL;
 		}
 	}
-		
+
 	ostream& operator<<(ostream& out, const Order& order) {
 		out <<
 				"\nOrder's Info: " <<
