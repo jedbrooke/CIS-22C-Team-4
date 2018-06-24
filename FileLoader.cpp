@@ -1,6 +1,6 @@
 //
 //  FileLoader.cpp
-//  
+//
 //
 //  Created by Alex Rao on 6/10/18.
 //
@@ -10,40 +10,16 @@
 #include "FileLoader.h"
 using namespace std;
 
-BST<Product> FileLoader::loadProducts(string path){
+BST<Product> FileLoader::loadProducts(string path) {
+	BST<Product> p;
+	p.loadPrimary(path);
+	return p;
+}
 
-	cout << "loading products..." << endl;
-
-    BST<Product> products;
-    ifstream fis(path.c_str());
-    string line;
-    if (fis.is_open()) {
-        while (getline(fis, line)) {
-            string manf_company = line;
-            string model;
-            getline(fis, model);
-            double screen_size;
-            fis >> screen_size;
-            getline(fis, line); //advance to the next line
-            unsigned cpuGen;
-            fis >> cpuGen;
-            getline(fis, line); //advance to the next line
-            unsigned year;
-            fis >> year;
-            getline(fis, line); //advance to the next line
-            unsigned price;
-            fis >> price;
-            getline(fis, line); //advance to the next line
-
-            Product p(manf_company,model,screen_size,cpuGen,year,price);
-            products.insert(p);
-
-            getline(fis, line); //skip the emtpy line
-
-        }
-    }
-    fis.close();
-    return products;
+BST<ProductS> FileLoader::loadProductsS(string path) {
+	BST<ProductS> p;
+	p.loadSecondary(path);
+	return p;
 }
 
 HashTable<Customer> FileLoader::loadCustomers(string path) {
@@ -68,8 +44,7 @@ HashTable<Customer> FileLoader::loadCustomers(string path) {
             fis >> isEmployee;
             getline(fis, line); //advance to the next line
             string address;
-            fis >> address;
-            getline(fis, line); //advance to the next line
+            getline(fis, address);
             string city;
             fis >> city;
             getline(fis, line); //advance to the next line
@@ -86,6 +61,7 @@ HashTable<Customer> FileLoader::loadCustomers(string path) {
             getline(fis, line); //skip the emtpy line
 
         }
+
 	}
 	fis.close();
 	return customers;
@@ -100,6 +76,7 @@ HashTable<Employee> FileLoader::loadEmployees(string path) {
 	string line;
 	if (fis.is_open()) {
 		while (getline(fis, line)) {
+
             string username = line;
             string password;
             getline(fis, password);
@@ -123,3 +100,7 @@ HashTable<Employee> FileLoader::loadEmployees(string path) {
 	fis.close();
 	return employees;
 }
+
+static void saveProducts(string path, BST<Product> p);
+static void saveCustomers(string path, HashTable<Customer> c);
+static void saveEmployees(string path, HashTable<Employee> e);
