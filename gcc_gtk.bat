@@ -7,4 +7,5 @@ del tmp.txt
  
 rem echo %pkg-info%
 g++ *.cpp -o program.exe -Wall %pkg-info%
+program.exe
 pause
