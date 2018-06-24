@@ -26,35 +26,14 @@ int main(int argc, char *argv[]) {
 	gtk_init (&argc, &argv);
 
 	g_print("args passed to gtk_init\n");
-
-	BST<Product> bstp;
-	bstp.loadPrimary("Products_in.txt");
-	BST<ProductS> bsts;
-	bsts.loadSecondary("Products_in.txt");
-
-	HashTable<Customer> htc = FileLoader::loadCustomers("Customers.txt");
-	HashTable<Employee> hte = FileLoader::loadEmployees("Employees.txt");
-
-	Product p("hp","zee book", 120.2, 12000, 2040, 1000000);
-	ProductS productS;
 	Heap heap;
+	BST<Product> bstp;
+	bstp.loadPrimary("Products_out.txt");
+	BST<ProductS> bsts;
+	bsts.loadSecondary("Products_out.txt");
 
-	cout << "the file has changed" << endl;
-
-	Customer c("foo@bar.com","Hi1234","Bobby","Mcbobface",false,"123 faké street","Cupertinoville",12345,"foo@bar.com");
-	Customer c2("foo2@bar.com","2Hi1234","Bobby2","Mcbobface2",false,"123 faké street2","Cupertinoville2",12345,"foo2@bar.com");
-	Employee e("joe","hi","joe","joeman",true);
-
-	Order order(&c);
-	c.activeOrder(&order);
-	c.addToProduct(&p);
-	string orders = c.printActive();
-
-	cout << "orders:\n" << orders << endl;
-
-	htc.insert(c);
-	htc.insert(c2);
-	hte.insert(e);
+	HashTable<Customer> htc = FileLoader::loadCustomers("Customers_out.txt",heap,bstp);
+	HashTable<Employee> hte = FileLoader::loadEmployees("Employees.txt");
 
 	cout << "Success!" << endl;
 
@@ -69,6 +48,9 @@ int main(int argc, char *argv[]) {
 
 	g_print("gtk_main has ended\n");
 
+	FileLoader::saveProducts("Products_out.txt",bstp);
+	FileLoader::saveCustomers("Customers_out.txt", htc);
+	FileLoader::saveEmployees("Employee_out.txt", hte);
 
 
 	return 0;

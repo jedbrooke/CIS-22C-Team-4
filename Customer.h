@@ -56,6 +56,7 @@ public:
 	void placeOrder();		//place order
 	void addToProduct(Product* p);	//add product to the active Order
 	void removeProduct(int index);//remove product from cart if order not placed.
+	void insertOrder(Order* o); //insert order when loading
 };
 
 #endif /* CUSTOMER_H_ */
