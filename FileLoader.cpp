@@ -24,7 +24,7 @@ BST<ProductS> FileLoader::loadProductsS(string path) {
 
 HashTable<Customer> FileLoader::loadCustomers(string path, Heap& heap, BST<Product>& catalog) {
 
-	cout << "loading customers..." << endl;
+	cout << "loading customers from " << path << endl;
 
 	HashTable<Customer> customers;
 	ifstream fis(path.c_str());
@@ -37,31 +37,26 @@ HashTable<Customer> FileLoader::loadCustomers(string path, Heap& heap, BST<Produ
             getline(fis, password);
 						cout << password << endl;
             string first_name;
-            fis >> first_name;
-            getline(fis, line); //advance to the next line
+            getline(fis, first_name); //advance to the next line
             string last_name;
-            fis >> last_name;
-            getline(fis, line); //advance to the next line
-            bool isEmployee;
-            fis >> isEmployee;
+            getline(fis, last_name); //advance to the next line
+            bool isEmployee = false;
             getline(fis, line); //advance to the next line
             string address;
             getline(fis, address);
             string city;
-            fis >> city;
-            getline(fis, line); //advance to the next line
+            getline(fis, city); //advance to the next line
+            string zip_string;
             unsigned zip;
-            fis >> zip;
-            getline(fis, line); //advance to the next line
+            getline(fis, zip_string); //advance to the next line
+            zip = atoi(zip_string.c_str());
             string email;
-            fis >> email;
-
+            getline(fis,email);
+            cout << "email: " << email << endl;
             Customer* c = new Customer(username, password, first_name, last_name, isEmployee, address, city, zip, email);
             customers.insert(*c);
 
-						while(getline(fis,line)){
-							cout << line << endl;
-							if(line == "") break;
+						while(not (fis.peek() == '\n')){
 							Order * o = new Order;
 							heap.insert(o -> load(fis, catalog));
 							c->insertOrder(o);

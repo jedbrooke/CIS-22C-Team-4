@@ -171,7 +171,6 @@ void Customer::write(ostream& out) {
 	out << city << '\n';
 	out << zip << '\n';
 	out << email << '\n';
-	out << '\n';
 	orders.startIterator();
 	while (!orders.offEnd()) {
 
