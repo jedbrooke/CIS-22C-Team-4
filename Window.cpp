@@ -273,8 +273,14 @@ void Window::create_content(string tagName, string text, map<string,string> opti
         //set signal connect method
         g_signal_connect(widget, "clicked", G_CALLBACK(button_pressed), FALSE);
 
-        //connect it to the destroy event as well
-        g_signal_connect_swapped(widget,"clicked",G_CALLBACK(destroy),self_window);
+        if(optionsMap["stay"] != "true"){
+            //connect it to the destroy event as well
+            g_signal_connect_swapped(widget,"clicked",G_CALLBACK(destroy),self_window);
+        } 
+
+        
+
+
 
     } else if(tagName == "label") {
 
@@ -960,8 +966,10 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         of.close();
 
     }
-
-    WindowManager::go_to_window(optionsMap["link"],xml); //go to the new window
+    if(optionsMap["link"] != "stay"){
+        WindowManager::go_to_window(optionsMap["link"],xml); //go to the new window
+    }
+    
 }
 
 string Window::create_xml_tag(string tag, string text){
@@ -1112,7 +1120,7 @@ void Window::create_db_list_xml(vector<string> productsV, string &xml, string li
         if(glink){
 
             xml += "<vr>\n";
-            xml += create_xml_tag("button","options=\"link:stay,name:open,value:" + make + "`" + model + "\"","Search on web");
+            xml += create_xml_tag("button","stay=\"true\" options=\"link:stay,name:open,value:" + make + "`" + model + "\"","Search on web");
 
         }
 
