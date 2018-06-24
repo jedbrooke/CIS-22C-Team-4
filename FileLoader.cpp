@@ -45,7 +45,6 @@ HashTable<Customer> FileLoader::loadCustomers(string path) {
             getline(fis, line); //advance to the next line
             string address;
             getline(fis, address);
-            //getline(fis, line); //advance to the next line
             string city;
             fis >> city;
             getline(fis, line); //advance to the next line
