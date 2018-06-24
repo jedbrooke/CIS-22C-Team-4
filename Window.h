@@ -88,6 +88,8 @@ public:
 
 	static void create_purchase_history_xml(string& xml, Customer* c);
 
+	static void create_customer_list_xml(string& xml, stringstream& customersSS);
+
 	static void string_find_and_replace(string find, string replace, string &subject);
 
 	static vector<string> string_split(const string &input, char delim = ',');
