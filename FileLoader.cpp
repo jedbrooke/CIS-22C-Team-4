@@ -22,7 +22,7 @@ BST<ProductS> FileLoader::loadProductsS(string path) {
 	return p;
 }
 
-HashTable<Customer> FileLoader::loadCustomers(string path) {
+HashTable<Customer> FileLoader::loadCustomers(string path, Heap& heap, BST<Product>& catalog) {
 
 	cout << "loading customers..." << endl;
 
@@ -55,12 +55,21 @@ HashTable<Customer> FileLoader::loadCustomers(string path) {
             getline(fis, line); //advance to the next line
             string email;
             fis >> email;
-            getline(fis, line); //advance to the next line
 
             Customer* c = new Customer(username, password, first_name, last_name, isEmployee, address, city, zip, email);
             customers.insert(*c);
 
-						
+						while(getline(fis,line)){
+							cout << line << endl;
+							if(line == "") break;
+							Order * o = new Order;
+							heap.insert(o -> load(fis, catalog));
+							c->insertOrder(o);
+						}
+
+
+
+
 
             getline(fis, line); //skip the emtpy line
 
@@ -105,6 +114,37 @@ HashTable<Employee> FileLoader::loadEmployees(string path) {
 	return employees;
 }
 
-static void saveProducts(string path, BST<Product> p);
-static void saveCustomers(string path, HashTable<Customer> c);
-static void saveEmployees(string path, HashTable<Employee> e);
+void FileLoader::saveProducts(string path, BST<Product> p){
+		p.save(path);
+}
+void FileLoader::saveCustomers(string path, HashTable<Customer> c){
+	ofstream of;
+	of.open(path.c_str(),ios_base::out);
+
+	List<Customer*> l(c.getAll());
+
+	l.startIterator();
+
+	while(not l.offEnd()){
+
+			l.getIterator()->write(of);
+			l.moveIterNext();
+	}
+
+}
+void FileLoader::saveEmployees(string path, HashTable<Employee> e){
+
+	ofstream of;
+	of.open(path.c_str(),ios_base::out);
+
+	List<Employee*> l(e.getAll());
+
+	l.startIterator();
+
+	while(not l.offEnd()){
+
+			l.getIterator()->write(of);
+			l.moveIterNext();
+	}
+
+}

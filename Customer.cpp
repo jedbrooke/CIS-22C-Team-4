@@ -171,22 +171,21 @@ void Customer::write(ostream& out) {
 	out << city << '\n';
 	out << zip << '\n';
 	out << email << '\n';
+	out << '\n';
 	orders.startIterator();
 	while (!orders.offEnd()) {
-		out << orders.getIterator()->getPrice() << endl;
-		out << orders.getIterator()->isPlaced() << endl;
-		out << orders.getIterator()->getDayPlaced() << endl;
-		out << orders.getIterator()->getShippingSpeed() << endl;
-		out << orders.getIterator()->isShipped() << endl;
+
+		orders.getIterator()->save(out);
+
 		orders.moveIterNext();
 	}
-	out << "End";
+	out << endl;
 }
 
 ostream& operator<<(ostream& out, const Customer& customer) {
 	stringstream os;
 	customer.orders.displayNumberedList(os);
-//out << customer.r->printDetailed();
+
 	out << customer.getFirstname() << "," << customer.getLastname() << ","
 			<< customer.getAddress() << "," << customer.getCity() << ","
 			<< customer.getEmail() << "," << customer.getZip() << '\n';
@@ -230,6 +229,10 @@ void Customer::removeProduct(int index) {
 }
 
 void Customer::placeOrder() {
-		orders.insertStop(r); //add order to list 
+		orders.insertStop(r); //add order to list
 }
 
+void Customer::insertOrder(Order* o){
+
+		orders.insertStop(o); //add order to list
+}

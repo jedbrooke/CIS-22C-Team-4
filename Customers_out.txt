@@ -1,0 +1,42 @@
+Memebob@gmail.com
+poo1
+Meme
+Bob
+0
+11234 Adr ave
+England2
+91231
+Memebob@gmail.com
+
+
+testboi@email.com
+pass
+Mohamed
+E
+0
+19000 Test ave
+Cupertino
+19001
+testboi@email.com
+
+
+memejoe@email.com
+poo
+Meme
+Joe
+0
+12345 Address ave
+England
+19102
+memejoe@email.com
+
+
+foo@bar.com
+Hi1234
+Bobby
+Mcbobface
+0
+123 faké Street
+Cupertinoville
+12345
+foo@bar.com
