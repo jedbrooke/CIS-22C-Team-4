@@ -82,7 +82,7 @@ void HashTable<htdata>::displayByFirstname(ostream& out, string firstname) {
 			Table[i].moveIterNext();
 		}
 	}
-	cout << "Customer not found";
+	out << "Customer not found";
 }
 
 
@@ -97,7 +97,7 @@ void HashTable<htdata>::displayByLastname(ostream& out, string lastname) {
 			Table[i].moveIterNext();
 		}
 	}
-	cout << "Customer not found" ;
+	out << "Customer not found" ;
 }
 
 template <class htdata>
