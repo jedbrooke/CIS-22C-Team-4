@@ -60,6 +60,8 @@ HashTable<Customer> FileLoader::loadCustomers(string path) {
             Customer* c = new Customer(username, password, first_name, last_name, isEmployee, address, city, zip, email);
             customers.insert(*c);
 
+						
+
             getline(fis, line); //skip the emtpy line
 
         }
