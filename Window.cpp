@@ -495,6 +495,12 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         string psw = gtk_entry_get_text(GTK_ENTRY(entries["psw"]));
         string conf_psw = gtk_entry_get_text(GTK_ENTRY(entries["conf_psw"]));
 
+        if(customers->customerSignIn(email) != NULL){ //check if it's taken
+            xml += create_xml_tag("label","style=\"error\"","Sorry, that username is taken");
+            WindowManager::go_to_window("customer_create_new_account",xml); //go back to the customer create new account window
+            return;
+        }
+
         //time to check
         if(email != conf_email || psw != conf_psw){
         	if(email != conf_email){
