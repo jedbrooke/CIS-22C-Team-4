@@ -269,6 +269,13 @@
 		Go back
 	</button>
 </window>
+<window id="view_order_details">
+	<title>
+		Order Details:
+	</title>
+	<hr>
+	<variable>
+</window>
 <window id="customer_checkout">
 	<title>
 		Checkout:

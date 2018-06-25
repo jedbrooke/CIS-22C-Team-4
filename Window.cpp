@@ -66,10 +66,18 @@ Window::Window(string xml) {
         string msg;
 
         //get the tag
-        tag = tag.substr(1, tag.length()-2); //get rid of the <>
-        size_t pos = tag.find(" ");
-        string tagName = tag.substr(0, pos); //get the tag name
-        string options = tag.substr(pos+1); //get the options
+        string tagName;
+        string options;
+        try{
+            tag = tag.substr(1, tag.length()-2); //get rid of the <>
+            size_t pos = tag.find(" ");
+            tagName = tag.substr(0, pos); //get the tag name
+            options = tag.substr(pos+1); //get the options
+        } catch(exception const &e){
+            cerr << "Error: " << e.what() << endl;
+            cerr << "tag: " << tag << endl;
+        }
+       
 
         map<string,string> optionsMap;
 
@@ -712,6 +720,35 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         //prepare purchase history page
         create_purchase_history_xml(xml);
 
+    } else if(name == "view_order_details"){
+
+        string orderHex = optionsMap["value"]; //get the address hex value
+        stringstream hex_convert;
+        hex_convert << orderHex;
+        long order_address;
+        hex_convert >> hex >> order_address; //convert hex into long
+        Order* order = reinterpret_cast<Order*>(order_address);
+
+        stringstream orderSS(order->printDetailed());
+
+        string summary;
+
+        getline(orderSS,summary);
+
+        xml += create_xml_tag("label",summary);
+        xml += "<hr>\n";
+
+        create_order_laptop_list_xml(orderSS,"width=\"100\"","width=\"50\"",xml,false);
+
+
+        if(Customer* c = static_cast<Customer*>(user)){
+
+            xml += create_xml_tag("button","options=\"link:customer_interface\"","Back");
+
+        } else if(Employee* e = static_cast<Employee*>(user)){
+            xml += create_xml_tag("button","options=\"link:employee_interface\"","Back");
+        }
+
     } else if(name == "preship"){
         int index = atoi(optionsMap["value"].c_str());
         string order_str = priority_queue->printSpecific(index);
@@ -1283,7 +1320,7 @@ void Window::create_view_cart_xml(string& xml){
 
 }
 
-void Window::create_order_laptop_list_xml(stringstream& orderSS,string size,string number_size,string& xml){
+void Window::create_order_laptop_list_xml(stringstream& orderSS,string size,string number_size,string& xml,bool isCart){
 
     size_t start;
     size_t end_pos;
@@ -1332,10 +1369,12 @@ void Window::create_order_laptop_list_xml(stringstream& orderSS,string size,stri
         xml += create_xml_tag("label",number_size,token);
 
         if(Customer* c = static_cast<Customer*>(user)){ //if the current user is a customer then show the remove option
-            xml += "<vr>\n";
-            string options = "options=\"link:customer_view_cart,name:customer_view_cart,action:remove,value:" + to_string(count) + "\"";
-            cout << "options:" << options << endl;
-            xml += create_xml_tag("button",options,"remove");
+            if(isCart){
+                xml += "<vr>\n";
+                string options = "options=\"link:customer_view_cart,name:customer_view_cart,action:remove,value:" + to_string(count) + "\"";
+                cout << "options:" << options << endl;
+                xml += create_xml_tag("button",options,"remove");
+            }
         }
 
         
@@ -1410,6 +1449,12 @@ void Window::create_purchase_history_xml(string& xml, Customer* c){
             xml += "<vr>\n";
             xml += create_xml_tag("label",size,orderV[i]);
         }
+
+        xml += "<vr>\n";
+        string options = "options=\"link:view_order_details,name:view_order_details,value:" + orderHex + "\"";
+        xml += create_xml_tag("button",options,"view details");
+
+
         xml += "</hbox>\n";
         index++;
 

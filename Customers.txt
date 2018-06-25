@@ -38,6 +38,11 @@ Acer
 Switch 5
 1
 end
+1	700	1	0	1529901853	1529988253
+Acer
+Aspire Switch Alpha 12
+1
+end
 
 memegmail@email.com
 password1234
