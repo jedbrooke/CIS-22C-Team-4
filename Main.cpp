@@ -4,6 +4,9 @@
  */
 
 #include <iostream>
+#include <cstdlib> 
+#include <thread>
+#include <chrono>
 
 #include "BST.h"
 #include "Customer.h"
@@ -16,6 +19,7 @@
 #include "WindowManager.h"
 #include "Window.h"
 #include <gtk/gtk.h>
+
 
 using namespace std;
 
@@ -50,6 +54,21 @@ int main(int argc, char *argv[]) {
 	FileLoader::saveProducts("Products_in.txt",bstp);
 	FileLoader::saveCustomers("Customers.txt", htc);
 	FileLoader::saveEmployees("Employees.txt", hte);
+
+	cout << "writing files..." << endl;
+	for(int i = 0; i < 100; i++){
+		if(i < 50){
+			FileLoader::printProgBar(i,"Writing Products");
+		} else if (i >= 50 and i < 75){
+			FileLoader::printProgBar(i,"Writing Customers");
+		} else {
+			FileLoader::printProgBar(i,"Writing Employees");
+		}
+		int rand_int = (int)(((rand() % 10)/9.0) * 90) + 10; //rand int between 10 and 100
+		this_thread::sleep_for(chrono::milliseconds(10));
+	}
+
+	FileLoader::printProgBar(100,"Complete         ");
 
 	cout << endl;
 

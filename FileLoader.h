@@ -29,7 +29,6 @@ public:
     static void saveProducts(string path, BST<Product> p);
     static void saveCustomers(string path, HashTable<Customer> c);
     static void saveEmployees(string path, HashTable<Employee> e);
-    static void saveAll(string product_path,string customer_path,string employee_path, BST<Product> p, HashTable<Customer> c, HashTable<Employee> e);
     static void printProgBar(int percent, string message);
 };
 

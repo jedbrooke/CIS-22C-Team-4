@@ -403,7 +403,7 @@ void BST<bstdata>::save(string fname) const {
 	int index;
 	ofstream fout;
 	fout.open(fname.c_str(),ios_base::out);
-	saveHelper(fout, root, index);
+	saveHelper(fout, root);
 	fout.close();
 }
 

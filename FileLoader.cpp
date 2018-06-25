@@ -121,17 +121,12 @@ void FileLoader::saveCustomers(string path, HashTable<Customer> c){
 	List<Customer*> l(c.getAll());
 
 	int size = l.getLength();
-	int index;
 
 	l.startIterator();
 
 	while(not l.offEnd()){
 			l.getIterator()->write(of);
 			l.moveIterNext();
-
-			int percent = 50 + 25*((double)index/size);
-			printProgBar(percent, "Writing Customers");
-			index++;
 	}
 
 }
@@ -143,7 +138,6 @@ void FileLoader::saveEmployees(string path, HashTable<Employee> e){
 	List<Employee*> l(e.getAll());
 
 	int size = l.getLength();
-	int index;
 
 	l.startIterator();
 
@@ -151,18 +145,8 @@ void FileLoader::saveEmployees(string path, HashTable<Employee> e){
 
 			l.getIterator()->write(of);
 			l.moveIterNext();
-
-			int percent = 50 + 25*((double)index/size);
-			printProgBar(percent, "Writing Employees");
-			index++;
 	}
 
-}
-
-void FileLoader::saveAll(string product_path,string customer_path,string employee_path, BST<Product> p, HashTable<Customer> c, HashTable<Employee> e){
-	saveProducts(product_path,p);
-	saveCustomers(customer_path,c);
-	saveEmployees(employee_path,e);
 }
 
 void FileLoader::printProgBar(int percent, string message){
