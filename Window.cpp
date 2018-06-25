@@ -78,7 +78,7 @@ Window::Window(string xml) {
             cerr << "Error: " << e.what() << endl;
             cerr << "tag: " << tag << endl;
         }
-       
+
 
         map<string,string> optionsMap;
 
@@ -359,7 +359,7 @@ void Window::create_content(string tagName, string text, map<string,string> opti
     } else if (tagName == "pbar") {
 
         msg = "creating pbar: " + text + "\n";
-        g_print("%s",msg.c_str());
+        //g_print("%s",msg.c_str());
 
         widget = gtk_progress_bar_new();
 
@@ -384,7 +384,7 @@ void Window::create_content(string tagName, string text, map<string,string> opti
     if (optionsMap["default"] == "true"){
 
     	msg = "setting button \"" + text + "\" to be default\n";
-    	g_print("%s",msg.c_str());
+    	//g_print("%s",msg.c_str());
 
     	gtk_widget_set_can_default (widget, TRUE);
     	gtk_widget_grab_default (widget);
@@ -661,7 +661,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         }
 
     } else if(name == "add_to_cart"){
-        
+
         string make_and_model = optionsMap["value"];
 
         size_t pos = make_and_model.find('`');
@@ -680,7 +680,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
             cerr << "Error: Product Not found: " << endl << "product information: " << endl;
             cerr << "make: " << make << ", model: " << model << endl;
         }
-        
+
         create_view_cart_xml(xml);
 
     } else if(name == "customer_view_cart"){
@@ -697,13 +697,13 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
     } else if(name == "place_order"){
 
-        cout << "placing order" << endl;
+        //cout << "placing order" << endl;
 
         //place order
 
         int days = atoi(optionsMap["value"].c_str());
 
-        g_print("%s",g_strconcat("shipping days: ",to_string(days).c_str(),"\n",NULL));
+        //g_print("%s",g_strconcat("shipping days: ",to_string(days).c_str(),"\n",NULL));
 
         priority_queue->place(order,days);
 
@@ -768,7 +768,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         int index = atoi(optionsMap["value"].c_str());
         string order_str = priority_queue->printSpecific(index);
 
-        cout << "in preship func" << endl << order_str << endl;
+        //cout << "in preship func" << endl << order_str << endl;
 
         stringstream orderSS(order_str);
 
@@ -820,7 +820,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         }
 
 
-        cout << "matches:" << endl << matches.str() << endl;
+        //cout << "matches:" << endl << matches.str() << endl;
 
         create_customer_list_xml(xml,matches);
 
@@ -990,7 +990,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
         string orders = priority_queue->printSorted();
 
-        cout << "orders: " << endl << orders << endl;
+        //cout << "orders: " << endl << orders << endl;
 
         stringstream ordersSep(orders);
 
@@ -999,7 +999,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
         getline(ordersSep,title);
 
-        cout << title << endl;
+        //cout << title << endl;
 
         string width = "width=\"100\"";
 
@@ -1139,7 +1139,7 @@ void Window::assign_pointers(Heap* heap, HashTable<Customer>* _customers, HashTa
 	products = _products;
 	products_secondary = _products_secondary;
 
-    g_print("pointers assigned\n");
+    //g_print("pointers assigned\n");
 }
 
 void Window::create_db_list_xml(vector<string> productsV, string &xml, string link, string name, string text, bool glink){
@@ -1410,12 +1410,12 @@ void Window::create_order_laptop_list_xml(stringstream& orderSS,string size,stri
             if(isCart){
                 xml += "<vr>\n";
                 string options = "options=\"link:customer_view_cart,name:customer_view_cart,action:remove,value:" + to_string(count) + "\"";
-                cout << "options:" << options << endl;
+                //cout << "options:" << options << endl;
                 xml += create_xml_tag("button",options,"remove");
             }
         }
 
-        
+
 
         xml += "</hbox>\n";
     }
@@ -1439,7 +1439,7 @@ void Window::create_purchase_history_xml(string& xml){
 
 void Window::create_purchase_history_xml(string& xml, Customer* c){
 
-    g_print("%s",g_strconcat("placing order for: ",c->getFirstname().c_str(),"\n",NULL));
+    //g_print("%s",g_strconcat("placing order for: ",c->getFirstname().c_str(),"\n",NULL));
 
     string orders = c->getOrder();
 
@@ -1448,7 +1448,7 @@ void Window::create_purchase_history_xml(string& xml, Customer* c){
         return;
     }
 
-    g_print("%s",g_strconcat("orders: ",orders.c_str(),"\n",NULL));
+    //g_print("%s",g_strconcat("orders: ",orders.c_str(),"\n",NULL));
 
     stringstream orderSS(orders);
 
@@ -1534,13 +1534,13 @@ void Window::create_customer_list_xml(string& xml, stringstream& customersSS){
             if(is_number(field)){ // if it's a number
                 xml += create_xml_tag("label",zip_width,field);
             } else {
+                
                 if(index == 4){
                     username = field;
                     xml += create_xml_tag("label","width=\"130\"",field);
                 } else {
                     xml += create_xml_tag("label",width,field);
                 }
-                
             }
             
 
