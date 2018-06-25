@@ -50,4 +50,4 @@ rem echo %pkg-info%
 g++ *.cpp -o program.exe -Wall %pkg-info%
 pause
 ~~~~
-and put it in the directory with your code. Edit Windowmanager.cpp and Window.cpp to #include \<algorithm>\, then run the bat file.
+and put it in the directory with your code.
