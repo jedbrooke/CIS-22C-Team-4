@@ -36,6 +36,7 @@ public:
     htdata* customerSignIn(string username);
 
     List<htdata*> getAll();
+    string lowerCase(string);
 
 private:
     static const int SIZE = 100;
@@ -74,10 +75,11 @@ void HashTable<htdata>::displayCustomer(ostream& out) {
 
 template <class htdata>
 void HashTable<htdata>::displayByFirstname(ostream& out, string firstname) {
+    firstname = lowerCase(firstname);
 	for (int i =0; i< SIZE; i++){
 		Table[i].startIterator();
 		for (int j=0; j <Table[i].getLength(); j++){
-			if(Table[i].getIterator()->getFirstname().find(firstname) != string::npos){
+			if(lowerCase(Table[i].getIterator()->getFirstname()).find(firstname) != string::npos) {
 				out << *(Table[i].getIterator());
 			}
 			Table[i].moveIterNext();
@@ -89,10 +91,11 @@ void HashTable<htdata>::displayByFirstname(ostream& out, string firstname) {
 
 template <class htdata>
 void HashTable<htdata>::displayByLastname(ostream& out, string lastname) {
+    lastname = lowerCase(lastname);
 	for (int i =0; i< SIZE; i++){
 		Table[i].startIterator();
 		for (int j=0; j <Table[i].getLength(); j++){
-			if(Table[i].getIterator()->getLastname().find(lastname) != string::npos){
+			if(lowerCase(Table[i].getIterator()->getLastname()).find(lastname) != string::npos){
 				out << *(Table[i].getIterator());
 			}
 			Table[i].moveIterNext();
@@ -127,6 +130,14 @@ List<htdata*> HashTable<htdata>::getAll(){
     }
   }
   return l;
+}
+
+template<class htdata>
+string HashTable<htdata>::lowerCase(string name) {
+    for (int i = 0; i < name.length(); i++) {
+        name[i] = tolower(name[i]);
+    }
+    return name;
 }
 
 #endif /* HASHTABLE_H_ */
