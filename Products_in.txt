@@ -96,13 +96,6 @@ ZenBook Flip S
 2017
 1000
 
-Booky
-McBookFace
-12
-12
-13
-12
-
 Fujitsu
 Stylistic Q736
 13.3
@@ -166,13 +159,6 @@ Lifebook Y936
 2015
 1400
 
-Fujitsu
-Lifebook
-13.3
-6
-2015
-600
-
 HP
 Pavilion x2
 12.1
@@ -229,6 +215,13 @@ IdeaPad Flex 5 15"
 2017
 930
 
+Jasper
+Bookbook
+1000
+12000
+2040
+2
+
 Lenovo
 Thinkpad X1 Tablet (2017)
 12
@@ -249,13 +242,6 @@ ThinkPad X380 Yoga
 8
 2018
 1360
-
-Lenovo
-ThinkPad X1
-14
-6
-2016
-750
 
 Lenovo
 Yoga 520
@@ -299,13 +285,6 @@ Surface Pro (2017)
 2017
 800
 
-Poo
-PooBook
-12.5
-6
-2016
-700
-
 Vaio
 Z Canvas
 12.3
@@ -333,4 +312,18 @@ Z flip
 6
 2016
 1800
+
+hi
+hibook
+12
+1200
+120
+-7.2738e+08
+
+hi
+hibook pro
+12
+12
+12
+12
 
