@@ -1,0 +1,30 @@
+<?xml version="1.0"?> <!--*- mode: xml -*-->
+<app-bundle>
+  <meta>
+    <prefix>/usr/local/opt/gtk+</prefix>
+  </meta>
+
+  <plist>/Users/Jasper/Documents/GitHub/CIS-22C-Team-4/program.dSYM/Contents/Info.plist</plist>
+
+  <!-- Optionally specify a launcher script to use. Builtin script is
+       used if not specified.  -->
+  <!--launcher-script>${project}/launcher.sh</launcher-script-->
+
+  <!-- The executable for the application -->
+  <main-binary dest="${bundle}/Contents/Resources">/Users/Jasper/Documents/GitHub/CIS-22C-Team-4/program</main-binary>
+
+  <!-- Modules for GTK+ (image loaders, etc) -->
+  <binary>${prefix}/lib/gtk-2.0</binary>
+
+  <!-- Any additional data, like images, or Glade files -->
+    <data dest="${bundle}/Contents/Resources">/Users/Jasper/Documents/GitHub/CIS-22C-Team-4/customer_feedback.txt</data>
+    <data dest="${bundle}/Contents/Resources">/Users/Jasper/Documents/GitHub/CIS-22C-Team-4/Customers.txt</data>
+    <data dest="${bundle}/Contents/Resources">/Users/Jasper/Documents/GitHub/CIS-22C-Team-4/doc.txt</data>
+    <data dest="${bundle}/Contents/Resources">/Users/Jasper/Documents/GitHub/CIS-22C-Team-4/Employees.txt</data>
+    <data dest="${bundle}/Contents/Resources">/Users/Jasper/Documents/GitHub/CIS-22C-Team-4/Products_in.txt</data>
+    <data dest="${bundle}/Contents/Resources">/Users/Jasper/Documents/GitHub/CIS-22C-Team-4/Products_merge.txt</data>
+    <data dest="${bundle}/Contents/Resources">/Users/Jasper/Documents/GitHub/CIS-22C-Team-4/window_data.xml</data>
+    <destination overwrite="yes">${env:HOME}/Desktop</destination>
+    <data dest="${bundle}/Contents/Resources">/Users/Jasper/Documents/GitHub/CIS-22C-Team-4/icon.icns</data>
+
+</app-bundle>
