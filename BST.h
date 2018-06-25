@@ -7,16 +7,20 @@
 #define BST_H_
 
 #include <iostream>
+#include <fstream>
 #include <cstddef>
 #include <string>
 #include <assert.h>
 #include <iomanip>
 #include <vector>
 #include <sstream>
+#include <stdio.h>
 
-#include <fstream>
+
 #include "Product.h"
 #include "ProductS.h"
+	
+
 
 using namespace std;
 
@@ -34,6 +38,7 @@ private:
 			right = NULL;
 		}
 	};
+
 	Node* root;
 
 	void copyHelper(Node* copy);
@@ -395,7 +400,9 @@ void BST<bstdata>::loadSecondary(string fname) {
 
 template<class bstdata>
 void BST<bstdata>::save(string fname) const {
-	ofstream fout(fname);
+	int index;
+	ofstream fout;
+	fout.open(fname.c_str(),ios_base::out);
 	saveHelper(fout, root);
 	fout.close();
 }
@@ -480,5 +487,3 @@ void BST<bstdata>::printByModelToStringHelper(Node* root, int& index, string mod
 }
 
 #endif /* BST_H_ */
-
-

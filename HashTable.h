@@ -23,20 +23,20 @@ public:
     ~HashTable(){}
     //destructor
 
-
     /**Access Functions*/
 
     int hash(string key) const;
-
-
-
-
 
     void insert(htdata& c);
 
     void displayByLastname(ostream& out, string lastname) ;
     void displayByFirstname(ostream& out, string firstname);
     void displayCustomer(ostream& out);
+
+    htdata* customerSignIn(string username);
+
+    List<htdata*> getAll();
+    string lowerCase(string);
 
 private:
     static const int SIZE = 100;
@@ -62,9 +62,6 @@ void HashTable<htdata>::insert(htdata& c) {
 }
 
 
-
-
-
 template <class htdata>
 void HashTable<htdata>::displayCustomer(ostream& out) {
 	for (int i =0; i< SIZE; i++){
@@ -78,31 +75,69 @@ void HashTable<htdata>::displayCustomer(ostream& out) {
 
 template <class htdata>
 void HashTable<htdata>::displayByFirstname(ostream& out, string firstname) {
+    firstname = lowerCase(firstname);
 	for (int i =0; i< SIZE; i++){
 		Table[i].startIterator();
 		for (int j=0; j <Table[i].getLength(); j++){
-			if(Table[i].getIterator()->getFirstname() == firstname){
+			if(lowerCase(Table[i].getIterator()->getFirstname()).find(firstname) != string::npos) {
 				out << *(Table[i].getIterator());
 			}
 			Table[i].moveIterNext();
 		}
 	}
-	cout << "Customer not found";
+	//cout << "Customer not found";
 }
 
 
 template <class htdata>
 void HashTable<htdata>::displayByLastname(ostream& out, string lastname) {
+    lastname = lowerCase(lastname);
 	for (int i =0; i< SIZE; i++){
 		Table[i].startIterator();
 		for (int j=0; j <Table[i].getLength(); j++){
-			if(Table[i].getIterator()->getLastname() == lastname){
+			if(lowerCase(Table[i].getIterator()->getLastname()).find(lastname) != string::npos){
 				out << *(Table[i].getIterator());
 			}
 			Table[i].moveIterNext();
 		}
 	}
-	cout << "Customer not found" ;
+	//cout << "Customer not found" ;
+}
+
+template <class htdata>
+htdata* HashTable<htdata>::customerSignIn(string username){
+	for (int i =0; i< SIZE; i++){
+		Table[i].startIterator();
+		for(int j=0; j<Table[i].getLength(); j++){
+			if(Table[i].getIterator()->getUsername()== username){
+				return Table[i].getIterator();
+			}
+			Table[i].moveIterNext();
+		}
+
+	}
+	return NULL;
+}
+
+template <class htdata>
+List<htdata*> HashTable<htdata>::getAll(){
+  List<htdata*> l;
+  for(int i = 0; i < SIZE; i++){
+    Table[i].startIterator();
+    for(int j = 0; j < Table[i].getLength(); j++){
+      l.insertStop(Table[i].getIterator());
+      Table[i].moveIterNext();
+    }
+  }
+  return l;
+}
+
+template<class htdata>
+string HashTable<htdata>::lowerCase(string name) {
+    for (int i = 0; i < name.length(); i++) {
+        name[i] = tolower(name[i]);
+    }
+    return name;
 }
 
 #endif /* HASHTABLE_H_ */

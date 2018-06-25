@@ -86,7 +86,7 @@ string Customer::getOrder() const {
  */
 
 bool Customer::operator==(const Customer& customer) {
-	return (username == customer.username);
+	return (username == customer.username && password == customer.password);
 }
 
 bool Customer::operator<(const Customer& customer) {
@@ -173,20 +173,18 @@ void Customer::write(ostream& out) {
 	out << email << '\n';
 	orders.startIterator();
 	while (!orders.offEnd()) {
-		out << orders.getIterator().getPrice() << endl;
-		out << orders.getIterator().isPlaced() << endl;
-		out << orders.getIterator().getDayPlaced() << endl;
-		out << orders.getIterator().getShippingSpeed() << endl;
-		out << orders.getIterator().isShipped() << endl;
+
+		orders.getIterator()->save(out);
+
 		orders.moveIterNext();
 	}
-	out << "End";
+	out << endl;
 }
 
 ostream& operator<<(ostream& out, const Customer& customer) {
 	stringstream os;
 	customer.orders.displayNumberedList(os);
-//out << customer.r->printDetailed();
+
 	out << customer.getFirstname() << "," << customer.getLastname() << ","
 			<< customer.getAddress() << "," << customer.getCity() << ","
 			<< customer.getEmail() << "," << customer.getZip() << '\n';
@@ -225,16 +223,15 @@ void Customer::addToProduct(Product* p) {
 }
 
 void Customer::removeProduct(int index) {
-	assert(r->isPlaced());
-	if (!r->isPlaced()) {
-		r->removeLaptop(index - 1);
-	}
+	assert(!r->isPlaced());
+		r->removeLaptop(index);
 }
 
-void Customer::placeOrder(int i) {
-	r->placeOrder(i);
-	if (r->isPlaced()) {
-		orders.insertStop(*r);
-	}
+void Customer::placeOrder() {
+		orders.insertStop(r); //add order to list
 }
 
+void Customer::insertOrder(Order* o){
+
+		orders.insertStop(o); //add order to list
+}

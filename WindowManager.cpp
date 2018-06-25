@@ -5,6 +5,10 @@
  *      Author: Jasper
  */
 
+#ifdef _WIN32
+#include <algorithm>
+#endif // _WIN32
+
 #include "WindowManager.h"
 #include "Window.h"
 #include <fstream>
@@ -14,6 +18,7 @@
 #include <iostream>
 #include <cstddef> //for NULL
 
+
 using namespace std;
 
 //static variables
@@ -22,9 +27,9 @@ Window* WindowManager::current_window;
 string WindowManager::current_window_id;
 
 WindowManager::WindowManager() {
-	
+
 	current_window = NULL;
-	
+
 }
 
 WindowManager::~WindowManager() {
@@ -32,8 +37,11 @@ WindowManager::~WindowManager() {
 }
 
 void WindowManager::go_to_window(string id, string options){
-
+	if(id == "stay"){
+		id = current_window_id;
+	}
 	if(windows.find(id) == windows.end()){
+		cout << "unknown link: " + id << endl;
 		id = "404";
 	}
 
@@ -48,6 +56,10 @@ void WindowManager::go_to_window(string id, string options){
 	current_window = &w; //update the current window pointer
 }
 
+void WindowManager::go_to_window(string id){
+	go_to_window(id,"");
+}
+
 void WindowManager::loadxml(string path){
 
 	ifstream xmlFile(path.c_str());
@@ -57,7 +69,7 @@ void WindowManager::loadxml(string path){
 			//this is the window line
 			stringstream ss(line);
 			string window_id;
-			getline(ss, window_id, '\"'); //skip the first part 
+			getline(ss, window_id, '\"'); //skip the first part
 			getline(ss, window_id, '\"'); //get the actual id
 			string tag = "";
 			getline(xmlFile, tag);
@@ -91,6 +103,6 @@ void WindowManager::run_pbar(){
 			g_print("increasing pbar\n");
 			current_window->increase_pbar();
 		}
-		
+
 	}
 }

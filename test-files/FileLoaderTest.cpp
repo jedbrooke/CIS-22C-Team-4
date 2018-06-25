@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include "FileLoader.h"
+#include "HashTable.h"
 #include <sstream>
 using namespace std;
 
@@ -18,9 +19,14 @@ int main(){
     BST<Product> p(FileLoader::loadProducts(path));
 
     path = "Customers.txt";
-    BST<Customer> c(FileLoader::loadCustomers(path));
+    HashTable<Customer> c(FileLoader::loadCustomers(path));
 
     path = "Employees.txt";
-    BST<Employee> e(FileLoader::loadEmployees(path));
+    HashTable<Employee> e(FileLoader::loadEmployees(path));
 
+    Employee* em = e.customerSignIn("sandhater50");
+
+
+    cout << "employee:" << endl;
+    em->write(cout);
 }

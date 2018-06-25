@@ -21,13 +21,13 @@ Employee::Employee() {
 Employee::Employee(string username, string password, string firstName, string lastName, bool isEmployee) {
 	this->username = username;
 	this->password = password;
-	this->firstname = firstname;
-	this->lastname = lastname;
+	this->firstname = firstName;
+	this->lastname = lastName;
 	this->isEmployee = isEmployee;
 }
 
 bool Employee::operator==(const Employee& employee) {
-	return (username == employee.username);
+	return (username == employee.username && password == employee.password);
 }
 
 bool Employee::operator<(const Employee& employee) {

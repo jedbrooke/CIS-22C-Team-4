@@ -637,13 +637,15 @@ struct subOrder {
 #ifndef BST_H_
 #define BST_H_
 #include <iostream>
+#include <fstream>
 #include <cstddef>
 #include <string>
 #include <assert.h>
 #include <iomanip>
 #include <vector>
 #include <sstream>
-#include <fstream>
+#include <stdio.h>
+	
 using namespace std;
 template<class bstdata>
 class BST {
@@ -982,7 +984,9 @@ void BST<bstdata>::loadSecondary(string fname) {
 }
 template<class bstdata>
 void BST<bstdata>::save(string fname) const {
-	ofstream fout(fname);
+	int index;
+	ofstream fout;
+	fout.open(fname.c_str(),ios_base::out);
 	saveHelper(fout, root);
 	fout.close();
 }
@@ -1074,7 +1078,7 @@ private:
 	string email;
 	subOrder sub;
 	Order * r;	//store active order
-	List<Order> orders; //store history order
+	List<Order*> orders; //store history order
 public:
 	Customer();
 	Customer(string username, string password, string firstName,
@@ -1101,9 +1105,10 @@ public:
 	friend ostream& operator<<(ostream& out, const Customer& customer);
 	void activeOrder(Order *p);	//pass in orders to the cart.
 	string printActive();//return active order detail (Order's printDeTailed() )
-	void placeOrder(int i);		//place order
+	void placeOrder();		//place order
 	void addToProduct(Product* p);	//add product to the active Order
 	void removeProduct(int index);//remove product from cart if order not placed.
+	void insertOrder(Order* o); //insert order when loading
 };
 #endif /* CUSTOMER_H_ */
 
@@ -1134,7 +1139,7 @@ public:
 
 //
 //  FileLoader.h
-//  
+//
 //
 //  Created by Alex Rao on 6/10/18.
 //
@@ -1145,11 +1150,15 @@ public:
 using namespace std;
 class FileLoader{
 private:
-    
 public:
     static BST<Product> loadProducts(string path);
-    static BST<Customer> loadCustomers(string path);
-    static BST<Employee> loadEmployees(string path);
+    static BST<ProductS> loadProductsS(string path);
+    static HashTable<Customer> loadCustomers(string path, Heap& heap, BST<Product>& catalog);
+    static HashTable<Employee> loadEmployees(string path);
+    static void saveProducts(string path, BST<Product> p);
+    static void saveCustomers(string path, HashTable<Customer> c);
+    static void saveEmployees(string path, HashTable<Employee> e);
+    static void printProgBar(int percent, string message);
 };
 #endif /* FileLoader_h */
 
@@ -1176,6 +1185,9 @@ public:
     void displayByLastname(ostream& out, string lastname) ;
     void displayByFirstname(ostream& out, string firstname);
     void displayCustomer(ostream& out);
+    htdata* customerSignIn(string username);
+    List<htdata*> getAll();
+    string lowerCase(string);
 private:
     static const int SIZE = 100;
     List<htdata*> Table[SIZE];
@@ -1207,29 +1219,63 @@ void HashTable<htdata>::displayCustomer(ostream& out) {
 }
 template <class htdata>
 void HashTable<htdata>::displayByFirstname(ostream& out, string firstname) {
+    firstname = lowerCase(firstname);
 	for (int i =0; i< SIZE; i++){
 		Table[i].startIterator();
 		for (int j=0; j <Table[i].getLength(); j++){
-			if(Table[i].getIterator()->getFirstname() == firstname){
+			if(lowerCase(Table[i].getIterator()->getFirstname()).find(firstname) != string::npos) {
 				out << *(Table[i].getIterator());
 			}
 			Table[i].moveIterNext();
 		}
 	}
-	cout << "Customer not found";
+	//cout << "Customer not found";
 }
 template <class htdata>
 void HashTable<htdata>::displayByLastname(ostream& out, string lastname) {
+    lastname = lowerCase(lastname);
 	for (int i =0; i< SIZE; i++){
 		Table[i].startIterator();
 		for (int j=0; j <Table[i].getLength(); j++){
-			if(Table[i].getIterator()->getLastname() == lastname){
+			if(lowerCase(Table[i].getIterator()->getLastname()).find(lastname) != string::npos){
 				out << *(Table[i].getIterator());
 			}
 			Table[i].moveIterNext();
 		}
 	}
-	cout << "Customer not found" ;
+	//cout << "Customer not found" ;
+}
+template <class htdata>
+htdata* HashTable<htdata>::customerSignIn(string username){
+	for (int i =0; i< SIZE; i++){
+		Table[i].startIterator();
+		for(int j=0; j<Table[i].getLength(); j++){
+			if(Table[i].getIterator()->getUsername()== username){
+				return Table[i].getIterator();
+			}
+			Table[i].moveIterNext();
+		}
+	}
+	return NULL;
+}
+template <class htdata>
+List<htdata*> HashTable<htdata>::getAll(){
+  List<htdata*> l;
+  for(int i = 0; i < SIZE; i++){
+    Table[i].startIterator();
+    for(int j = 0; j < Table[i].getLength(); j++){
+      l.insertStop(Table[i].getIterator());
+      Table[i].moveIterNext();
+    }
+  }
+  return l;
+}
+template<class htdata>
+string HashTable<htdata>::lowerCase(string name) {
+    for (int i = 0; i < name.length(); i++) {
+        name[i] = tolower(name[i]);
+    }
+    return name;
 }
 #endif /* HASHTABLE_H_ */
 
@@ -1376,6 +1422,7 @@ public:
 	string printDetailed();
 	void save(ostream & out);
 	Order * load(istream & in, BST<Product> & products);
+	friend ostream& operator<<(ostream& out, const Order& order) ;
 };
 #endif /* ORDER_H_ */
 
@@ -1393,12 +1440,14 @@ public:
 #include <vector>
 #include <map>
 #include <cstddef> //for NULL
-//class Heap;
+#include <iostream>
+#include <fstream>
+#include <unistd.h>
+#include <iterator>
 class WindowManager; //forward class declaration
 using namespace std;
 class Window {
-	
-protected:
+private:
 	string title;
 	GtkWidget* self_window;
 	GtkWidget* self_box;
@@ -1406,18 +1455,16 @@ protected:
 	static map<string, GtkWidget*> entries;
 	static GdkPixbuf* icon;
 	static Heap* priority_queue;
-	static BST<Customer>* customers;
+	static HashTable<Customer>* customers;
+	static HashTable<Employee>* employees;
 	static BST<Product>* products;
 	static BST<ProductS>* products_secondary;
-	//static Customer customer;
-	//static HashTable* employees;
+	static User* user;
+	static Order* order;
 public:
 	Window();
-	
 	Window(string xml);
-	
 	~Window();
-	
 	static void button_pressed(GtkWidget *widget, gpointer data);
 	//called when close window red button is pressed at app level
 	static gboolean delete_event(GtkWidget *widget, GdkEvent *event, gpointer data);
@@ -1425,16 +1472,23 @@ public:
 	static void destroy(GtkWidget* widget, gpointer data);
 	void increase_pbar();
 	static void set_icon(string path);
-	static void assign_pointers(Heap* heap, BST<Customer>* _customers, BST<Product>* _products, BST<ProductS>* _products_secondary);
+	static void assign_pointers(Heap* heap, HashTable<Customer>* _customers, HashTable<Employee>* _employees, BST<Product>* _products, BST<ProductS>* _products_secondary);
 	void create_content(string tagName, string text, map<string,string> optionsMap, GtkWidget* box);
 	static string create_xml_tag(string tag, string text);
 	static string create_xml_tag(string tag, string options, string text);
-	static void create_db_list_xml(vector<string> productsV, string &xml, string link, string name, string text);
+	static void create_db_list_xml(vector<string> productsV, string &xml, string link, string name, string text, bool glink=false);
 	static void create_db_list_xml(vector<string> productsV, string &xml);
+	static void create_view_cart_xml(string& xml);
+	static void create_order_laptop_list_xml(stringstream& OrderSS,string size,string number_size,string& xml,bool isCart=true);
+														//if it's not the cart then it's view order, so no changes can be made
+	static void create_purchase_history_xml(string& xml);
+	static void create_purchase_history_xml(string& xml, Customer* c);
+	static void create_customer_list_xml(string& xml, stringstream& customersSS);
 	static void string_find_and_replace(string find, string replace, string &subject);
-	static vector<string> string_split(const string &input, char delim);
+	static vector<string> string_split(const string &input, char delim = ',');
 	static string to_lower(string str);
-	static string vector_join(const vector<string> &v, const char* const delim);
+	static string vector_join(const vector<string> &v, const char* const delim = ",");
+	static bool is_number(const string& s);
 };
 #endif /* WINDOW_H_ */
 
@@ -1462,13 +1516,14 @@ public:
 	WindowManager();
 	~WindowManager();
 	static void go_to_window(string id, string options);
+	static void go_to_window(string id);
 	static void loadxml(string path);
 	static string getxml(string id);
 	static string get_current_window_id();
-	static map<string, GtkWidget*> get_current_window_entries();
 	static void run_pbar();
 };
 #endif /* WINDOWMANAGER_H_ */
+
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -1542,7 +1597,7 @@ string Customer::getOrder() const {
  }
  */
 bool Customer::operator==(const Customer& customer) {
-	return (username == customer.username);
+	return (username == customer.username && password == customer.password);
 }
 bool Customer::operator<(const Customer& customer) {
 	if (firstname < customer.firstname)
@@ -1623,19 +1678,14 @@ void Customer::write(ostream& out) {
 	out << email << '\n';
 	orders.startIterator();
 	while (!orders.offEnd()) {
-		out << orders.getIterator().getPrice() << endl;
-		out << orders.getIterator().isPlaced() << endl;
-		out << orders.getIterator().getDayPlaced() << endl;
-		out << orders.getIterator().getShippingSpeed() << endl;
-		out << orders.getIterator().isShipped() << endl;
+		orders.getIterator()->save(out);
 		orders.moveIterNext();
 	}
-	out << "End";
+	out << endl;
 }
 ostream& operator<<(ostream& out, const Customer& customer) {
 	stringstream os;
 	customer.orders.displayNumberedList(os);
-//out << customer.r->printDetailed();
 	out << customer.getFirstname() << "," << customer.getLastname() << ","
 			<< customer.getAddress() << "," << customer.getCity() << ","
 			<< customer.getEmail() << "," << customer.getZip() << '\n';
@@ -1666,16 +1716,14 @@ void Customer::addToProduct(Product* p) {
 	r->addLaptop(p);
 }
 void Customer::removeProduct(int index) {
-	assert(r->isPlaced());
-	if (!r->isPlaced()) {
-		r->removeLaptop(index - 1);
-	}
+	assert(!r->isPlaced());
+		r->removeLaptop(index);
 }
-void Customer::placeOrder(int i) {
-	r->placeOrder(i);
-	if (r->isPlaced()) {
-		orders.insertStop(*r);
-	}
+void Customer::placeOrder() {
+		orders.insertStop(r); //add order to list
+}
+void Customer::insertOrder(Order* o){
+		orders.insertStop(o); //add order to list
 }
 
 /*
@@ -1697,12 +1745,12 @@ Employee::Employee() {
 Employee::Employee(string username, string password, string firstName, string lastName, bool isEmployee) {
 	this->username = username;
 	this->password = password;
-	this->firstname = firstname;
-	this->lastname = lastname;
+	this->firstname = firstName;
+	this->lastname = lastName;
 	this->isEmployee = isEmployee;
 }
 bool Employee::operator==(const Employee& employee) {
-	return (username == employee.username);
+	return (username == employee.username && password == employee.password);
 }
 bool Employee::operator<(const Employee& employee) {
 	if (firstname < employee.firstname)
@@ -1787,71 +1835,127 @@ string Employee::toString() const {
 
 //
 //  FileLoader.cpp
-//  
+//
 //
 //  Created by Alex Rao on 6/10/18.
 //
 #include <iostream>
+#include <fstream>
 using namespace std;
-BST<Product> FileLoader::loadProducts(string path){
-	cout << "loading products..." << endl;
-    BST<Product> products;
-    ifstream fis(path.c_str());
-    string line;
-    if (fis.is_open()) {
-        while (getline(fis, line)) {
-            string manf_company = line;
-            string model;
-            getline(fis, model);
-            double screen_size;
-            fis >> screen_size;
+BST<Product> FileLoader::loadProducts(string path) {
+	BST<Product> p;
+	p.loadPrimary(path);
+	return p;
+}
+BST<ProductS> FileLoader::loadProductsS(string path) {
+	BST<ProductS> p;
+	p.loadSecondary(path);
+	return p;
+}
+HashTable<Customer> FileLoader::loadCustomers(string path, Heap& heap, BST<Product>& catalog) {
+	HashTable<Customer> customers;
+	ifstream fis(path.c_str());
+	string line;
+	if (fis.is_open()) {
+		while (getline(fis, line)) {
+            string username = line;
+            string password;
+            getline(fis, password);
+            string first_name;
+            getline(fis, first_name); //advance to the next line
+            string last_name;
+            getline(fis, last_name); //advance to the next line
+            bool isEmployee = false;
             getline(fis, line); //advance to the next line
-            unsigned cpuGen;
-            fis >> cpuGen;
-            getline(fis, line); //advance to the next line
-            unsigned year;
-            fis >> year;
-            getline(fis, line); //advance to the next line
-            unsigned price;
-            fis >> price;
-            getline(fis, line); //advance to the next line
-            Product p(manf_company,model,screen_size,cpuGen,year,price);
-            products.insert(p);
+            string address;
+            getline(fis, address);
+            string city;
+            getline(fis, city); //advance to the next line
+            string zip_string;
+            unsigned zip;
+            getline(fis, zip_string); //advance to the next line
+            zip = atoi(zip_string.c_str());
+            string email;
+            getline(fis,email);
+            Customer* c = new Customer(username, password, first_name, last_name, isEmployee, address, city, zip, email);
+            customers.insert(*c);
+						while(not (fis.peek() == '\n')){
+							Order * o = new Order;
+							heap.insert(o -> load(fis, catalog));
+							c->insertOrder(o);
+						}
             getline(fis, line); //skip the emtpy line
         }
-    }
-    fis.close();
-    return products;
-}
-BST<Customer> FileLoader::loadCustomers(string path) {
-	cout << "loading customers..." << endl;
-	BST<Customer> customers;
-	ifstream fis(path.c_str());
-	if (fis.is_open()) {
-		while(fis.peek() != ios_base::end) {
-			Customer c;
-			c.read(fis);
-			customers.insert(c);
-		}
 	}
 	fis.close();
 	return customers;
 }
-BST<Employee> FileLoader::loadEmployees(string path) {
-	cout << "loading employees..." << endl;
-	BST<Employee> employees;
+HashTable<Employee> FileLoader::loadEmployees(string path) {
+	HashTable<Employee> employees;
 	ifstream fis(path.c_str());
+	string line;
 	if (fis.is_open()) {
-		while(fis.peek() != ios_base::end) {
-			Employee e;
-			e.read(fis);
-			employees.insert(e);
+		while (getline(fis, line)) {
+            string username = line;
+            string password;
+            getline(fis, password);
+            string first_name;
+            fis >> first_name;
+            getline(fis, line); //advance to the next line
+            string last_name;
+            fis >> last_name;
+            getline(fis, line); //advance to the next line
+            bool isEmployee;
+            fis >> isEmployee;
+            getline(fis, line); //advance to the next line
+            Employee* e = new Employee(username, password, first_name, last_name, isEmployee);
+            employees.insert(*e);
+            getline(fis, line); //skip the emtpy line
 		}
 	}
 	fis.close();
 	return employees;
 }
-
+void FileLoader::saveProducts(string path, BST<Product> p){
+		p.save(path);
+}
+void FileLoader::saveCustomers(string path, HashTable<Customer> c){
+	ofstream of;
+	of.open(path.c_str(),ios_base::out);
+	List<Customer*> l(c.getAll());
+	int size = l.getLength();
+	l.startIterator();
+	while(not l.offEnd()){
+			l.getIterator()->write(of);
+			l.moveIterNext();
+	}
+}
+void FileLoader::saveEmployees(string path, HashTable<Employee> e){
+	ofstream of;
+	of.open(path.c_str(),ios_base::out);
+	List<Employee*> l(e.getAll());
+	int size = l.getLength();
+	l.startIterator();
+	while(not l.offEnd()){
+			l.getIterator()->write(of);
+			l.moveIterNext();
+	}
+}
+void FileLoader::printProgBar(int percent, string message){
+  string bar;
+  for(int i = 0; i < 50; i++){
+    if( i < (percent/2)){
+      bar.replace(i,1,"=");
+    }else if( i == (percent/2)){
+      bar.replace(i,1,"_");
+    }else{
+      bar.replace(i,1," ");
+    }
+  }
+  cout<< "\r" "[" << bar << "] ";
+  cout.width( 3 );
+  cout<< percent << "% " << message << flush;
+}
 /*
  * Heap.cpp
  * Andrew Maxwell
@@ -1884,7 +1988,9 @@ bool DEBUG = false;
     //helper function to build_heap, remove, and sort
     //bubbles an element down to its proper location within the heap
     void Heap::heap_increase_key(int i, Order * key) {
-    	assert(heaped);
+    	if(!heaped) {
+    		build_heap();
+    	}
     	if (*(heap -> at(floor(i/2))) < *key) {
     		heap -> at(i) = heap -> at(floor(i/2));
     		heap -> at(floor(i/2)) = key;
@@ -1894,7 +2000,9 @@ bool DEBUG = false;
     //helper function to insert
     //bubbles an element up to its proper location
     void Heap::remove(int index) {
-    	assert(heaped);
+    	if(!heaped) {
+    		build_heap();
+    	}
     	assert(1 <= index);
     	assert(index <= heap_size);
     	heap -> at(index) = heap -> at(heap_size);
@@ -1917,14 +2025,12 @@ bool DEBUG = false;
     		int realLength = heap_size;
     		while (heap_size > 1) {
     			if (DEBUG) {
-    				cout << "\ninitially\n";
     				printRaw(cout);
     			}
     			Order * swap = heap -> at(1);
     			heap -> at(1) = heap -> at(heap_size);
     			heap -> at(heap_size) = swap;
     			if (DEBUG) {
-    				cout << "\nafter swapping\n";
     				printRaw(cout);
     			}
     			heap_size--;
@@ -1951,7 +2057,9 @@ bool DEBUG = false;
     	build_heap();
     }
     void Heap::place(Order * o, int days) {
-    	assert(heaped);
+    	if(!heaped) {
+    		build_heap();
+    	}
     	if (o == NULL) {
     		return;
     	}
@@ -1964,7 +2072,9 @@ bool DEBUG = false;
     }
     //Places an order while simultaneously putting it on the heap
     void Heap::insert(Order * o) {
-    	assert(heaped);
+    	if(!heaped) {
+    		build_heap();
+    	}
     	if (o == NULL) {
     		return;
     	}
@@ -1975,14 +2085,18 @@ bool DEBUG = false;
     	heap_increase_key(heap_size, o);
     }
     void Heap::ship(int index) {
-    	assert(!heaped);
+    	if(heaped) {
+    		sort();
+    	}
     	assert(1 <= index);
     	assert(index <= heap_size);
     	heap -> at(heap_size - index + 1) -> ship();
     }
     //Ships an order and removes it from the heap.
     void Heap::clear() {	//Removes the shipped orders. pre: is a heap.
-    	assert(heaped);
+    	if(!heaped) {
+    		build_heap();
+    	}
     	while (heap -> at(heap_size) -> isShipped()) {	//Remove all shipped orders at the end of the vector manually so that they don't get swapped with other shipped orders by the remove function and then not get removed.
     		heap -> pop_back();
     		heap_size--;
@@ -2011,7 +2125,7 @@ bool DEBUG = false;
     //pre: 0 < i <= heap_size
      Order * Heap::get_left(int i)  const {
     	assert(heaped);
-        assert(0 < i);
+    	assert(0 < i);
         assert(i <= heap_size);
         return heap -> at(i * 2);
     }
@@ -2045,13 +2159,17 @@ bool DEBUG = false;
         }
     }
     string Heap::printSpecific(int index) {	//Prints the order at the given index in the sorted vector
-    	assert(!heaped);
+    	if(heaped) {
+    		sort();
+    	}
     	assert(1 <= index);
     	assert(index <= heap_size);
     	return heap -> at(heap_size - index + 1) -> printDetailed();
     }
     string Heap::printSorted() {			//Prints all of the orders in sorted order. Pre: must be sorted (!heaped).
-    	assert(!heaped);
+    	if(heaped) {
+    		sort();
+    	}
     	stringstream out;
     	if (heap_size == 0) {
     		out << "No orders to ship!\n";
@@ -2071,31 +2189,47 @@ bool DEBUG = false;
  * Mohamed Elgharbawy
  */
 #include <iostream>
+#include <cstdlib> 
+#include <thread>
+#include <chrono>
 #include <gtk/gtk.h>
 using namespace std;
 int main(int argc, char *argv[]) {
 	
 	gtk_init (&argc, &argv);
-	g_print("args passed to gtk_init\n");
-	
+	//g_print("args passed to gtk_init\n");
+	Heap heap;
 	BST<Product> bstp;
 	bstp.loadPrimary("Products_in.txt");
 	BST<ProductS> bsts;
 	bsts.loadSecondary("Products_in.txt");
-	Product product;
-	ProductS productS;
-	Heap heap;
-	Customer customer;
-	Employee employee;
-	cout << "Success!" << endl;
-	
-	Window::assign_pointers(NULL,NULL,&bstp,&bsts);
+	HashTable<Customer> htc = FileLoader::loadCustomers("Customers.txt",heap,bstp);
+	HashTable<Employee> hte = FileLoader::loadEmployees("Employees.txt");
+	Window::assign_pointers(&heap,&htc,&hte,&bstp,&bsts);
+	Window::set_icon("icon.png");
 	WindowManager::loadxml("window_data.xml");
-	WindowManager::go_to_window("welcome_screen","");
-	g_print("going to gtk_main\n");
+	WindowManager::go_to_window("welcome_screen");
+	//g_print("going to gtk_main\n");
+	cout << "Great Success!" << endl;
 	gtk_main();
-	g_print("gtk_main has ended\n");
-	
+	//g_print("gtk_main has ended\n");
+	FileLoader::saveProducts("Products_in.txt",bstp);
+	FileLoader::saveCustomers("Customers.txt", htc);
+	FileLoader::saveEmployees("Employees.txt", hte);
+	cout << "writing files..." << endl;
+	for(int i = 0; i < 100; i++){
+		if(i < 50){
+			FileLoader::printProgBar(i,"Writing Products");
+		} else if (i >= 50 and i < 75){
+			FileLoader::printProgBar(i,"Writing Customers");
+		} else {
+			FileLoader::printProgBar(i,"Writing Employees");
+		}
+		int rand_int = (int)(((rand() % 10)/9.0) * 90) + 10; //rand int between 10 and 100
+		this_thread::sleep_for(chrono::milliseconds(10));
+	}
+	FileLoader::printProgBar(100,"Complete         ");
+	cout << endl;
 	return 0;
 }
 
@@ -2177,7 +2311,8 @@ using namespace std;
 	//Pre: !placed
 	void Order::removeLaptop(int index) {
 		assert(!placed);
-		assert(index < laptops.getLength());
+		assert(index <= laptops.getLength());
+		assert(index > 0);
 		laptops.moveToIndex(index);
 		price -= laptops.getIterator().price;
 		laptops.removeIterator();
@@ -2211,6 +2346,7 @@ using namespace std;
 		arriveBy += 86400 * daysToShip;
 		shippingSpeed = daysToShip;
 		placed = true;
+		customer->placeOrder();
 	}
 	//places the order; sets it as ready to ship; sets value of timePlaced and arriveBy.
 	bool Order::operator>(const Order& order) {
@@ -2273,10 +2409,9 @@ using namespace std;
 	}
 	string Order::printDetailed() {	//Prints above information + also the list of all laptops.
 		stringstream out;
-		out << print();
-		out << "\n" << *customer;
+		out << print() << endl;
+		//out << "\n" << *customer;
 		laptops.displayNumberedList(out);
-		out << endl << endl;
 		return out.str();
 	}
 	void Order::save(ostream & out) {	//Prints out all information in format for load() to read
@@ -2323,6 +2458,17 @@ using namespace std;
 		} else {
 			return NULL;
 		}
+	}
+	ostream& operator<<(ostream& out, const Order& order) {
+		out <<
+				"\nOrder's Info: " <<
+				"\nPrice: $" << order.getPrice()<<
+				"\nOrder Placed: " <<order.isPlaced()<<
+				"\nDate placed: " << order.getDayPlaced() <<
+				"\nArrive By: " << order.getArriveBy()<<
+				"\nShipping speed: "<<order.getShippingSpeed() << endl;
+		order.laptops.displayNumberedList(out);
+		return out;
 	}
 
 /*
@@ -2570,79 +2716,77 @@ void User::setIsEmployee(bool isEmployee) {
  *  Created on: Jun 2, 2018
  *      Author: Jasper
  */
+#ifdef _WIN32
+#include <algorithm>
+#endif // _WIN32
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
 #include <sstream>
 #include <locale>
+#include <iterator>
+#include <iostream>
+#include <fstream>
 #include <gtk/gtk.h>
 using namespace std;
 //static variables
 GdkPixbuf* Window::icon;
 map<string, GtkWidget*> Window::entries;
 Heap* Window::priority_queue;
-BST<Customer>* Window::customers;
+HashTable<Customer>* Window::customers;
+HashTable<Employee>* Window::employees;
 BST<Product>* Window::products;
 BST<ProductS>* Window::products_secondary;
-//Customer customer;
+User* Window::user;
+Order* Window::order;
 Window::Window(string xml) {
     //create the window
     self_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     g_signal_connect(self_window, "delete-event", G_CALLBACK(delete_event), NULL);
     gtk_container_set_border_width(GTK_CONTAINER(self_window), 10);
-    
     //create box
     self_box = gtk_vbox_new(FALSE, 2);
-    
     //set the box spacing
     gtk_box_set_spacing(GTK_BOX(self_box),3);
     //add the box to the window
     gtk_container_add(GTK_CONTAINER(self_window), self_box);
-    
     //wipe the entries
     map<string, GtkWidget*> m;
     entries = m;
-    
     //set up xml stringstream
     stringstream xmlss(xml);
-    
     string tag, text, closetag = "";
-    
     //create new vector of box pointers
 	vector<GtkWidget*> boxes;
 	boxes.push_back(self_box);
-    
     while(getline(xmlss,tag)) {
         string msg;
-        
         //get the tag
-        tag = tag.substr(1, tag.length()-2); //get rid of the <>
-        size_t pos = tag.find(" ");
-        string tagName = tag.substr(0, pos); //get the tag name
-        string options = tag.substr(pos+1); //get the options
-        
+        string tagName;
+        string options;
+        try{
+            tag = tag.substr(1, tag.length()-2); //get rid of the <>
+            size_t pos = tag.find(" ");
+            tagName = tag.substr(0, pos); //get the tag name
+            options = tag.substr(pos+1); //get the options
+        } catch(exception const &e){
+            cerr << "Error: " << e.what() << endl;
+            cerr << "tag: " << tag << endl;
+        }
         map<string,string> optionsMap;
-        
         string optionpair;
         stringstream optionsSS(options);
-        
         while(getline(optionsSS,optionpair,' ')) {//loop through the options, separated by spaces
             string attribute;
             string value;
-            
             stringstream optsep(optionpair);
-            
             getline(optsep, attribute, '\"'); //skip the options=
             attribute = attribute.substr(0,attribute.length()-1); //get rid of the '='
             getline(optsep,value,'\"'); //get the actual value
-            
             optionsMap.insert(make_pair(attribute,value));
         }
-        
-        if(tagName == "variable") { //skip unassigned variable tag
-            
+        if(tagName == "variable") { //skip unassigned variable tag, should not happen but just in case
             continue;
-            
         } else if(tagName == "hbox") {// skip the line named box and assign inner box == true;
             //get homogeneous
             if(optionsMap["homogeneous"] == "true"){
@@ -2652,15 +2796,14 @@ Window::Window(string xml) {
                 //create new box
                 boxes.push_back(gtk_hbox_new(FALSE, 2));
             }
-            
             //set the box spacing
             gtk_box_set_spacing(GTK_BOX(boxes.at(boxes.size()-1)),3);
-                       
+            if (optionsMap.find("left") != optionsMap.end()) {
+                gtk_misc_set_alignment(GTK_MISC(boxes.at(boxes.size()-1)),(int)atoi(optionsMap["left"].c_str()),0);
+            }
             //restart the while loop
             continue;
-            
         } else if (tagName == "vbox") {
-            
             //get homogeneous
             if(optionsMap["homogeneous"] == "true"){
                 //create new box
@@ -2671,11 +2814,8 @@ Window::Window(string xml) {
             }
             //set the box spacing
             gtk_box_set_spacing(GTK_BOX(boxes.at(boxes.size()-1)),3);
-            
             continue;
-            
         } else if (tagName == "scroll") {
-        	
         	//create the new scroll window
         	GtkWidget* scroll_window = gtk_scrolled_window_new(NULL,NULL);
         	boxes.push_back(scroll_window); //NULL,NULL for auto-generated scroll bars
@@ -2683,11 +2823,14 @@ Window::Window(string xml) {
         		//set the scroll window size
         		int size = atoi(optionsMap["columns"].c_str()) * (atoi(optionsMap["width"].c_str())+4) + 15;
         		gtk_widget_set_size_request (scroll_window, size, 300);
-        	} else {
+        	} else if(optionsMap.find("width") != optionsMap.end()){ //if just the width is present
+                //set the scroll window size
+                int size = atoi(optionsMap["width"].c_str()) + 15;
+                gtk_widget_set_size_request (scroll_window, size, 300);
+            } else {
         		// just make it big
         		gtk_widget_set_size_request (scroll_window, 1500, 300);
         	}
-        	
         	//set the box border width
         	gtk_container_set_border_width (GTK_CONTAINER (boxes.at(boxes.size()-1)), 10);
         	//set the box policy
@@ -2714,78 +2857,71 @@ Window::Window(string xml) {
         	string window_name = "GtkScrolledWindow";
         	if( box_name == window_name) {
             	//pack it into the scroll box
-            	gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (boxes.at(boxes.size()-2)), boxes.at(boxes.size()-1));
+            	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW (boxes.at(boxes.size()-2)), boxes.at(boxes.size()-1));
             } else {
             	//pack the box into the next higher box
             	gtk_box_pack_start(GTK_BOX(boxes.at(boxes.size()-2)),boxes.at(boxes.size()-1),FALSE,FALSE,0);
             }
-            
             //show the box
             gtk_widget_show(boxes.at(boxes.size()-1));
             //remove the box from the box stack
             boxes.pop_back();
             continue;
-        } 
+        }
         //end of elf
         getline(xmlss,text); //get the text
         getline(xmlss,closetag); //and the closetag
-        
-        if(boxes.size() > 1) {
-            create_content(tagName,text,optionsMap,boxes.at(boxes.size()-1));
-        } else {
-            create_content(tagName,text,optionsMap,self_box);
+        try{
+            if(boxes.size() > 1) {
+                create_content(tagName,text,optionsMap,boxes.at(boxes.size()-1));
+            } else {
+                create_content(tagName,text,optionsMap,self_box);
+            }
+        } catch(const string msg){
+            cerr << msg << endl;
         }
-    } 
+    }
     //show the box
     gtk_widget_show(self_box);
-    
     //align window in center
     gtk_window_set_position(GTK_WINDOW(self_window), GTK_WIN_POS_CENTER);
-    
     //make the window deletable
     gtk_window_set_deletable(GTK_WINDOW(self_window), TRUE);
-    
     //set the window icon
     gtk_window_set_icon(GTK_WINDOW(self_window), icon);
-    
     //show the window
     gtk_widget_show(self_window);
-    
     //make the window active
-    GTK_WINDOW(self_window).set_keep_above(TRUE);
+    //gtk_window_activate_focus(GTK_WINDOW(self_window));
 }
 Window::~Window() {
     // TODO Auto-generated destructor stub
+    //idk, delete some stuff I guess
 }
 void Window::create_content(string tagName, string text, map<string,string> optionsMap, GtkWidget* box) {
     string msg;
     GtkWidget* widget;
     if(tagName == "title") {
-        
         //make the title lable
         widget = gtk_label_new(text.c_str());
-        
         //set alignment
         gtk_misc_set_alignment(GTK_MISC(widget),0,0);
-        
         //title markup
         char* markup = g_strconcat("<big>", text.c_str(), "</big>", NULL);
         gtk_label_set_markup(GTK_LABEL(widget), markup);
         g_free(markup);
         gtk_misc_set_alignment(GTK_MISC(widget), 0, 0);
-        
     } else if(tagName == "button") {
         //create new button
         widget = gtk_button_new_with_label(text.c_str());
         //set name
         gtk_widget_set_name(widget,optionsMap["options"].c_str());
-        
         //set signal connect method
         g_signal_connect(widget, "clicked", G_CALLBACK(button_pressed), FALSE);
-        
-        //connect it to the destroy event as well
-        g_signal_connect_swapped(widget,"clicked",G_CALLBACK(destroy),self_window);
-                
+        if(optionsMap["stay"] != "true"){
+            //connect it to the destroy event as well
+            g_signal_connect_swapped(widget,"clicked",G_CALLBACK(destroy),self_window);
+        }
     } else if(tagName == "label") {
         //create new label
         widget = gtk_label_new(text.c_str());
@@ -2800,7 +2936,6 @@ void Window::create_content(string tagName, string text, map<string,string> opti
         }
         if (optionsMap.find("width") != optionsMap.end()) {//if the size option is present
         	gtk_widget_set_size_request(widget,atoi(optionsMap["width"].c_str()),-1);
-        	
         	gtk_label_set_line_wrap (GTK_LABEL(widget),TRUE);
         }
         if (optionsMap["justify"] == "center") {
@@ -2814,36 +2949,27 @@ void Window::create_content(string tagName, string text, map<string,string> opti
         	//set alignment
         	gtk_misc_set_alignment(GTK_MISC(widget), 0, 0);
         }
-        
-       
-        
     } else if (tagName == "entry") {
-        
         //create new entry and assign it to the pointer
         widget = gtk_entry_new();
-        
         //set the name
         gtk_widget_set_name(widget,text.c_str());
-        
         //check if it's a password box
         if (optionsMap["type"] == "psw") {
             gtk_entry_set_visibility(GTK_ENTRY(widget),FALSE);
         } else if (optionsMap["type"] == "hidden"){
         	gtk_entry_set_text(GTK_ENTRY(widget),optionsMap["value"].c_str());
         }
-        
         //adding entries to entries map
         entries.insert(make_pair(text,widget));
-        
     } else if (tagName == "pbar") {
-        
         msg = "creating pbar: " + text + "\n";
-        g_print("%s",msg.c_str());
-        
+        //g_print("%s",msg.c_str());
         widget = gtk_progress_bar_new();
-        
         gtk_progress_bar_set_text(GTK_PROGRESS_BAR(widget),text.c_str());
-        
+    } else {
+        string err = "Error: Invalid XML tag: " + tagName;
+        throw err;
     }
     string box_name = g_strconcat(G_OBJECT_TYPE_NAME(box),NULL);
 	string window_name = "GtkScrolledWindow";
@@ -2857,7 +2983,7 @@ void Window::create_content(string tagName, string text, map<string,string> opti
     //set it to default if it is set to default
     if (optionsMap["default"] == "true"){
     	msg = "setting button \"" + text + "\" to be default\n";
-    	g_print("%s",msg.c_str());
+    	//g_print("%s",msg.c_str());
     	gtk_widget_set_can_default (widget, TRUE);
     	gtk_widget_grab_default (widget);
     }
@@ -2867,20 +2993,14 @@ void Window::create_content(string tagName, string text, map<string,string> opti
     	//show the widget
     	gtk_widget_show(widget);
     }
-    
 }
 void Window::button_pressed(GtkWidget* widget, gpointer data) {
-    
     string xml = "";
-    
     string optionsRaw = gtk_widget_get_name(widget); //the options are stored in the button name
     stringstream optsep(optionsRaw); //now we need a string stream object to extract them
     map<string, string> optionsMap; //and a map to store them
-    
     string optvalpair; //this will store the pairs of option:value
-    
     while(getline(optsep,optvalpair,',')) { //loop through each comma separated option:value pair
-        
         stringstream seperator(optvalpair); //another string stream object to separate the pair
         string option;
         string value;
@@ -2888,47 +3008,75 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         getline(seperator,value,':'); //get the value
         optionsMap.insert(make_pair(option,value)); //add them to the map
     }
-    
     string name = optionsMap["name"];
     string msg;
-    
     if(name == "quit") {
-        
+        user = NULL;
+        order = NULL;
+        //do all the write functions
         gtk_main_quit();
+    } else if(name == "open"){
+        string make_and_model = optionsMap["value"];
+        string_find_and_replace("`"," ",make_and_model);
+        string url = "https://google.com/search?q=" + make_and_model;
+        string cmd_win = "explorer \"" + url + "\"";
+        system(cmd_win.c_str());
+        string cmd_unix = "open \"" + url + "\"";
+        system(cmd_unix.c_str());
     } else if(name == "customer_sign_in") {
-        
-        g_print("in customer_sign_in block\n");
-        
         string email = gtk_entry_get_text(GTK_ENTRY(entries["email"]));
         string psw = gtk_entry_get_text(GTK_ENTRY(entries["psw"]));
-        
-        msg = "email: " + email + "\n";
-        g_print("%s",msg.c_str());
-        msg = "password: " + psw + "\n";
-        g_print("%s",msg.c_str());
-              
+        Customer* c = customers->customerSignIn(email);
+        Customer* c_check = new Customer(email,psw,"","",false,"","",0,"");
+        if(c == NULL){
+            xml += create_xml_tag("label","style=\"error\"","That username is not in our database");
+            WindowManager::go_to_window("customer_sign_in_using_and_existing_account",xml);
+            return;
+        }
+        if(!(*c_check == *c)){
+            xml += create_xml_tag("label","style=\"error\"","usernames and/or passwords do not match");
+            WindowManager::go_to_window("customer_sign_in_using_and_existing_account",xml);
+            return;
+        }
+        user = c;
+        order = new Order(c);
+        c->activeOrder(order);
+        xml += create_xml_tag("title","Welcome, " + c->getFirstname() + ".");
+        xml += "<hr>\n";
+        delete c_check;
     } else if(name == "employee_login") {
-        
-        unsigned id = atoi(gtk_entry_get_text(GTK_ENTRY(entries["id"])));
+        string username = gtk_entry_get_text(GTK_ENTRY(entries["username"]));
         string psw = gtk_entry_get_text(GTK_ENTRY(entries["psw"]));
-        
-        msg = "id: " + to_string(id) + "\n";
-        g_print("%s",msg.c_str());
-        msg = "password: " + psw + "\n";
-        g_print("%s",msg.c_str());
-        
+        username.erase(remove(username.begin(),username.end(),' '),username.end()); //remove white space
+        Employee* e = employees->customerSignIn(username);
+        Employee* e_check = new Employee(username,psw,"","",true);
+        if(e == NULL){
+            xml += create_xml_tag("label","style=\"error\"","That username is not in our database");
+            WindowManager::go_to_window("employee_login_screen",xml);
+            return;
+        }
+        if(!(*e_check == *e)){
+            xml += create_xml_tag("label","style=\"error\"","Incorrect password");
+            WindowManager::go_to_window("employee_login_screen",xml);
+            return;
+        }
+        user = e;
+        delete e_check;
     } else if(name == "customer_create_new_account_1") {
-        
         //get parameters
         string email = gtk_entry_get_text(GTK_ENTRY(entries["email"]));
         string conf_email = gtk_entry_get_text(GTK_ENTRY(entries["conf_email"]));
         string psw = gtk_entry_get_text(GTK_ENTRY(entries["psw"]));
         string conf_psw = gtk_entry_get_text(GTK_ENTRY(entries["conf_psw"]));
-        
+        if(customers->customerSignIn(email) != NULL){ //check if it's taken
+            xml += create_xml_tag("label","style=\"error\"","Sorry, that username is taken");
+            WindowManager::go_to_window("customer_create_new_account",xml); //go back to the customer create new account window
+            return;
+        }
         //time to check
         if(email != conf_email || psw != conf_psw){
         	if(email != conf_email){
-        		xml += create_xml_tag("label","style=\"error\"","error: emails must match");
+        		xml += create_xml_tag("label","style=\"error\"","error: usernames must match");
         	}
         	if (psw != conf_psw){
         		xml += create_xml_tag("label","style=\"error\"","error: passwords must match");
@@ -2939,11 +3087,9 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         	xml += create_xml_tag("label","style=\"error\"","error: please do not leave any fields blank");
         	WindowManager::go_to_window("customer_create_new_account",xml); //go back to the customer create new account window
         	return;
-        } else {
-        	string value = email + "`" + psw; 
-        	xml += create_xml_tag("entry","type=\"hidden\" value=\""+value+"\"","values");
         }
-            
+    	string value = email + "`" + psw;
+    	xml += create_xml_tag("entry","type=\"hidden\" value=\""+value+"\"","values");
     } else if(name == "customer_create_new_account_2") {
     	map<string,string> values;
     	string email_and_psw = gtk_entry_get_text(GTK_ENTRY(entries["values"]));
@@ -2956,22 +3102,32 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
     	values["phone_num"] = gtk_entry_get_text(GTK_ENTRY(entries["phone_num"]));
     	values["city"] = gtk_entry_get_text(GTK_ENTRY(entries["city"]));
     	values["zip_str"] = gtk_entry_get_text(GTK_ENTRY(entries["zip"]));
-    	unsigned zip = atoi(values["zip_str"].c_str());
-    	map<string,string>::iterator it;
-    	for(it = values.begin(); it != values.end(); it++){
-    		msg = it->first + ": " + it->second + "\n";
-    		g_print("%s",msg.c_str());
-    	}
+    	unsigned zip;
+        bool isValid = true;
     	if(values["fname"] == "" || values["lname"] == "" || values["address"] == "" || values["phone_num"] == "" || values["city"] == "" || values["zip_str"] == ""){//if any of the fields are blank, reject
-    		xml += create_xml_tag("label","style=\"error\"","error: please do not leave any fields blank");
-    		string value = values["email"] + "`" + values["psw"]; 
-    		xml += create_xml_tag("entry","type=\"hidden\" value=\""+value+"\"","values");
-    		WindowManager::go_to_window("customer_create_new_account_cont",xml);
-    		return;
-    	} else {
-    		//Customer c(email,psw,fname,lname,false,address,city,zip,email);
-    		//customers->insert(c);
+    		isValid = false;
+            xml += create_xml_tag("label","style=\"error\"","error: please do not leave any fields blank");
     	}
+        if(!is_number(values["zip_str"]) || values["zip_str"].length() != 5){ //if zip is not a number or is not 5 digits exactly
+            isValid = false;
+            xml += create_xml_tag("label","style=\"error\"","please enter a 5 digit number for the ZIP code");
+        } else{
+            zip = atoi(values["zip_str"].c_str());
+        }
+        if(!isValid){
+            string value = values["email"] + "`" + values["psw"];
+            xml += create_xml_tag("entry","type=\"hidden\" value=\""+value+"\"","values");
+            WindowManager::go_to_window("customer_create_new_account_cont",xml);
+            return;
+        }
+		Customer* c = new Customer(values["email"],values["psw"],values["fname"],values["lname"],false,values["address"],values["city"],zip,values["email"]);
+		customers->insert(*c);
+        user = customers->customerSignIn(values["email"]);
+        Customer* c_ptr = static_cast<Customer*>(user);
+        order = new Order(c_ptr);
+        c_ptr->activeOrder(order);
+        xml += create_xml_tag("title","Welcome, " + user->getFirstname() + ".");
+        xml += "<hr>\n";
     } else if(name == "customer_search"){
     	string make = gtk_entry_get_text(GTK_ENTRY(entries["make"]));
         string model = gtk_entry_get_text(GTK_ENTRY(entries["model"]));
@@ -2979,7 +3135,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         	xml += create_xml_tag("label","style=\"error\"","Please enter the make and/or model you would like to search for.");
      		WindowManager::go_to_window("customer_search_for_a_product",xml);
      		return;
-        } 
+        }
         vector<string> productsV = products->printListToString();
         vector<string> matches;
         if( make != "" && model == ""){ //if they just searched for make
@@ -3017,39 +3173,170 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         	xml += create_xml_tag("label","No matches");
         } else {
         	xml += create_xml_tag("label","There are " + to_string(matches.size()) + " matches.");
-        	create_db_list_xml(matches,xml,"customer_view_cart","add_to_cart","add to cart");
+        	create_db_list_xml(matches,xml,"customer_view_cart","add_to_cart","add to cart",true);
         }
     } else if(name == "customer_db_list"){
-        
         string value = optionsMap["value"];
-        
         if(value == "comp_name"){
             vector<string> productsV = products->printListToString();
-            create_db_list_xml(productsV,xml,"customer_view_cart","add_to_cart","add to cart");
-            
+            create_db_list_xml(productsV,xml,"customer_view_cart","add_to_cart","add to cart",true);
         } else if(value == "price"){
-            
-            
         } else if(value == "model"){
-            
             vector<string> productsV = products_secondary->printListToString();
-            create_db_list_xml(productsV,xml,"customer_view_cart","add_to_cart","add to cart");
+            create_db_list_xml(productsV,xml,"customer_view_cart","add_to_cart","add to cart",true);
         }
-        
     } else if(name == "add_to_cart"){
-        //do a bunch of stuff
+        string make_and_model = optionsMap["value"];
+        size_t pos = make_and_model.find('`');
+        string make = make_and_model.substr(0,pos);
+        string model = make_and_model.substr(pos+1);
+        string_find_and_replace("`"," ",model);
+        Product pSearch(make,model,0,0,0,0);
+        Customer* c = static_cast<Customer*>(user);
+        if(products->find(pSearch) != NULL){
+            c->addToProduct(products->find(pSearch));
+        } else {
+            cerr << "Error: Product Not found: " << endl << "product information: " << endl;
+            cerr << "make: " << make << ", model: " << model << endl;
+        }
+        create_view_cart_xml(xml);
+    } else if(name == "customer_view_cart"){
+        if(optionsMap["action"] == "remove"){
+            Customer* c = static_cast<Customer*>(user);
+            int index = atoi(optionsMap["value"].c_str());
+            c->removeProduct(index);
+        }
+        create_view_cart_xml(xml);
+    } else if(name == "place_order"){
+        //cout << "placing order" << endl;
+        //place order
+        int days = atoi(optionsMap["value"].c_str());
+        //g_print("%s",g_strconcat("shipping days: ",to_string(days).c_str(),"\n",NULL));
+        priority_queue->place(order,days);
+        Customer* c = static_cast<Customer*>(user);
+        order = new Order(c);
+        c->activeOrder(order);
+        //prepare purchase history page
+        create_purchase_history_xml(xml);
+    } else if(name == "purchase_history"){
+        //prepare purchase history page
+        create_purchase_history_xml(xml);
+    } else if(name == "view_order_details"){
+        string orderHex = optionsMap["value"]; //get the address hex value
+        stringstream hex_convert;
+        hex_convert << orderHex;
+        long order_address;
+        hex_convert >> hex >> order_address; //convert hex into long
+        Order* order = reinterpret_cast<Order*>(order_address);
+        stringstream orderSS(order->printDetailed());
+        string summary;
+        getline(orderSS,summary);
+        vector<string> v = string_split(summary);
+        string price = "Total Price: " + v[0];
+        string date = "Arrive By: " + v[1];
+        string status = "Order Status: " + v[2];
+        xml += "<hbox>\n";
+        xml += create_xml_tag("label",price);
+        xml += "<vr>\n";
+        xml += create_xml_tag("label",date);
+        xml += "<vr>\n";
+        xml += create_xml_tag("label",status);
+        xml += "</hbox>\n";
+        xml += "<hr>\n";
+        create_order_laptop_list_xml(orderSS,"width=\"100\"","width=\"50\"",xml,false);
+        if(not user->getIsEmployee()){
+            xml += create_xml_tag("button","options=\"link:customer_interface\"","Back");
+        } else{
+            xml += create_xml_tag("button","options=\"link:employee_interface\"","Back");
+        }
+    } else if(name == "preship"){
+        int index = atoi(optionsMap["value"].c_str());
+        string order_str = priority_queue->printSpecific(index);
+        //cout << "in preship func" << endl << order_str << endl;
+        stringstream orderSS(order_str);
+        string line;
+        getline(orderSS,line); //get the order summary line
+        std::vector<string> v = string_split(line);
+        xml += create_xml_tag("label","Price: " + v[0]);
+        xml += create_xml_tag("label","Arrive by: " + v[1]);
+        create_order_laptop_list_xml(orderSS,"width=\"100\"","width=\"50\"",xml);
+        xml += create_xml_tag("button","options=\"link:employee_shipping_confirmation,name:ship,value:" + to_string(index) + "\"","Confirm");
     } else if(name == "ship"){
-        //ship(index)
-    } else if (name == "employee_add_product") {
-    	gtk_entry_get_text(GTK_ENTRY(entries["email"]));
+        int index = atoi(optionsMap["value"].c_str());
+        priority_queue->ship(index);
+    } else if(name == "employee_customer_search"){
+        string fname = gtk_entry_get_text(GTK_ENTRY(entries["fname"]));
+        string lname = gtk_entry_get_text(GTK_ENTRY(entries["lname"]));
+        stringstream matches;
+        if (fname == "" and lname == "") {
+            //wa- hey man you can't just leave the fields blank
+            xml += create_xml_tag("label","Please enter a first and/or last name to search");
+            WindowManager::go_to_window("employee_search_customer_by_name");
+            return;
+        } else if(not (fname == "") and lname == ""){ //just the first name
+            customers->displayByFirstname(matches,fname);
+            xml += create_xml_tag("label","Matches for \"" + fname + "\":");
+        } else if(fname == "" and not (lname == "")){ //just last name
+            customers->displayByFirstname(matches,lname);
+            xml += create_xml_tag("label","Matches for \"" + lname + "\":");
+        } else { //we got both
+            customers->displayByFirstname(matches,fname);
+            customers->displayByFirstname(matches,lname);
+            xml += create_xml_tag("label","Matches for \"" + fname + " " + lname + "\":");
+        }
+        //cout << "matches:" << endl << matches.str() << endl;
+        create_customer_list_xml(xml,matches);
+    } else if(name == "employee_add_product") {
     	string make = gtk_entry_get_text(GTK_ENTRY(entries["make"]));
     	string model = gtk_entry_get_text(GTK_ENTRY(entries["model"]));
     	string screenSize = gtk_entry_get_text(GTK_ENTRY(entries["screenSize"]));
     	string cpuGen = gtk_entry_get_text(GTK_ENTRY(entries["cpuGen"]));
     	string year = gtk_entry_get_text(GTK_ENTRY(entries["year"]));
     	string price = gtk_entry_get_text(GTK_ENTRY(entries["price"]));
+        string_find_and_replace("$","",price); //remove the dollar sign if they added it.
+        bool isValid = true;
+        Product p_check(make,model,0,0,0,0);
+        if (products->search(p_check)){
+            isValid = false;
+            xml += create_xml_tag("label","style=\"error\"","There is already a product with that make and model in our databse");
+        }
+        if(!is_number(screenSize)){
+            isValid = false;
+            xml += create_xml_tag("label","style=\"error\"","Screen size must be a decimal number");
+        }
+        if(!is_number(cpuGen)){
+            isValid = false;
+            xml += create_xml_tag("label","style=\"error\"","CPU Gen must be a number");
+        }
+        if(!is_number(year)){
+            isValid = false;
+            xml += create_xml_tag("label","style=\"error\"","Year must be a number");
+        }
+        if(!is_number(price)){
+            isValid = false;
+            xml += create_xml_tag("label","style=\"error\"","Price must be a positive decimal number");
+        }
+        size_t pos = price.find(".");
+        if(pos != string::npos){//if there is a decimal place
+            if(price.substr(0,pos).length() > 10){//if there are more than 10 digits before decimal place
+                isValid = false;
+                xml += create_xml_tag("label","style=\"error\"","Price must not be larger than one billion");
+            }
+        } else {//if there is no decimal place
+            if(price.length() > 10){//if there are more than 10 digits 
+                isValid = false;
+                xml += create_xml_tag("label","style=\"error\"","Price must not be larger than one billion");
+            }
+        }
+        
+        if(!isValid){
+            WindowManager::go_to_window("employee_add_new_product",xml);
+            return;
+        }
     	Product p(make,model, atoi(screenSize.c_str()), atoi(cpuGen.c_str()), atoi(year.c_str()), atoi(price.c_str()));
     	products->insert(p);
+    	ProductS ps(make,model, atoi(screenSize.c_str()), atoi(cpuGen.c_str()), atoi(year.c_str()), atoi(price.c_str()));
+    	products_secondary->insert(ps);
     	xml += "<hr>\n";
     	xml += "<vbox homogeneous=\"true\">\n";
     	xml += create_xml_tag("label", "make: " + make);
@@ -3060,83 +3347,151 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
     	xml += create_xml_tag("label", "price: $" + price + ".00");
     	xml += "</vbox>\n";
     	xml += "<hr>\n";
+    } else if(name == "add_product_by_file") {
+        /*checkpoint*/
+        string file_name = gtk_entry_get_text(GTK_ENTRY(entries["file_name"]));
+        ifstream fis;
+        size_t pos = file_name.find(".");
+        if(file_name.substr(pos+1) != "txt"){//if it's not a text file
+            xml += create_xml_tag("label","style=\"error\"","Error: Only text files are supported");
+            WindowManager::go_to_window("employee_add_product_by_file",xml);
+            return;
+        }   
+        fis.open(file_name.c_str());
+        if(fis.fail()){//file not found or could not be open
+            xml += create_xml_tag("label","style=\"error\"","Sorry, that file could not be found");
+            WindowManager::go_to_window("employee_add_product_by_file",xml);
+            return;
+        }
+        //if it's all good to go
+        int pre_size = products->getSize();
+        products->loadPrimary(file_name);
+        products_secondary->loadSecondary(file_name);
+        int num_new = products->getSize() - pre_size;
+        xml += create_xml_tag("label","added " + to_string(num_new) + " products.");
     } else if(name == "employee_remove_product"){
     	vector<string> productsV = products->printListToString();
     	create_db_list_xml(productsV,xml,"employee_remove_product_confirm","remove_product","remove");
     } else if(name == "remove_product"){
     	string make_and_model = optionsMap["value"];
-    	msg = "value: " + make_and_model + "\n";
-    	g_print("%s",msg.c_str());
     	size_t pos = make_and_model.find('`');
     	string make = make_and_model.substr(0,pos);
     	string model = make_and_model.substr(pos+1);
     	string_find_and_replace("`"," ",model);
-    	g_print("%s",g_strconcat("make: ",make.c_str()," model: ", model.c_str(),"\n",NULL));
     	Product pSearch(make,model,0,0,0,0);
-    	g_print("product made\n");
-    	msg = "product:\n" + products->find(pSearch)->toString() + "\n";
-    	g_print("%s",msg.c_str());
     	xml += "<hr>\n";
     	xml += "<vbox homogeneous=\"true\">\n";
     	xml += create_xml_tag("label", "make: " + products->find(pSearch)->getMake());
     	xml += create_xml_tag("label", "model: " + products->find(pSearch)->getModel());
-    	xml += create_xml_tag("label", "screen size: " + to_string(products->find(pSearch)->getScreenSize()));
+        string screenSize = to_string(products->find(pSearch)->getScreenSize());
+        vector<string> v = string_split(screenSize,'.');
+        screenSize = v[0] + "." + v[1][0] + " in.";
+    	xml += create_xml_tag("label", "screen size: " + screenSize);
     	xml += create_xml_tag("label", "cpu Gen: " + to_string(products->find(pSearch)->getCpuGen()) + "th gen");
     	xml += create_xml_tag("label", "year: " + to_string(products->find(pSearch)->getYear()));
-    	xml += create_xml_tag("label", "price: $" + to_string(products->find(pSearch)->getPrice()) + ".00");
+    	xml += create_xml_tag("label", "price: $" + to_string((int)products->find(pSearch)->getPrice()) + ".00");
     	xml += "</vbox>\n";
     	xml += "<hr>\n";
-    	products->remove(pSearch);
+        string_find_and_replace(" ","`",model);
+        string value = make + "`" + model;
+        xml += create_xml_tag("entry","type=\"hidden\" value=\""+value+"\"","values");
+    } else if(name == "remove_product_confirm"){
+        string make_and_model = gtk_entry_get_text(GTK_ENTRY(entries["values"]));
+        size_t pos = make_and_model.find('`');
+        string make = make_and_model.substr(0,pos);
+        string model = make_and_model.substr(pos+1);
+        string_find_and_replace("`"," ",model);
+        Product p(make,model,0,0,0,0);
+        products->remove(p);
+        ProductS ps(make,model,0,0,0,0);
+        products_secondary->remove(ps);
     } else if(name == "employee_db_search"){
-        
         string value = optionsMap["value"];
-        
         if(value == "comp_name"){
-            xml += create_xml_tag("title","List Database of products by: Company name");
+            xml += create_xml_tag("title","List database of products by: Company name");
             xml += "<hr>\n";
             vector<string> productsV = products->printListToString();
             create_db_list_xml(productsV,xml);
-            
         } else if(value == "price"){
-            
-            
         } else if(value == "model"){
-            xml += create_xml_tag("title","List Database of products by: Company name");
+            xml += create_xml_tag("title","List database of products by: Model name");
             xml += "<hr>\n";
             vector<string> productsV = products_secondary->printListToString();
             create_db_list_xml(productsV,xml);
         }
-    }
-    
-    /*else if(name == "employee_view_orders") {
-       string orders = priority_queue.printSorted();
-       stringstream ordersSep(orders);
-       string order;
-       xml += "<hbox homogeneous\"true\">\n";
-       while(getline(ordersSep,order)){
-            //get each order in the queue
-            stringstream orderSep(order);
-            string item;
-            xml += "<scroll>"
-            while(getline(orderSep,item,',')){
-                xml += create_xml_tag("label",item);
-            }
+    } else if(name == "unsorted_customer_information"){
+        stringstream customersSS;
+        customers->displayCustomer(customersSS);
+        create_customer_list_xml(xml, customersSS);
+    } else if(name == "view_customer"){
+        string username = optionsMap["value"];
+        Customer* c = customers->customerSignIn(username);
+        if(c != NULL){
+            xml += create_xml_tag("title","View orders for " + c->getFirstname());
+            xml += "<hr>\n";
+            create_purchase_history_xml(xml, c);
+        } else {
+            xml += create_xml_tag("title","Customer not found!");
+            cerr << "Customer \"" << username << "\" not found!" << endl;
         }
-        xml += "</hbox>";
-    }*/
-    
-    /**
-     @TODO
-     - execute options based on if else to detect name and proceed accordingly
-     (so we will still need the huge if-elif stack)
-     [begun]
-     - destroy this window [done]
-     */
-    
-    WindowManager::go_to_window(optionsMap["link"],xml); //go to the new window
+    } else if(name == "employee_view_orders") {
+        string orders = priority_queue->printSorted();
+        //cout << "orders: " << endl << orders << endl;
+        stringstream ordersSep(orders);
+        string title;
+        string order_str;
+        getline(ordersSep,title);
+        //cout << title << endl;
+        string width = "width=\"100\"";
+        int index = 1;
+        xml += "<hbox>\n";
+        xml += create_xml_tag("label",width,"Number");
+        xml += create_xml_tag("label",width,"Price");
+        xml += create_xml_tag("label",width,"Arrive by:");
+        xml += create_xml_tag("label",width,"Status");
+        xml += create_xml_tag("label",width,""); //empty slot for ship button to go
+        xml += "</hbox>\n";
+        xml += "<placeholder>\n";
+        while(getline(ordersSep,order_str)){
+            xml += "<hbox homogeneous\"false\">\n";
+            //get each order in the queue
+            stringstream orderSep(order_str);
+            string item;
+            xml += create_xml_tag("label","width=\"50\"",to_string(index));
+            while(getline(orderSep,item,',')){// price,ship date, status
+                xml += "<vr>\n";
+                xml += create_xml_tag("label",width,item);
+            }
+            if(item == "Waiting to be shipped"){
+                xml += "<vr>\n";
+                xml += create_xml_tag("button","options=\"link:employee_confirm_ship_order,name:preship,value:"+to_string(index)+"\"","Ship Order");
+            }
+            xml += "</hbox>\n";
+            xml += "<hr>\n";
+            index++;
+        }
+        if(index > 8){
+            string_find_and_replace("<placeholder>\n","<scroll>\n<vbox>\n",xml);
+            xml += "</vbox>\n";
+            xml += "</scroll>\n";
+        } else {
+            string_find_and_replace("<placeholder>\n","",xml);
+        }
+    } else if(name == "send_feedback"){
+        ofstream of;
+        of.open("customer_feedback.txt",ios_base::app);
+        string comment = gtk_entry_get_text(GTK_ENTRY(entries["comment"]));
+        of << user->getFirstname() << " " << user->getLastname() << endl;
+        of << user->getUsername() << endl;
+        of << comment << endl << endl;
+        of.flush();
+        of.close();
+    }
+    if(optionsMap["link"] != "stay"){
+        WindowManager::go_to_window(optionsMap["link"],xml); //go to the new window
+    }
 }
 string Window::create_xml_tag(string tag, string text){
-    
     string xml;
     xml += "<" + tag + ">\n";
     xml += text + "\n";
@@ -3144,7 +3499,6 @@ string Window::create_xml_tag(string tag, string text){
     return xml;
 }
 string Window::create_xml_tag(string tag, string options, string text){
-    
     string xml;
     xml += "<" + tag + " " + options + ">\n";
     xml += text + "\n";
@@ -3152,71 +3506,62 @@ string Window::create_xml_tag(string tag, string options, string text){
     return xml;
 }
 gboolean Window::delete_event(GtkWidget *widget, GdkEvent *event, gpointer data) { //called when close window red button is pressed at app level
-     
     if(WindowManager::get_current_window_id() == "end_screen") {
         gtk_main_quit();
         return TRUE;
     } else {
-        
         WindowManager::go_to_window("end_screen","");
         //WindowManager::run_pbar();
         return FALSE;
     }
-    
 }
 void Window::destroy(GtkWidget* widget, gpointer data) { //called from regular buttons
-    
     gtk_widget_destroy(widget);
-    
 }
 void Window::increase_pbar() {
-    
     gdouble frac = gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(pbar));
     frac += 0.1;
     gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(pbar),frac);
-    
 }
 void Window::set_icon(string path) {
-    
     GdkPixbuf *pixbuf;
     GError *error = NULL;
     pixbuf = gdk_pixbuf_new_from_file(path.c_str(), &error);
-    
     if (!pixbuf) {
-        
         fprintf(stderr, "%s\n", error->message);
         g_error_free(error);
     }
-    
     icon = pixbuf;
-    
 }
-void Window::assign_pointers(Heap* heap, BST<Customer>* _customers, BST<Product>* _products, BST<ProductS>* _products_secondary) {
-    
-    //priority_queue = &heap;
-    //customers = _customers;
+void Window::assign_pointers(Heap* heap, HashTable<Customer>* _customers, HashTable<Employee>* _employees, BST<Product>* _products, BST<ProductS>* _products_secondary) {
+    priority_queue = heap;
+    customers = _customers;
+    employees = _employees;
 	products = _products;
 	products_secondary = _products_secondary;
-    g_print("pointers assigned\n");    
+    //g_print("pointers assigned\n");
 }
-void Window::create_db_list_xml(vector<string> productsV, string &xml, string link, string name, string text){
-	string size = "width=\"100\""; 
+void Window::create_db_list_xml(vector<string> productsV, string &xml, string link, string name, string text, bool glink){
+	string size = "width=\"100\"";
 	string index_options = "width=\"50\" justify=\"center\"";
 	xml += "<vbox>\n";
 	xml += "<hbox homogeneous=\"false\">\n";
-	xml += create_xml_tag("label",size,"number"); //index
-	xml += create_xml_tag("label",size,"company"); //manf comp
-	xml += create_xml_tag("label",size,"model"); //model
-	xml += create_xml_tag("label",size,"screen size"); //screen size
-	xml += create_xml_tag("label",size,"cpu gen"); //cpu gen
-	xml += create_xml_tag("label",size,"year"); //year
-	xml += create_xml_tag("label",size,"price"); //price
+	xml += create_xml_tag("label",size,"Number"); //index
+	xml += create_xml_tag("label",size,"Company"); //manf comp
+	xml += create_xml_tag("label",size,"Model"); //model
+	xml += create_xml_tag("label",size,"Screen Size"); //screen size
+	xml += create_xml_tag("label",size,"CPU Gen"); //cpu gen
+	xml += create_xml_tag("label",size,"Year"); //year
+	xml += create_xml_tag("label",size,"Price"); //price
 	xml += "</hbox>\n";
 	if(productsV.size() > 9){
-		xml += "<scroll columns=\"8\" " + size + ">\n";
+        if(glink){
+            xml += "<scroll columns=\"9\" " + size + ">\n";
+        } else {
+            xml += "<scroll columns=\"8\" " + size + ">\n";
+        }
 		xml += "<vbox>\n";
 	}
-	
 	string attribute;
 	string make;
 	for (int i = 0; i < productsV.size(); ++i) {
@@ -3227,56 +3572,51 @@ void Window::create_db_list_xml(vector<string> productsV, string &xml, string li
 	    xml += "<vr>\n";
 	    getline(product,make,',');
 	    xml += create_xml_tag("label",size,make); //manf comp
-	    
 	    xml += "<vr>\n";
 	    string model;
 	    getline(product,model,',');
 	    xml += create_xml_tag("label",size,model); //model
-	    
 	    xml += "<vr>\n";
 	    getline(product,attribute,',');
 	    xml += create_xml_tag("label",size,attribute+" in."); //screen size
-	    
 	    xml += "<vr>\n";
 	    getline(product,attribute,',');
 	    xml += create_xml_tag("label",size,attribute+"th gen"); //cpu gen
-	    
 	    xml += "<vr>\n";
 	    getline(product,attribute,',');
 	    xml += create_xml_tag("label",size,attribute); //year
-	    
 	    xml += "<vr>\n";
 	    getline(product,attribute,',');
 	    xml += create_xml_tag("label",size,"$"+attribute+".00"); //price
 	    string_find_and_replace(" ","`",model);
 		xml += "<vr>\n";
 	    xml += create_xml_tag("button","options=\"link:" + link + ",name:" + name + ",value:" + make + "`" + model + "\"",text);
-	    
+        if(glink){
+            xml += "<vr>\n";
+            xml += create_xml_tag("button","stay=\"true\" options=\"link:stay,name:open,value:" + make + "`" + model + "\"","Search on web");
+        }
 	    xml += "</hbox>\n";
 	    xml += "<hr>\n";
 	}
-	
 	if (productsV.size() > 9) {
 		xml += "</vbox>\n";
 		xml += "</scroll>\n";
 	}
-	
 	xml += "</vbox>\n";
 }
 void Window::create_db_list_xml(vector<string> productsV, string &xml){ //no buttons
-	string size = "width=\"100\""; 
+	string size = "width=\"100\"";
 	string index_options = "width=\"50\" justify=\"center\"";
 	xml += "<vbox>\n";
 	xml += "<hbox homogeneous=\"false\">\n";
-	xml += create_xml_tag("label",size,"number"); //index
-	xml += create_xml_tag("label",size,"company"); //manf comp
-	xml += create_xml_tag("label",size,"model"); //model
-	xml += create_xml_tag("label",size,"screen size"); //screen size
-	xml += create_xml_tag("label",size,"cpu gen"); //cpu gen
-	xml += create_xml_tag("label",size,"year"); //year
-	xml += create_xml_tag("label",size,"price"); //price
+	xml += create_xml_tag("label","width=\"70\"","Number"); //index
+	xml += create_xml_tag("label",size,"Company"); //manf comp
+	xml += create_xml_tag("label",size,"Model"); //model
+	xml += create_xml_tag("label",size,"Screen Size"); //screen size
+	xml += create_xml_tag("label",size,"CPU Gen"); //cpu gen
+	xml += create_xml_tag("label",size,"Year"); //year
+	xml += create_xml_tag("label",size,"Price"); //price
 	xml += "</hbox>\n";
-	           
 	xml += "<scroll columns=\"7\" " + size + ">\n";
 	xml += "<vbox>\n";
 	string attribute;
@@ -3288,34 +3628,208 @@ void Window::create_db_list_xml(vector<string> productsV, string &xml){ //no but
 	    xml += "<vr>\n";
 	    getline(product,attribute,',');
 	    xml += create_xml_tag("label",size,attribute); //manf comp
-	    
 	    xml += "<vr>\n";
 	    getline(product,attribute,',');
 	    xml += create_xml_tag("label",size,attribute); //model
-	    
 	    xml += "<vr>\n";
 	    getline(product,attribute,',');
 	    xml += create_xml_tag("label",size,attribute+" in."); //screen size
-	    
 	    xml += "<vr>\n";
 	    getline(product,attribute,',');
 	    xml += create_xml_tag("label",size,attribute+"th gen"); //cpu gen
-	    
 	    xml += "<vr>\n";
 	    getline(product,attribute,',');
 	    xml += create_xml_tag("label",size,attribute); //year
-	    
 	    xml += "<vr>\n";
 	    getline(product,attribute,',');
 	    xml += create_xml_tag("label",size,"$"+attribute+".00"); //price
-	    
 	    xml += "</hbox>\n";
 	    xml += "<hr>\n";
 	}
-	
 	xml += "</vbox>\n";
 	xml += "</scroll>\n";
 	xml += "</vbox>\n";
+}
+void Window::create_view_cart_xml(string& xml){
+    Customer* c = static_cast<Customer*>(user);
+    string active = c->printActive();
+    stringstream orderSS(active);
+    xml += create_xml_tag("title","Order Summary:");
+    xml += "<hr>\n";
+    string summary;
+    getline(orderSS,summary); //get the order summary line
+    //split it up
+    stringstream price_sep(summary);
+    string price;
+    getline(price_sep,price,' '); //skip "active"
+    getline(price_sep,price,' '); //skip "Order: "
+    getline(price_sep,price,','); //this should now contain the price
+    if(price == "0.00"){ //order is empty
+        xml += create_xml_tag("label","Your cart is currently empty");
+        return;
+    }
+    price = "$"+price;
+    xml += "<hbox>\n";
+    xml += create_xml_tag("label","Total Price:");
+    xml += create_xml_tag("label",price);
+    xml += "</hbox>\n";
+    xml += "<hr>\n";
+    string size = "width=\"80\"";
+    string number_size = "width=\"50\" justify=\"center\"";
+    create_order_laptop_list_xml(orderSS,size,number_size,xml);
+    xml += create_xml_tag("button","options=\"link:customer_checkout\"","Checkout");
+}
+void Window::create_order_laptop_list_xml(stringstream& orderSS,string size,string number_size,string& xml,bool isCart){
+    size_t start;
+    size_t end_pos;
+    string product;
+    xml += "<hbox>\n";
+    xml += create_xml_tag("label",size,"Number");
+    xml += create_xml_tag("label",size,"Comapny");
+    xml += create_xml_tag("label",size,"Model");
+    xml += create_xml_tag("label",number_size,"Qty.");
+    xml += "</hbox>\n";
+    xml += "<placeholder>\n";
+    int count = 0;
+    while(getline(orderSS,product)){ //loop through each product in the cart
+        if(product == "") break;
+        count++;
+        start = product.find("#");
+        end_pos = product.find(":"); // get the number
+        string number = product.substr(start+1,end_pos-1);
+        xml += "<hr>\n";
+        xml += "<hbox>\n";
+        xml += create_xml_tag("label",number_size,number);
+        xml += "<vr>\n";
+        start = product.find(" ");
+        stringstream product_info(product.substr(start+1));
+        string token;
+        getline(product_info,token,','); //company
+        xml += create_xml_tag("label",size,token);
+        xml += "<vr>\n";
+        getline(product_info,token,','); //model
+        xml += create_xml_tag("label",size,token);
+        xml += "<vr>\n";
+        getline(product_info,token,','); //Qty.
+        xml += create_xml_tag("label",number_size,token);
+        if(not user->getIsEmployee()){ //if the current user is a customer then show the remove option
+            if(isCart){
+                xml += "<vr>\n";
+                string options = "options=\"link:customer_view_cart,name:customer_view_cart,action:remove,value:" + to_string(count) + "\"";
+                //cout << "options:" << options << endl;
+                xml += create_xml_tag("button",options,"remove");
+            }
+        }
+        xml += "</hbox>\n";
+    }
+    if(count > 8){
+        string_find_and_replace("<placeholder>\n","<scroll width=\"420\">\n<vbox>\n",xml); //blaze
+        xml += "</vbox>\n";
+        xml += "</scroll>\n";
+    } else {
+        string_find_and_replace("<placeholder>\n","",xml);
+    }
+}
+void Window::create_purchase_history_xml(string& xml){
+    Customer* c = static_cast<Customer*>(user);
+    create_purchase_history_xml(xml, c);
+}
+void Window::create_purchase_history_xml(string& xml, Customer* c){
+    //g_print("%s",g_strconcat("placing order for: ",c->getFirstname().c_str(),"\n",NULL));
+    string orders = c->getOrder();
+    if(orders == ""){
+        xml += create_xml_tag("label","No orders have been placed yet");
+        return;
+    }
+    //g_print("%s",g_strconcat("orders: ",orders.c_str(),"\n",NULL));
+    stringstream orderSS(orders);
+    string order_str;
+    int index = 1;
+    string size = "width=\"100\"";
+    string number_size = "width=\"50\" justify=\"center\"";
+    xml += "<hbox>\n";
+    xml += create_xml_tag("label",number_size,""); // index
+    xml += create_xml_tag("label",size,"Price:");
+    xml += create_xml_tag("label",size,"Arrive By:");
+    xml += create_xml_tag("label",size,"Shipping Status:");
+    xml += "</hbox>\n";
+    while(getline(orderSS,order_str)){
+        size_t pos = order_str.find(" ");
+        string orderHex = order_str.substr(pos+1); //get the address hex value
+        stringstream hex_convert;
+        hex_convert << orderHex;
+        long order_address;
+        hex_convert >> hex >> order_address; //convert hex into long
+        Order* o = reinterpret_cast<Order*>(order_address); //reinterpret cast that sob and store it in a pointer
+        order_str = o->print(); //get the order information
+        vector<string> orderV = string_split(order_str);
+        orderV.at(0) = "$" + orderV.at(0);
+        xml += "<hr>\n";
+        xml += "<hbox>\n";
+        xml += create_xml_tag("label",number_size,to_string(index));
+        for(int i = 0; i < orderV.size(); i++){
+            xml += "<vr>\n";
+            xml += create_xml_tag("label",size,orderV[i]);
+        }
+        xml += "<vr>\n";
+        string options = "options=\"link:view_order_details,name:view_order_details,value:" + orderHex + "\"";
+        xml += create_xml_tag("button",options,"view details");
+        xml += "</hbox>\n";
+        index++;
+    }
+}
+void Window::create_customer_list_xml(string& xml, stringstream& customersSS){
+    string width = "width=\"100\"";
+    string zip_width = "width=\"40\"";
+    xml += "<hbox homogeneous=\"false\">\n";
+    xml += create_xml_tag("label",zip_width,"     ");
+    xml += create_xml_tag("label",width,"First Name");
+    xml += create_xml_tag("label",width,"Last Name");
+    xml += create_xml_tag("label",width,"Address");
+    xml += create_xml_tag("label",width,"City");
+    xml += create_xml_tag("label","width=\"130\"","Username");
+    xml += create_xml_tag("label",width,"Zip");
+    xml += "</hbox>\n";
+    xml += "<placeholder>\n";
+    string line;
+    int count = 0;
+    while(getline(customersSS,line,'\n')){
+        if(line[0] == '#') continue;
+        string field;
+        xml += "<hr>\n";
+        xml+= "<hbox>\n";
+        bool isFirst = true;
+        stringstream customer(line);
+        int index = 0;
+        string username;
+        while(getline(customer,field,',')){
+            xml += "<vr>\n";
+            if(is_number(field)){ // if it's a number
+                xml += create_xml_tag("label",zip_width,field);
+            } else {
+                
+                if(index == 4){
+                    username = field;
+                    xml += create_xml_tag("label","width=\"130\"",field);
+                } else {
+                    xml += create_xml_tag("label",width,field);
+                }
+            }
+            
+            index++;
+        }
+        xml += "<vr>\n";
+        xml += create_xml_tag("button","options=\"link:employee_search_customer_results,value:" + username + ",name:view_customer\"","view orders");
+        xml += "</hbox>\n";
+        count ++;
+    }
+    if(count > 8){
+        string_find_and_replace("<placeholder>\n","<scroll columns=\"7\" " + width + ">\n<vbox>\n",xml);
+        xml += "</vbox>\n";
+        xml += "</scroll>\n";
+    } else {
+        string_find_and_replace("<placeholder>\n","",xml);
+    }
 }
 void Window::string_find_and_replace(string find, string replace, string &subject){
 	string::size_type n = 0;
@@ -3328,7 +3842,7 @@ vector<string> Window::string_split(const string &input, char delim){
 	vector<string> v;
 	stringstream ss(input);
 	string token;
-	while(getline(ss,token,delim)){v.push_back(token);} 
+	while(getline(ss,token,delim)){v.push_back(token);}
 	return v;
 }
 string Window::to_lower(string str){ //Lifted from cplusplus.com http://www.cplusplus.com/reference/locale/tolower/
@@ -3352,12 +3866,30 @@ string Window::vector_join(const vector<string> &v, const char* const delim){ //
 			return ss.str();
 	}
 }
+bool Window::is_number(const string& s) {
+    int i;
+    bool decimal = false;
+    for(i = 0; i < s.length(); i++){
+        if(!isdigit(s[i])){
+            if(s[i] == '.' && !decimal){
+                decimal = true;
+            } else {
+                break;
+            }
+        }
+    }
+    return !s.empty() && i == s.length();
+}
+
 /*
  * WindowManager.cpp
  *
  *  Created on: Jun 2, 2018
  *      Author: Jasper
  */
+#ifdef _WIN32
+#include <algorithm>
+#endif // _WIN32
 #include <fstream>
 #include <sstream>
 #include <ctime>
@@ -3370,15 +3902,17 @@ map<string, string> WindowManager::windows;
 Window* WindowManager::current_window;
 string WindowManager::current_window_id;
 WindowManager::WindowManager() {
-	
 	current_window = NULL;
-	
 }
 WindowManager::~WindowManager() {
 	delete current_window;
 }
 void WindowManager::go_to_window(string id, string options){
+	if(id == "stay"){
+		id = current_window_id;
+	}
 	if(windows.find(id) == windows.end()){
+		cout << "unknown link: " + id << endl;
 		id = "404";
 	}
 	current_window_id = id; //set the current window id to the new id
@@ -3391,6 +3925,9 @@ void WindowManager::go_to_window(string id, string options){
 	Window w(xml);	//create the new window
 	current_window = &w; //update the current window pointer
 }
+void WindowManager::go_to_window(string id){
+	go_to_window(id,"");
+}
 void WindowManager::loadxml(string path){
 	ifstream xmlFile(path.c_str());
 	if (xmlFile.is_open()){
@@ -3399,7 +3936,7 @@ void WindowManager::loadxml(string path){
 			//this is the window line
 			stringstream ss(line);
 			string window_id;
-			getline(ss, window_id, '\"'); //skip the first part 
+			getline(ss, window_id, '\"'); //skip the first part
 			getline(ss, window_id, '\"'); //get the actual id
 			string tag = "";
 			getline(xmlFile, tag);
@@ -3428,7 +3965,6 @@ void WindowManager::run_pbar(){
 			g_print("increasing pbar\n");
 			current_window->increase_pbar();
 		}
-		
 	}
 }
 

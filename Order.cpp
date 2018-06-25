@@ -94,7 +94,8 @@ using namespace std;
 
 	void Order::removeLaptop(int index) {
 		assert(!placed);
-		assert(index < laptops.getLength());
+		assert(index <= laptops.getLength());
+		assert(index > 0);
 		laptops.moveToIndex(index);
 		price -= laptops.getIterator().price;
 		laptops.removeIterator();
@@ -130,6 +131,7 @@ using namespace std;
 		arriveBy += 86400 * daysToShip;
 		shippingSpeed = daysToShip;
 		placed = true;
+		customer->placeOrder();
 	}
 	//places the order; sets it as ready to ship; sets value of timePlaced and arriveBy.
 
@@ -199,10 +201,9 @@ using namespace std;
 
 	string Order::printDetailed() {	//Prints above information + also the list of all laptops.
 		stringstream out;
-		out << print();
-		out << "\n" << *customer;
+		out << print() << endl;
+		//out << "\n" << *customer;
 		laptops.displayNumberedList(out);
-		out << endl << endl;
 		return out.str();
 	}
 
@@ -251,5 +252,17 @@ using namespace std;
 		} else {
 			return NULL;
 		}
+	}
+
+	ostream& operator<<(ostream& out, const Order& order) {
+		out <<
+				"\nOrder's Info: " <<
+				"\nPrice: $" << order.getPrice()<<
+				"\nOrder Placed: " <<order.isPlaced()<<
+				"\nDate placed: " << order.getDayPlaced() <<
+				"\nArrive By: " << order.getArriveBy()<<
+				"\nShipping speed: "<<order.getShippingSpeed() << endl;
+		order.laptops.displayNumberedList(out);
+		return out;
 
 	}

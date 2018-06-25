@@ -78,8 +78,8 @@ h.displayCustomer(cout);
 //place order.
 r.placeOrder(30); //calling place order function.
 k.placeOrder(20);
-max2.insertOrder(); //	once the order has been place, add to history list.
-max1.insertOrder();
+//max2.insertOrder(); //	once the order has been place, add to history list.
+//max1.insertOrder();
 cout << "TESTING HASHTABLE 2:\n ";
 h.displayCustomer(cout);
 
@@ -94,7 +94,7 @@ cout << max2.printActive();
 max2.addToProduct(&x);
 cout << "New Active Order 123: \n" << max2.printActive();
 dummy.placeOrder(5);
-max2.insertOrder();
+//max2.insertOrder();
 
 cout << "HashTable 3 \n";
 h.displayCustomer(cout);
