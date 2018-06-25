@@ -96,6 +96,13 @@ ZenBook Flip S
 2017
 1000
 
+Booky
+McBookFace
+12
+12
+13
+12
+
 Fujitsu
 Stylistic Q736
 13.3
@@ -158,6 +165,13 @@ Lifebook Y936
 6
 2015
 1400
+
+Fujitsu
+Lifebook
+13.3
+6
+2015
+600
 
 HP
 Pavilion x2
@@ -237,6 +251,13 @@ ThinkPad X380 Yoga
 1360
 
 Lenovo
+ThinkPad X1
+14
+6
+2016
+750
+
+Lenovo
 Yoga 520
 14
 7
@@ -277,6 +298,13 @@ Surface Pro (2017)
 7
 2017
 800
+
+Poo
+PooBook
+12.5
+6
+2016
+700
 
 Vaio
 Z Canvas
