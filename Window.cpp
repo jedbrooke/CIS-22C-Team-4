@@ -909,7 +909,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
         int num_new = products->getSize() - pre_size;
 
-        xml += create_xml_tag("label","added " + num_new + " products.");
+        xml += create_xml_tag("label","added " + to_string(num_new) + " products.");
 
 
     } else if(name == "employee_remove_product"){
