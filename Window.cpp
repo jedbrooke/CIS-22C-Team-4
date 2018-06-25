@@ -446,7 +446,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         }
 
         if(!(*c_check == *c)){
-            xml += create_xml_tag("label","style=\"error\"","Incorrect password");
+            xml += create_xml_tag("label","style=\"error\"","usernames and/or passwords do not match");
             WindowManager::go_to_window("customer_sign_in_using_and_existing_account",xml);
             return;
         }
@@ -646,7 +646,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         }
 
     } else if(name == "add_to_cart"){
-
+        
         string make_and_model = optionsMap["value"];
 
         size_t pos = make_and_model.find('`');
@@ -665,10 +665,21 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
             cerr << "Error: Product Not found: " << endl << "product information: " << endl;
             cerr << "make: " << make << ", model: " << model << endl;
         }
-
+        
         create_view_cart_xml(xml);
 
     } else if(name == "customer_view_cart"){
+
+        if(optionsMap.find("action") != optionsMap.end()){
+            cout << "I've found the action!" << endl;
+        }
+        if(optionsMap["action"] == "remove"){
+            cout << "action encountered" << endl;
+            Customer* c = static_cast<Customer*>(user);
+            int index = atoi(optionsMap["value"].c_str());
+            c->removeProduct(index);
+
+        }
 
         create_view_cart_xml(xml);
 
@@ -756,7 +767,6 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
         cout << "matches:" << endl << matches.str() << endl;
 
-        /*** checkpoint ***/
         create_customer_list_xml(xml,matches);
 
     } else if(name == "employee_add_product") {
@@ -1226,8 +1236,6 @@ void Window::create_view_cart_xml(string& xml){
 
     string active = c->printActive();
 
-    cout << active << endl;
-
     stringstream orderSS(active);
 
     xml += create_xml_tag("title","Order Summary:");
@@ -1260,7 +1268,7 @@ void Window::create_view_cart_xml(string& xml){
     xml += "</hbox>\n";
     xml += "<hr>\n";
 
-    string size = "width=\"100\"";
+    string size = "width=\"80\"";
     string number_size = "width=\"50\" justify=\"center\"";
 
 
@@ -1288,7 +1296,7 @@ void Window::create_order_laptop_list_xml(stringstream& orderSS,string size,stri
 
     xml += "<placeholder>\n";
 
-    int count;
+    int count = 0;
 
     while(getline(orderSS,product)){ //loop through each product in the cart
 
@@ -1319,11 +1327,17 @@ void Window::create_order_laptop_list_xml(stringstream& orderSS,string size,stri
         xml += "<vr>\n";
         getline(product_info,token,','); //Qty.
         xml += create_xml_tag("label",number_size,token);
+
+        xml += "<vr>\n";
+        string options = "options=\"link:customer_view_cart,name:customer_view_cart,action:remove,value:" + to_string(count) + "\"";
+        cout << "options:" << options << endl;
+        xml += create_xml_tag("button",options,"remove");
+
         xml += "</hbox>\n";
     }
 
     if(count > 8){
-        string_find_and_replace("<placeholder>\n","<scroll width=\"200\">\n<vbox>\n",xml);
+        string_find_and_replace("<placeholder>\n","<scroll width=\"420\">\n<vbox>\n",xml); //blaze
         xml += "</vbox>\n";
         xml += "</scroll>\n";
     } else {
