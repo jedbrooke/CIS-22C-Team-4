@@ -612,6 +612,7 @@
 		Product Removed
 	</title>
 	<hr>
+	<variable>
 	<button options="link:employee_remove_product,name:employee_remove_product">
 		Remove another product
 	</button>

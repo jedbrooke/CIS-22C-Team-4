@@ -889,7 +889,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
         if(file_name.substr(pos+1) != "txt"){//if it's not a text file
             xml += create_xml_tag("label","style=\"error\"","Error: Only text files are supported");
-            WindowManager::go_to_window("employee_add_product_by_file");
+            WindowManager::go_to_window("employee_add_product_by_file",xml);
             return;
         }   
 
@@ -897,7 +897,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
         if(fis.fail()){//file not found or could not be open
             xml += create_xml_tag("label","style=\"error\"","Sorry, that file could not be found");
-            WindowManager::go_to_window("employee_add_product_by_file");
+            WindowManager::go_to_window("employee_add_product_by_file",xml);
             return;
         }
 
@@ -907,14 +907,7 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         products->loadPrimary(file_name);
         products_secondary->loadSecondary(file_name);
 
-        int new_entries = products->getSize() - pre_size;
-
-        xml += create_xml_tag("entry","type=\"hidden\" value=\"" + to_string(new_entries) + "\"","num_new")
-
-
-    } else if(name == "employee_add_product_by_file_confirm"){
-
-        string num_new = gtk_entry_get_text(GTK_ENTRY(entries["num_new"]));
+        int num_new = products->getSize() - pre_size;
 
         xml += create_xml_tag("label","added " + num_new + " products.");
 
