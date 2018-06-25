@@ -19,7 +19,6 @@
 
 using namespace std;
 
-
 int main(int argc, char *argv[]) {
 
 
@@ -51,6 +50,8 @@ int main(int argc, char *argv[]) {
 	FileLoader::saveProducts("Products_in.txt",bstp);
 	FileLoader::saveCustomers("Customers.txt", htc);
 	FileLoader::saveEmployees("Employees.txt", hte);
+
+	cout << endl;
 
 
 	return 0;

@@ -16,8 +16,11 @@
 #include <sstream>
 #include <stdio.h>
 
+#include "FileLoader.h"
 #include "Product.h"
 #include "ProductS.h"
+	
+class FileLoader; //forward declaration
 
 using namespace std;
 
@@ -35,6 +38,7 @@ private:
 			right = NULL;
 		}
 	};
+
 	Node* root;
 
 	void copyHelper(Node* copy);
@@ -48,7 +52,7 @@ private:
 	void printListHelper(Node* root, int& index) const;
 	void printByMakeHelper(Node* root, int& index, string make) const;
 	void printByModelHelper(Node* root, int& index, string model) const;
-	void saveHelper(ostream& out, Node*root) const;
+	void saveHelper(ostream& out, Node*root, int& index) const;
 
 	//to-String methods
 	void printListToStringHelper(Node* root, int& index, vector<string> &string) const;
@@ -396,21 +400,25 @@ void BST<bstdata>::loadSecondary(string fname) {
 
 template<class bstdata>
 void BST<bstdata>::save(string fname) const {
+	int index;
 	ofstream fout;
 	fout.open(fname.c_str(),ios_base::out);
-	saveHelper(fout, root);
+	saveHelper(fout, root, index);
 	fout.close();
 }
 
 template<class bstdata>
-void BST<bstdata>::saveHelper(ostream& out, Node*root) const {
+void BST<bstdata>::saveHelper(ostream& out, Node*root, int& index) const {
 	if (root == NULL)
 		return;
 	else {
 		root->data.print(out);
 		out << endl;
-		saveHelper(out, root->left);
-		saveHelper(out, root->right);
+		int percentage = 50*((double)index/getSize());
+		FileLoader::printProgBar(percentage,"Writing Products");
+		index++;
+		saveHelper(out, root->left, index);
+		saveHelper(out, root->right, index);
 	}
 }
 
