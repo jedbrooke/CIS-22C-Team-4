@@ -741,12 +741,14 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         create_order_laptop_list_xml(orderSS,"width=\"100\"","width=\"50\"",xml,false);
 
 
-        if(Customer* c = static_cast<Customer*>(user)){
+        if(not user->getIsEmployee()){
 
             xml += create_xml_tag("button","options=\"link:customer_interface\"","Back");
 
-        } else if(Employee* e = static_cast<Employee*>(user)){
+        } else{
+
             xml += create_xml_tag("button","options=\"link:employee_interface\"","Back");
+
         }
 
     } else if(name == "preship"){
@@ -1368,7 +1370,7 @@ void Window::create_order_laptop_list_xml(stringstream& orderSS,string size,stri
         getline(product_info,token,','); //Qty.
         xml += create_xml_tag("label",number_size,token);
 
-        if(Customer* c = static_cast<Customer*>(user)){ //if the current user is a customer then show the remove option
+        if(not user->getIsEmployee()){ //if the current user is a customer then show the remove option
             if(isCart){
                 xml += "<vr>\n";
                 string options = "options=\"link:customer_view_cart,name:customer_view_cart,action:remove,value:" + to_string(count) + "\"";
