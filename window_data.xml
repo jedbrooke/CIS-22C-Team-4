@@ -140,6 +140,9 @@
 	<button options="link:customer_interface,name:customer_create_new_account_2" default="true">
 		Submit
 	</button>
+	<button options="link:customer_login_screen">
+		Cancel
+	</button>
 </window>
 <window id="customer_interface">
 	<variable>
@@ -158,7 +161,7 @@
 			</button>
 			<hr>
 			<button options="link:customer_list_database_for_products">
-				List database for products
+				List database of products
 			</button>
 			<hr>
 			<button options="link:customer_view_cart,name:customer_view_cart">
@@ -266,6 +269,13 @@
 		Go back
 	</button>
 </window>
+<window id="view_order_details">
+	<title>
+		Order Details:
+	</title>
+	<hr>
+	<variable>
+</window>
 <window id="customer_checkout">
 	<title>
 		Checkout:
@@ -316,6 +326,9 @@
 	</entry>
 	<button options="link:customer_interface,name:send_feedback">
 		Send
+	</button>
+	<button options="link:customer_interface">
+		Back
 	</button>
 </window>
 <window id="employee_login_screen">

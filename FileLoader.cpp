@@ -26,18 +26,14 @@ BST<ProductS> FileLoader::loadProductsS(string path) {
 
 HashTable<Customer> FileLoader::loadCustomers(string path, Heap& heap, BST<Product>& catalog) {
 
-	cout << "loading customers from " << path << endl;
-
 	HashTable<Customer> customers;
 	ifstream fis(path.c_str());
 	string line;
 	if (fis.is_open()) {
 		while (getline(fis, line)) {
             string username = line;
-						cout << username << endl;
             string password;
             getline(fis, password);
-						cout << password << endl;
             string first_name;
             getline(fis, first_name); //advance to the next line
             string last_name;
@@ -54,7 +50,6 @@ HashTable<Customer> FileLoader::loadCustomers(string path, Heap& heap, BST<Produ
             zip = atoi(zip_string.c_str());
             string email;
             getline(fis,email);
-            cout << "email: " << email << endl;
             Customer* c = new Customer(username, password, first_name, last_name, isEmployee, address, city, zip, email);
             customers.insert(*c);
 
@@ -78,8 +73,6 @@ HashTable<Customer> FileLoader::loadCustomers(string path, Heap& heap, BST<Produ
 }
 
 HashTable<Employee> FileLoader::loadEmployees(string path) {
-
-	cout << "loading employees..." << endl;
 
 	HashTable<Employee> employees;
 	ifstream fis(path.c_str());

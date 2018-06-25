@@ -22,7 +22,7 @@ Acer
 Aspire Switch Alpha 12
 1
 end
-5	3750	1	0	1529883104	1530315104
+5	3750	1	1	1529883104	1530315104
 Acer
 Switch 5
 1
@@ -31,6 +31,24 @@ Switch 7 Black Edition
 1
 HP
 EliteBook x360 (1030 G2)
+1
+end
+5	800	1	0	1529891818	1530323818
+Acer
+Switch 5
+1
+end
+1	700	1	0	1529901853	1529988253
+Acer
+Aspire Switch Alpha 12
+1
+end
+5	2980	1	0	1529909928	1530341928
+Acer
+Aspire Switch Alpha 12
+1
+HP
+ZBook x2
 1
 end
 
