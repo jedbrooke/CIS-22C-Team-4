@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <cstdlib> 
+#include <thread>
 #include <chrono>
 
 #include "Product.h" //will not compile with .h
