@@ -10,6 +10,8 @@
 #include "FileLoader.h"
 using namespace std;
 
+
+
 BST<Product> FileLoader::loadProducts(string path) {
 	BST<Product> p;
 	p.loadPrimary(path);
@@ -111,10 +113,11 @@ void FileLoader::saveCustomers(string path, HashTable<Customer> c){
 
 	List<Customer*> l(c.getAll());
 
+	int size = l.getLength();
+
 	l.startIterator();
 
 	while(not l.offEnd()){
-
 			l.getIterator()->write(of);
 			l.moveIterNext();
 	}
@@ -127,6 +130,8 @@ void FileLoader::saveEmployees(string path, HashTable<Employee> e){
 
 	List<Employee*> l(e.getAll());
 
+	int size = l.getLength();
+
 	l.startIterator();
 
 	while(not l.offEnd()){
@@ -135,4 +140,22 @@ void FileLoader::saveEmployees(string path, HashTable<Employee> e){
 			l.moveIterNext();
 	}
 
+}
+
+void FileLoader::printProgBar(int percent, string message){
+  string bar;
+
+  for(int i = 0; i < 50; i++){
+    if( i < (percent/2)){
+      bar.replace(i,1,"=");
+    }else if( i == (percent/2)){
+      bar.replace(i,1,"_");
+    }else{
+      bar.replace(i,1," ");
+    }
+  }
+
+  cout<< "\r" "[" << bar << "] ";
+  cout.width( 3 );
+  cout<< percent << "% " << message << flush;
 }

@@ -583,12 +583,9 @@
 </window>
 <window id="end_screen">
 	<title>
-		Writing data to files...
+		Thank you for shopping!
 	</title>
 	<hr>
-	<pbar>
-		writing
-	</pbar>
 	<button options="link:welcome_screen">
 		Main Menu
 	</button>
