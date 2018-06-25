@@ -1,3 +1,21 @@
+john
+pass
+John
+Maxwell
+0
+12345 Example avenue
+Santa clara
+95051
+john
+1	1800	1	0	1529884963	1529971363
+Acer
+Aspire Switch 12 S
+1
+Acer
+Switch 5
+1
+end
+
 testboi@email.com
 pass
 Mohamed
@@ -31,6 +49,11 @@ end
 5	740	1	1	1529878931	1530310931
 Lenovo
 ThinkPad L380 Yoga
+1
+end
+5	900	1	0	1529889352	1530321352
+HP
+Elite x2 1012
 1
 end
 
