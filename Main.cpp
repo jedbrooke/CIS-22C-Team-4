@@ -35,6 +35,8 @@ int main(int argc, char *argv[]) {
 	HashTable<Customer> htc = FileLoader::loadCustomers("Customers.txt",heap,bstp);
 	HashTable<Employee> hte = FileLoader::loadEmployees("Employees.txt");
 
+	cout << "Great Success!" << endl;
+
 	Window::assign_pointers(&heap,&htc,&hte,&bstp,&bsts);
 	Window::set_icon("icon.png");
 	WindowManager::loadxml("window_data.xml");
