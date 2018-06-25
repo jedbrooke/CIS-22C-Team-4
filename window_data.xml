@@ -158,7 +158,7 @@
 			</button>
 			<hr>
 			<button options="link:customer_list_database_for_products">
-				List database for products
+				List database of products
 			</button>
 			<hr>
 			<button options="link:customer_view_cart,name:customer_view_cart">
