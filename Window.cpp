@@ -17,7 +17,8 @@
 #include <sstream>
 #include <locale>
 #include <iterator>
-#include <climits>
+#include <iostream>
+#include <fstream>
 #include <gtk/gtk.h>
 
 
@@ -896,6 +897,41 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
     	xml += "</vbox>\n";
     	xml += "<hr>\n";
 
+    } else if(name == "add_product_by_file") {
+
+        /*checkpoint*/
+
+        string file_name = gtk_entry_get_text(GTK_ENTRY(entries["file_name"]));
+
+        ifstream fis;
+
+        size_t pos = file_name.find(".");
+
+        if(file_name.substr(pos+1) != "txt"){//if it's not a text file
+            xml += create_xml_tag("label","style=\"error\"","Error: Only text files are supported");
+            WindowManager::go_to_window("employee_add_product_by_file",xml);
+            return;
+        }   
+
+        fis.open(file_name.c_str());
+
+        if(fis.fail()){//file not found or could not be open
+            xml += create_xml_tag("label","style=\"error\"","Sorry, that file could not be found");
+            WindowManager::go_to_window("employee_add_product_by_file",xml);
+            return;
+        }
+
+        //if it's all good to go
+        int pre_size = products->getSize();
+
+        products->loadPrimary(file_name);
+        products_secondary->loadSecondary(file_name);
+
+        int num_new = products->getSize() - pre_size;
+
+        xml += create_xml_tag("label","added " + to_string(num_new) + " products.");
+
+
     } else if(name == "employee_remove_product"){
 
     	vector<string> productsV = products->printListToString();
@@ -942,6 +978,9 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
         Product p(make,model,0,0,0,0);
         products->remove(p);
+
+        ProductS ps(make,model,0,0,0,0);
+        products_secondary->remove(ps);
 
     } else if(name == "employee_db_search"){
 
