@@ -373,7 +373,7 @@
 	<button options="link:employee_list_database_select">
 		List database of products
 	</button>
-	<button options="link:employee_add_new_product">
+	<button options="link:employee_add_new_product_choices">
 		Add a new product
 	</button>
 	<button options="link:employee_remove_product,name:employee_remove_product">
@@ -480,6 +480,18 @@
 		Go back
 	</button>
 </window>
+<window id="employee_add_new_product_choices">
+	<title>
+		Add a new product:
+	</title>
+	<hr>
+	<button options="link:employee_add_new_product">
+		Manually
+	</button>
+	<button options="link:employee_add_product_by_file">
+		From file
+	</button>
+</window>
 <window id="employee_add_new_product">
 	<title>
 		Add a new product
@@ -542,6 +554,32 @@
 	</button>
 	<button options="link:employee_interface">
 		Go back
+	</button>
+</window>
+<window id="employee_add_product_by_file">
+	<title>
+		Add products from file:
+	</title>
+	<hr>
+	<label>
+		Enter file name:
+	</label>
+	<variable>
+	<entry>
+		file_name
+	</entry>
+	<button options="link:employee_add_product_by_file_confirm,name:add_product_by_file">
+		Select
+	</button>
+</window>
+<window id="employee_add_product_by_file_confirm">
+	<title>
+		Add products from file:
+	</title>
+	<hr>
+	<variable>
+	<button options="link:employee_interface">
+		Back
 	</button>
 </window>
 <window id="employee_remove_product">
