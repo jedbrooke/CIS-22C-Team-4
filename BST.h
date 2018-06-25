@@ -16,8 +16,11 @@
 #include <sstream>
 #include <stdio.h>
 
+
 #include "Product.h"
 #include "ProductS.h"
+	
+
 
 using namespace std;
 
@@ -35,6 +38,7 @@ private:
 			right = NULL;
 		}
 	};
+
 	Node* root;
 
 	void copyHelper(Node* copy);
@@ -396,6 +400,7 @@ void BST<bstdata>::loadSecondary(string fname) {
 
 template<class bstdata>
 void BST<bstdata>::save(string fname) const {
+	int index;
 	ofstream fout;
 	fout.open(fname.c_str(),ios_base::out);
 	saveHelper(fout, root);
