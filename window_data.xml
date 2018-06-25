@@ -571,9 +571,6 @@
 	<button options="link:employee_add_product_by_file_confirm,name:add_product_by_file">
 		Select
 	</button>
-	<button options="link:employee_interface,name:back">
-		Back
-	</button>
 </window>
 <window id="employee_add_product_by_file_confirm">
 	<title>
