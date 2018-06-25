@@ -140,6 +140,9 @@
 	<button options="link:customer_interface,name:customer_create_new_account_2" default="true">
 		Submit
 	</button>
+	<button options="link:customer_login_screen">
+		Cancel
+	</button>
 </window>
 <window id="customer_interface">
 	<variable>
@@ -316,6 +319,9 @@
 	</entry>
 	<button options="link:customer_interface,name:send_feedback">
 		Send
+	</button>
+	<button options="link:customer_interface">
+		Back
 	</button>
 </window>
 <window id="employee_login_screen">

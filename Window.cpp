@@ -676,11 +676,8 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
     } else if(name == "customer_view_cart"){
 
-        if(optionsMap.find("action") != optionsMap.end()){
-            cout << "I've found the action!" << endl;
-        }
         if(optionsMap["action"] == "remove"){
-            cout << "action encountered" << endl;
+
             Customer* c = static_cast<Customer*>(user);
             int index = atoi(optionsMap["value"].c_str());
             c->removeProduct(index);
@@ -1334,10 +1331,14 @@ void Window::create_order_laptop_list_xml(stringstream& orderSS,string size,stri
         getline(product_info,token,','); //Qty.
         xml += create_xml_tag("label",number_size,token);
 
-        xml += "<vr>\n";
-        string options = "options=\"link:customer_view_cart,name:customer_view_cart,action:remove,value:" + to_string(count) + "\"";
-        cout << "options:" << options << endl;
-        xml += create_xml_tag("button",options,"remove");
+        if(Customer* c = static_cast<Customer*>(user)){ //if the current user is a customer then show the remove option
+            xml += "<vr>\n";
+            string options = "options=\"link:customer_view_cart,name:customer_view_cart,action:remove,value:" + to_string(count) + "\"";
+            cout << "options:" << options << endl;
+            xml += create_xml_tag("button",options,"remove");
+        }
+
+        
 
         xml += "</hbox>\n";
     }
