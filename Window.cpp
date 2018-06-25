@@ -735,7 +735,19 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
         getline(orderSS,summary);
 
-        xml += create_xml_tag("label",summary);
+        vector<string> v = string_split(summary);
+
+        string price = "Total Price: " + v[0];
+        string date = "Arrive By: " + v[1];
+        string status = "Order Status: " + v[2];
+
+        xml += "<hbox>\n";
+        xml += create_xml_tag("label",price);
+        xml += "<vr>\n";
+        xml += create_xml_tag("label",date);
+        xml += "<vr>\n";
+        xml += create_xml_tag("label",status);
+        xml += "</hbox>\n";
         xml += "<hr>\n";
 
         create_order_laptop_list_xml(orderSS,"width=\"100\"","width=\"50\"",xml,false);
@@ -968,13 +980,15 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
         cout << title << endl;
 
+        string width = "width=\"100\"";
+
         int index = 1;
         xml += "<hbox>\n";
-        xml += create_xml_tag("label","Number");
-        xml += create_xml_tag("label","Price");
-        xml += create_xml_tag("label","Arrive by:");
-        xml += create_xml_tag("label","Status");
-        xml += create_xml_tag("label",""); //empty slot for ship button to go
+        xml += create_xml_tag("label",width,"Number");
+        xml += create_xml_tag("label",width,"Price");
+        xml += create_xml_tag("label",width,"Arrive by:");
+        xml += create_xml_tag("label",width,"Status");
+        xml += create_xml_tag("label",width,""); //empty slot for ship button to go
         xml += "</hbox>\n";
 
         xml += "<placeholder>\n";
@@ -994,13 +1008,14 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
             while(getline(orderSep,item,',')){// price,ship date, status
 
                 xml += "<vr>\n";
-                xml += create_xml_tag("label",item);
+                xml += create_xml_tag("label",width,item);
             }
 
             if(item == "Waiting to be shipped"){
                 xml += "<vr>\n";
                 xml += create_xml_tag("button","options=\"link:employee_confirm_ship_order,name:preship,value:"+to_string(index)+"\"","Ship Order");
             }
+
             xml += "</hbox>\n";
             xml += "<hr>\n";
             index++;
