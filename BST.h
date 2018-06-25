@@ -16,11 +16,11 @@
 #include <sstream>
 #include <stdio.h>
 
-#include "FileLoader.h"
+
 #include "Product.h"
 #include "ProductS.h"
 	
-class FileLoader; //forward declaration
+
 
 using namespace std;
 
@@ -52,7 +52,7 @@ private:
 	void printListHelper(Node* root, int& index) const;
 	void printByMakeHelper(Node* root, int& index, string make) const;
 	void printByModelHelper(Node* root, int& index, string model) const;
-	void saveHelper(ostream& out, Node*root, int& index) const;
+	void saveHelper(ostream& out, Node*root) const;
 
 	//to-String methods
 	void printListToStringHelper(Node* root, int& index, vector<string> &string) const;
@@ -408,17 +408,14 @@ void BST<bstdata>::save(string fname) const {
 }
 
 template<class bstdata>
-void BST<bstdata>::saveHelper(ostream& out, Node*root, int& index) const {
+void BST<bstdata>::saveHelper(ostream& out, Node*root) const {
 	if (root == NULL)
 		return;
 	else {
 		root->data.print(out);
 		out << endl;
-		int percentage = 50*((double)index/getSize());
-		FileLoader::printProgBar(percentage,"Writing Products");
-		index++;
-		saveHelper(out, root->left, index);
-		saveHelper(out, root->right, index);
+		saveHelper(out, root->left);
+		saveHelper(out, root->right);
 	}
 }
 
