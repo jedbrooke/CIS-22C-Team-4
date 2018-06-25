@@ -314,13 +314,6 @@ Z flip
 1800
 
 hi
-hibook
-12
-1200
-120
--7.2738e+08
-
-hi
 hibook pro
 12
 12

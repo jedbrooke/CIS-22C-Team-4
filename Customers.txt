@@ -7,11 +7,6 @@ hi
 hi
 12345
 hi
-1	-7.2738e+08	1	0	1529909762	1529996162
-hi
-hibook
-1
-end
 
 testboi@email.com
 pass

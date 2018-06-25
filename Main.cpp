@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
 	HashTable<Customer> htc = FileLoader::loadCustomers("Customers.txt",heap,bstp);
 	HashTable<Employee> hte = FileLoader::loadEmployees("Employees.txt");
 
-	cout << "Great Success!" << endl;
+	
 
 	Window::assign_pointers(&heap,&htc,&hte,&bstp,&bsts);
 	Window::set_icon("icon.png");
@@ -46,6 +46,8 @@ int main(int argc, char *argv[]) {
 	WindowManager::go_to_window("welcome_screen");
 
 	//g_print("going to gtk_main\n");
+
+	cout << "Great Success!" << endl;
 
 	gtk_main();
 
