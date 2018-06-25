@@ -79,14 +79,12 @@ bool DEBUG = false;
     		int realLength = heap_size;
     		while (heap_size > 1) {
     			if (DEBUG) {
-    				cout << "\ninitially\n";
     				printRaw(cout);
     			}
     			Order * swap = heap -> at(1);
     			heap -> at(1) = heap -> at(heap_size);
     			heap -> at(heap_size) = swap;
     			if (DEBUG) {
-    				cout << "\nafter swapping\n";
     				printRaw(cout);
     			}
     			heap_size--;
