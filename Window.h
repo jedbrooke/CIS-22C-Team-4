@@ -84,8 +84,8 @@ public:
 
 	static void create_view_cart_xml(string& xml);
 
-	static void create_order_laptop_list_xml(stringstream& OrderSS,string size,string number_size,string& xml);
-
+	static void create_order_laptop_list_xml(stringstream& OrderSS,string size,string number_size,string& xml,bool isCart=true);
+														//if it's not the cart then it's view order, so no changes can be made
 	static void create_purchase_history_xml(string& xml);
 
 	static void create_purchase_history_xml(string& xml, Customer* c);
