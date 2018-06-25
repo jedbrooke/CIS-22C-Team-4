@@ -836,8 +836,13 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
 
         string_find_and_replace("$","",price); //remove the dollar sign if they added it.
 
-        bool isValid = true;
 
+        bool isValid = true;
+        Product p_check(make,model,0,0,0,0);
+        if (products->search(p_check)){
+            isValid = false;
+            xml += create_xml_tag("label","style=\"error\"","There is already a product with that make and model in our databse");
+        }
         if(!is_number(screenSize)){
             isValid = false;
             xml += create_xml_tag("label","style=\"error\"","Screen size must be a decimal number");
@@ -852,8 +857,23 @@ void Window::button_pressed(GtkWidget* widget, gpointer data) {
         }
         if(!is_number(price)){
             isValid = false;
-            xml += create_xml_tag("label","style=\"error\"","Price must be a decimal number");
+            xml += create_xml_tag("label","style=\"error\"","Price must be a positive decimal number");
         }
+
+        size_t pos = price.find(".");
+
+        if(pos != string::npos){//if there is a decimal place
+            if(price.substr(0,pos).length() > 10){//if there are more than 10 digits before decimal place
+                isValid = false;
+                xml += create_xml_tag("label","style=\"error\"","Price must not be larger than one billion");
+            }
+        } else {//if there is no decimal place
+            if(price.length() > 10){//if there are more than 10 digits 
+                isValid = false;
+                xml += create_xml_tag("label","style=\"error\"","Price must not be larger than one billion");
+            }
+        }
+        
 
         if(!isValid){
             WindowManager::go_to_window("employee_add_new_product",xml);
@@ -1530,7 +1550,7 @@ void Window::create_customer_list_xml(string& xml, stringstream& customersSS){
     xml += create_xml_tag("label",width,"Last Name");
     xml += create_xml_tag("label",width,"Address");
     xml += create_xml_tag("label",width,"City");
-    xml += create_xml_tag("label",width,"Email");
+    xml += create_xml_tag("label","width=\"130\"","Username");
     xml += create_xml_tag("label",width,"Zip");
     xml += "</hbox>\n";
 
@@ -1553,12 +1573,15 @@ void Window::create_customer_list_xml(string& xml, stringstream& customersSS){
             if(is_number(field)){ // if it's a number
                 xml += create_xml_tag("label",zip_width,field);
             } else {
-                xml += create_xml_tag("label",width,field);
+                
+                if(index == 4){
+                    username = field;
+                    xml += create_xml_tag("label","width=\"130\"",field);
+                } else {
+                    xml += create_xml_tag("label",width,field);
+                }
             }
-            if(index == 4){
-                username = field;
-                //cout << username << endl;
-            }
+            
 
             index++;
         }
